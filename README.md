@@ -1,4 +1,10 @@
 # Quizapp
+## ⚠️ Dev Environment Notice
+
+- This project supports both `pnpm` and `npm`.
+- **Do NOT commit `pnpm-lock.yaml` or `package-lock.json`** — these are intentionally ignored in `.gitignore`.
+- You can use either `pnpm install` or `npm install`, but don't push your lock file.
+
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.8.
 
