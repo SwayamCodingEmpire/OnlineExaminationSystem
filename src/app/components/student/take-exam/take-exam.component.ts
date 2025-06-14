@@ -7,7 +7,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 @Component({
   selector: 'app-take-exam',
   imports: [
-            CommonModule,
+    CommonModule,
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
