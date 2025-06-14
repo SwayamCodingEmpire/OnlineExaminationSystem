@@ -1,1 +1,57 @@
-/* You can add global styles to this file, and also import other style files */
+.cozentus-bg{
+  background-color: #2e3c54 !important;
+}
+
+
+.square-btn {
+  width: 40px;
+  height: 40px;
+}
+
+.table-header-light {
+  background-color: #f8fbff !important;
+}
+
+.na-bg{
+  background-color: #f8fbff !important;
+}
+
+th {
+  font-family: "Montserrat", sans-serif !important;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+body {
+  font-family: "Montserrat", sans-serif !important;
+}
+
+tr {
+  font-family: "Montserrat", sans-serif !important;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.bg-action{
+  background-color: transparent !important;
+  border: none !important;
+
+}
+
+.edit-mode {
+  height: 25px !important;
+  font-size: inherit !important;
+  border-radius: 0 !important;
+}
+
+.nav-dimension {
+width: 2rem;
+height: 2rem;
+}
+
+.ellipsis {
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+}
+

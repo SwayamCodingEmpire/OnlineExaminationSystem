@@ -1,0 +1,36 @@
+.avatar-circle {
+  width: 2.25rem;
+  height: 2.25rem;
+  background-color: #ff33cc;
+  display: inline-block;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 2.25rem;
+  color: white;
+  font-weight: bold;
+  vertical-align: middle; /* important! */
+}
+
+.custom-dropdown {
+  background-color: #2e3c54;
+  border-radius: 5px;
+  min-width: 220px;
+  right: 0; /* needed if absolutely positioned in context */
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+}
+
+.custom-dropdown-item {
+  transition: background 0.2s ease-in-out;
+}
+
+.dropdown-item:hover {
+  background-color: #3e5172 !important; /* A different color like blue or grey */
+  color: white !important; /* Change text color to white on hover */
+  text-decoration: none !important; /* Remove underline */
+}
+
+.nav-link.active {
+  background-color: #3e5172 !important;
+}
+
