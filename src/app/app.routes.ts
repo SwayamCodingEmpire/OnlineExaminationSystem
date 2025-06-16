@@ -10,6 +10,7 @@ import { StudentDashboardComponent } from './components/student/dashboard/dashbo
 import { ResultsComponent } from './components/student/results/results.component';
 import { TakeExamComponent } from './components/student/take-exam/take-exam.component';
 import { LoginComponent } from './components/shared/login/login.component';
+import { ExamsComponent } from './components/student/exams/exams.component';
 
 export const routes: Routes = [
   {
@@ -26,18 +27,15 @@ export const routes: Routes = [
       { path: 'questions/:code', component: QuestionsComponent }
     ]
   },
-
-  { path: '',  component: LoginComponent },
   {
     path: 'student',
     component: StudentLayoutComponent,
     children: [
-      // ✅ Default student route
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-
       { path: 'dashboard', component: StudentDashboardComponent },
-      { path: 'results', component: ResultsComponent },
-      { path: 'exams', component: ExamComponent }
+      { path: 'results/:id', component: ResultsComponent },       // ✅ View specific result
+      { path: 'exams', component: ExamsComponent },
+      { path: 'take-exam/:id', component: TakeExamComponent }      // ✅ New route for taking exam
     ]
   },
 ];
