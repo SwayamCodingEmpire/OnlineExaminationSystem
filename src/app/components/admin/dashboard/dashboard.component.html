@@ -1,5 +1,5 @@
-  <div class="container-fluid">
-    <div class="row pt-5">
+<div class="container-fluid">
+  <div class="row pt-5">
     <div class="col-3 mb-4">
       <div class="card shadow-sm w-100">
 
@@ -45,7 +45,7 @@
 
           <!-- Header Content -->
           <div class="text-end">
-            <small class="text-muted">Total Enrolled Topics</small>
+            <small class="text-muted">Total Ongoing Exams</small>
             <h5 class=" mb-0 text-secondary">237</h5>
           </div>
         </div>
@@ -67,16 +67,15 @@
         <div class="card-header ms-3 me-3 bg-white">
 
           <!-- Overlapping Icon Box -->
-          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1  start-0 translate-middle-y"
-           >
+          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1  start-0 translate-middle-y">
             <div class="bg-danger bg-gradient rounded-1 icon-div">
               <i class="fa-regular fa-circle-info fs-3 text-center my-1 px-4 py-4 text-white"></i>
             </div>
           </div>
 
           <!-- Header Content -->
-          <div class="text-end pe-0 pt-3">
-            <small class="text-muted">Fixed Issues</small>
+          <div class="text-end pe-0 pb-3">
+            <small class="text-muted">Total Exams Conducted</small>
             <h5 class="mb-0 text-secondary">75</h5>
           </div>
         </div>
@@ -84,7 +83,7 @@
         <!-- Card Body -->
         <div class="card-body pt-2">
           <p class="text-secondary small mb-0">
-            <i class="fa-solid fa-tag pe-2"></i>Tracked from Github
+            <i class="fa-solid fa-tag pe-2"></i>Last 2 years
           </p>
         </div>
 
@@ -106,7 +105,7 @@
 
           <!-- Header Content -->
           <div class="text-end">
-            <small class="text-muted me-0 pe-0">Total Revenue</small>
+            <small class="text-muted me-0 pe-0">Upcoming Exams</small>
             <h5 class=" mb-0 text-secondary">+245</h5>
           </div>
         </div>
@@ -114,7 +113,7 @@
         <!-- Card Body -->
         <div class="card-body pt-2">
           <p class="text-secondary small mb-0">
-            <i class="fa-regular fa-clock-rotate-left fa-flip-horizontal me-2"></i> Just Updated
+            <i class="fa-regular fa-clock-rotate-left fa-flip-horizontal me-2"></i>
           </p>
         </div>
 
@@ -122,4 +121,60 @@
     </div>
   </div>
 
+  <div class="row mt-2">
+    <div class="col-6">
+
+      <div class="card">
+        <div class="card-body">
+          <div id="chart">
+            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [labels]="chartOptions.labels"
+              [responsive]="chartOptions.responsive"></apx-chart>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Exam Leaderboard</h5>
+          <select class="form-select w-auto" [(ngModel)]="selectedExamCode" (change)="filterLeaderboard()">
+            <option *ngFor="let code of examCodes" [value]="code">{{ code }}</option>
+          </select>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Student Name</th>
+                  <th scope="col">Score</th>
+                  <th scope="col">Time Taken</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let student of filteredLeaderboard; index as i">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ student.name }}</td>
+                  <td>{{ student.score }}</td>
+                  <td>{{ student.time }}</td>
+                </tr>
+                <tr *ngIf="filteredLeaderboard.length === 0">
+                  <td colspan="4" class="text-center">No data available for this exam</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
   </div>
+
+
+</div>
