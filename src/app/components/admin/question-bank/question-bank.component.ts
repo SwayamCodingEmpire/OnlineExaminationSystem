@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
@@ -44,6 +44,7 @@ export class QuestionBankComponent {
   currentQuestionType: string = 'MCQ';
   selectedQuestion: any = null;
   questionDetailsModal: any;
+  fb: FormBuilder = new FormBuilder();
 
   constructor(private questionService: StudentService) {
     this.searchForm = new FormGroup({
@@ -187,19 +188,19 @@ export class QuestionBankComponent {
       // Add question to the list
       this.questions.unshift(questionData);
       this.originalQuestions = [...this.questions];
-      
+
       // Reset forms
       this.mcqForm.reset();
       this.subjectiveForm.reset();
-      
+
       // Close modal
       if (this.addQuestionModal) {
         this.addQuestionModal.hide();
       }
-      
+
       // Recalculate pagination
       this.calculateTotalPages();
-      
+
       console.log('Question created:', questionData);
     } else {
       console.log('Form is invalid');
@@ -219,13 +220,13 @@ export class QuestionBankComponent {
     if (this.selectedTopicFilter === '') {
       this.questions = [...this.originalQuestions];
     } else {
-      this.questions = this.originalQuestions.filter(question => 
+      this.questions = this.originalQuestions.filter(question =>
         question.topic === this.selectedTopicFilter
       );
     }
     this.currentPage = 1;
     this.calculateTotalPages();
-    
+
     // Also apply search filter if exists
     const searchTerm = this.searchForm.get('searchTerm')?.value;
     if (searchTerm && searchTerm.trim() !== '') {
@@ -267,7 +268,7 @@ export class QuestionBankComponent {
   editQuestion(index: number) {
     this.editingIndex = index;
     const question = this.questions[index];
-    
+
     this.questionForm.patchValue({
       code: question.code,
       name: question.questionText,
@@ -307,18 +308,18 @@ export class QuestionBankComponent {
   deleteQuestion(index: number) {
     this.questionIndexToDelete = index;
     const question = this.questions[index];
-    
+
     // Update the modal content
     const questionCodeElement = document.getElementById('questionCodeToDelete');
     if (questionCodeElement) {
       questionCodeElement.textContent = question.code;
     }
-    
+
     // Show the modal
     if (this.deleteModal) {
       this.deleteModal.show();
     }
-    
+
     // Set up the confirm delete button click handler
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     if (confirmDeleteBtn) {
@@ -331,7 +332,7 @@ export class QuestionBankComponent {
       // Remove question from array
       this.questions.splice(this.questionIndexToDelete, 1);
       this.originalQuestions = [...this.questions];
-      
+
       this.deleteModal?.hide();
       this.questionIndexToDelete = null;
       this.calculateTotalPages();
@@ -357,11 +358,11 @@ export class QuestionBankComponent {
   sortTable(column: string, ascending: boolean) {
     this.sortedColumn = column;
     this.isAscending = ascending;
-    
+
     this.questions.sort((a: any, b: any) => {
       let valA: string;
       let valB: string;
-      
+
       // Handle different column mappings
       if (column === 'name') {
         valA = a.questionText?.toString().toLowerCase() || '';
@@ -373,7 +374,7 @@ export class QuestionBankComponent {
         valA = a[column]?.toString().toLowerCase() || '';
         valB = b[column]?.toString().toLowerCase() || '';
       }
-      
+
       return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
   }
@@ -381,53 +382,53 @@ export class QuestionBankComponent {
   loadQuestions() {
     // Updated mock data with new structure including marks
     this.questions = [
-      { 
-        id: 1, 
-        code: 'Q001', 
-        questionText: 'What is the main concept of Object-Oriented Programming in Java?', 
-        topic: 'Java', 
+      {
+        id: 1,
+        code: 'Q001',
+        questionText: 'What is the main concept of Object-Oriented Programming in Java?',
+        topic: 'Java',
         type: 'MCQ',
         difficulty: 'Easy',
         marks: 2,
         options: { A: 'Inheritance', B: 'Encapsulation', C: 'Polymorphism', D: 'All of the above' },
         correctAnswer: 'D'
       },
-      { 
-        id: 2, 
-        code: 'Q002', 
-        questionText: 'Explain the concept of Dependency Injection in Spring Framework', 
-        topic: 'Spring', 
+      {
+        id: 2,
+        code: 'Q002',
+        questionText: 'Explain the concept of Dependency Injection in Spring Framework',
+        topic: 'Spring',
         type: 'Subjective',
         difficulty: 'Medium',
         marks: 5,
         wordLimit: 200
       },
-      { 
-        id: 3, 
-        code: 'Q003', 
-        questionText: 'What are Angular Components and how do they work?', 
-        topic: 'Angular', 
+      {
+        id: 3,
+        code: 'Q003',
+        questionText: 'What are Angular Components and how do they work?',
+        topic: 'Angular',
         type: 'MCQ',
         difficulty: 'Hard',
         marks: 3,
         options: { A: 'UI Building Blocks', B: 'Services', C: 'Modules', D: 'Directives' },
         correctAnswer: 'A'
       },
-      { 
-        id: 4, 
-        code: 'Q004', 
-        questionText: 'Design a database schema for an e-commerce application', 
-        topic: 'Database', 
+      {
+        id: 4,
+        code: 'Q004',
+        questionText: 'Design a database schema for an e-commerce application',
+        topic: 'Database',
         type: 'Subjective',
         difficulty: 'Medium',
         marks: 8,
         wordLimit: 300
       },
-      { 
-        id: 5, 
-        code: 'Q005', 
-        questionText: 'What is the time complexity of Quick Sort algorithm?', 
-        topic: 'Data Structures', 
+      {
+        id: 5,
+        code: 'Q005',
+        questionText: 'What is the time complexity of Quick Sort algorithm?',
+        topic: 'Data Structures',
         type: 'MCQ',
         difficulty: 'Hard',
         marks: 4,
@@ -441,16 +442,16 @@ export class QuestionBankComponent {
 
   filterQuestions() {
     const searchTerm = this.searchForm.get('searchTerm')?.value?.toLowerCase() || '';
-    
+
     let filteredQuestions = [...this.originalQuestions];
-    
+
     // Apply topic filter first
     if (this.selectedTopicFilter) {
-      filteredQuestions = filteredQuestions.filter(question => 
+      filteredQuestions = filteredQuestions.filter(question =>
         question.topic === this.selectedTopicFilter
       );
     }
-    
+
     // Then apply search filter
     if (searchTerm.trim() !== '') {
       filteredQuestions = filteredQuestions.filter(question =>
@@ -461,7 +462,7 @@ export class QuestionBankComponent {
         question.difficulty.toLowerCase().includes(searchTerm)
       );
     }
-    
+
     this.questions = filteredQuestions;
     this.currentPage = 1;
     this.calculateTotalPages();
@@ -505,4 +506,27 @@ export class QuestionBankComponent {
       this.currentPage = this.totalPages || 1;
     }
   }
+
+  questionForm1 = this.fb.group({
+  code: [''],
+  topic: [''],
+  difficulty: [''],
+  type: ['MCQ'],
+  marks: [1],
+  questionText: [''],
+  optionA: [''],
+  optionB: [''],
+  optionC: [''],
+  optionD: [''],
+  correctAnswer: [''],
+  wordLimit: [null]
+});
+
+onSubmit() {
+  if (this.questionForm.valid) {
+    console.log('Form Submitted', this.questionForm.value);
+    // Call your API or emit event here
+  }
+}
+
 }

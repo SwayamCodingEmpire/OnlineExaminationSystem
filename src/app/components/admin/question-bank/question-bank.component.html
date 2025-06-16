@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="row mx-2">
     <div class="col-6 mt-3">
-      <label>Questions</label>
+      <label>Question Bank</label>
     </div>
     <div class="col-6 text-end mt-2">
       <button class="btn bg-white square-btn">
@@ -34,8 +34,8 @@
           <div class="col-6 justify-content-end d-flex">
             <div class="row">
               <div class="col-6">
-                <button class="btn px-5 py-2 w-100 border border-secondary mx-2" [disabled]="false" 
-                        data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                <button class="btn px-5 py-2 w-100 border border-secondary mx-2" [disabled]="false"
+                  data-bs-toggle="modal" data-bs-target="#addQuestionModal">
                   Add Question
                 </button>
               </div>
@@ -118,7 +118,7 @@
                     <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
                       <span class="mx-2">|</span>
                       <button class="bg-action text-primary text-decoration-underline border-0 bg-transparent p-0"
-                              (click)="showQuestionDetails(question)">Details
+                        (click)="showQuestionDetails(question)">Details
                       </button>
                     </ng-container>
 
@@ -140,8 +140,8 @@
                     <a *ngIf="editingIndex !== i + pageSize * (currentPage - 1)" data-bs-toggle="tooltip"
                       data-bs-placement="bottom" [attr.title]="'Click to view question details'"
                       class="text-primary text-decoration-underline"
-                      [routerLink]="['/admin/question-details', question.code, question.name]" (click)="hideTooltip($event)"
-                      role="button">
+                      [routerLink]="['/admin/question-details', question.code, question.name]"
+                      (click)="hideTooltip($event)" role="button">
                       {{ question.code }}
                     </a>
 
@@ -154,7 +154,8 @@
                   <!-- Question Name -->
                   <td class="w-25" [ngStyle]="{
                   background: i % 2 === 0 ? '#f8fbff' : 'transparent'}">
-                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ question.questionText | slice:0:50 }}{{ question.questionText.length > 50 ? '...' : '' }}</span>
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ question.questionText |
+                      slice:0:50 }}{{ question.questionText.length > 50 ? '...' : '' }}</span>
                     <form [formGroup]="questionForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
                       <input type="text" formControlName="name" class="form-control edit-mode"
                         placeholder="Enter Question" />
@@ -184,8 +185,8 @@
                   <td class="" [ngStyle]="{
                   background: i % 2 === 0 ? '#f8fbff' : 'transparent'
                 }" style="max-width: 100px">
-                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)" 
-                          [class]="question.type === 'MCQ' ? 'badge bg-primary' : 'badge bg-success'">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
+                      [class]="question.type === 'MCQ' ? 'badge bg-primary' : 'badge bg-success'">
                       {{ question.type }}
                     </span>
                     <form [formGroup]="questionForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
@@ -271,174 +272,99 @@
 <!-- Add Question Modal -->
 <div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addQuestionModalLabel">Add New Question</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Tab Navigation -->
-        <ul class="nav nav-tabs" id="questionTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="mcq-tab" data-bs-toggle="tab" data-bs-target="#mcq" 
-                    type="button" role="tab" aria-controls="mcq" aria-selected="true" (click)="setQuestionType('MCQ')">
-              MCQ Question
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="subjective-tab" data-bs-toggle="tab" data-bs-target="#subjective" 
-                    type="button" role="tab" aria-controls="subjective" aria-selected="false" (click)="setQuestionType('Subjective')">
-              Subjective Question
-            </button>
-          </li>
-        </ul>
+    <form [formGroup]="questionForm" (ngSubmit)="onSubmit()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addQuestionModalLabel">Add New Question</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
 
-        <!-- Tab Content -->
-        <div class="tab-content mt-3" id="questionTabContent">
-          <!-- MCQ Tab -->
-          <div class="tab-pane fade show active" id="mcq" role="tabpanel" aria-labelledby="mcq-tab">
-            <form [formGroup]="mcqForm">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Question Code</label>
-                  <input type="text" class="form-control" formControlName="code" placeholder="Enter question code">
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Topic</label>
-                  <select class="form-select" formControlName="topic">
-                    <option value="">Select Topic</option>
-                    <option value="Java">Java</option>
-                    <option value="Spring">Spring</option>
-                    <option value="Angular">Angular</option>
-                    <option value="Database">Database</option>
-                    <option value="Data Structures">Data Structures</option>
-                    <option value="Algorithms">Algorithms</option>
-                    <option value="System Design">System Design</option>
+        <div class="modal-body">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <div>
+                <input class="form-control mb-1" placeholder="Question Code" formControlName="code" />
+                <div class="d-flex gap-2">
+                    <select class="form-select" formControlName="topic">
+                    <option value="Topic" disabled selected>Topic</option>
+                    <option>Angular</option>
+                    <option>Spring boot</option>
+                    <option>Java</option>
+                  </select>
+                  <select class="form-select" formControlName="difficulty">
+                    <option value="" disabled selected>Difficulty</option>
+                    <option>Easy</option>
+                    <option>Medium</option>
+                    <option>Hard</option>
                   </select>
                 </div>
               </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Question</label>
-                <textarea class="form-control" rows="3" formControlName="questionText" 
-                         placeholder="Enter your question here"></textarea>
+              <div>
+                <select class="form-select mb-2" formControlName="type">
+                  <option value="MCQ">MCQ</option>
+                  <option value="Subjective">Subjective</option>
+                </select>
+                <input type="number" class="form-control" placeholder="Marks" formControlName="marks" />
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="mb-4">
+                <label class="fw-bold">Question:</label>
+                <textarea class="form-control" formControlName="questionText" rows="3"></textarea>
               </div>
 
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Option A</label>
-                  <input type="text" class="form-control" formControlName="optionA" placeholder="Enter option A">
+              <!-- MCQ Options -->
+              <div *ngIf="questionForm.value.type === 'MCQ'" class="mb-4">
+                <label class="fw-bold">Options:</label>
+                <div class="row">
+                  <div class="col-md-6 mb-2">
+                    <input type="text" class="form-control" placeholder="Option A" formControlName="optionA" />
+                  </div>
+                  <div class="col-md-6 mb-2">
+                    <input type="text" class="form-control" placeholder="Option B" formControlName="optionB" />
+                  </div>
+                  <div class="col-md-6 mb-2">
+                    <input type="text" class="form-control" placeholder="Option C" formControlName="optionC" />
+                  </div>
+                  <div class="col-md-6 mb-2">
+                    <input type="text" class="form-control" placeholder="Option D" formControlName="optionD" />
+                  </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Option B</label>
-                  <input type="text" class="form-control" formControlName="optionB" placeholder="Enter option B">
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Option C</label>
-                  <input type="text" class="form-control" formControlName="optionC" placeholder="Enter option C">
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Option D</label>
-                  <input type="text" class="form-control" formControlName="optionD" placeholder="Enter option D">
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Correct Answer</label>
+                <div class="mt-3">
+                  <label class="fw-bold">Correct Answer:</label>
                   <select class="form-select" formControlName="correctAnswer">
-                    <option value="">Select correct answer</option>
+                    <option value="" disabled selected>Select Correct Option</option>
                     <option value="A">Option A</option>
                     <option value="B">Option B</option>
                     <option value="C">Option C</option>
                     <option value="D">Option D</option>
                   </select>
                 </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Difficulty</label>
-                  <select class="form-select" formControlName="difficulty">
-                    <option value="">Select difficulty</option>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Marks</label>
-                  <input type="number" class="form-control" formControlName="marks" 
-                         placeholder="Enter marks" min="1">
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <!-- Subjective Tab -->
-          <div class="tab-pane fade" id="subjective" role="tabpanel" aria-labelledby="subjective-tab">
-            <form [formGroup]="subjectiveForm">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Question Code</label>
-                  <input type="text" class="form-control" formControlName="code" placeholder="Enter question code">
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Topic</label>
-                  <select class="form-select" formControlName="topic">
-                    <option value="">Select Topic</option>
-                    <option value="Java">Java</option>
-                    <option value="Spring">Spring</option>
-                    <option value="Angular">Angular</option>
-                    <option value="Database">Database</option>
-                    <option value="Data Structures">Data Structures</option>
-                    <option value="Algorithms">Algorithms</option>
-                    <option value="System Design">System Design</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Question</label>
-                <textarea class="form-control" rows="4" formControlName="questionText" 
-                         placeholder="Enter your question here"></textarea>
               </div>
 
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Word Limit</label>
-                  <input type="number" class="form-control" formControlName="wordLimit" 
-                         placeholder="Enter word limit" min="1">
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Difficulty</label>
-                  <select class="form-select" formControlName="difficulty">
-                    <option value="">Select difficulty</option>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label class="form-label">Marks</label>
-                  <input type="number" class="form-control" formControlName="marks" 
-                         placeholder="Enter marks" min="1">
-                </div>
+              <!-- Subjective Word Limit -->
+              <div *ngIf="questionForm.value.type === 'Subjective'" class="mb-3">
+                <label class="fw-bold">Word Limit:</label>
+                <input type="number" class="form-control" placeholder="e.g. 250" formControlName="wordLimit" />
               </div>
-            </form>
+            </div>
           </div>
         </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" [disabled]="questionForm.invalid">Add Question</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="createQuestion()">Create Question</button>
-      </div>
-    </div>
+    </form>
   </div>
 </div>
 
+
 <!-- Question Details Modal -->
-<div class="modal fade" id="questionDetailsModal" tabindex="-1" aria-labelledby="questionDetailsModalLabel" aria-hidden="true">
+<div class="modal fade" id="questionDetailsModal" tabindex="-1" aria-labelledby="questionDetailsModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -470,33 +396,29 @@
               <h6 class="fw-bold">Options:</h6>
               <div class="row">
                 <div class="col-md-6 mb-2">
-                  <div class="p-2 border rounded" 
-                       [class.bg-success]="selectedQuestion.correctAnswer === 'A'"
-                       [class.text-white]="selectedQuestion.correctAnswer === 'A'">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'A'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'A'">
                     <strong>A)</strong> {{ selectedQuestion.options?.A }}
                     <i *ngIf="selectedQuestion.correctAnswer === 'A'" class="fas fa-check float-end"></i>
                   </div>
                 </div>
                 <div class="col-md-6 mb-2">
-                  <div class="p-2 border rounded"
-                       [class.bg-success]="selectedQuestion.correctAnswer === 'B'"
-                       [class.text-white]="selectedQuestion.correctAnswer === 'B'">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'B'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'B'">
                     <strong>B)</strong> {{ selectedQuestion.options?.B }}
                     <i *ngIf="selectedQuestion.correctAnswer === 'B'" class="fas fa-check float-end"></i>
                   </div>
                 </div>
                 <div class="col-md-6 mb-2">
-                  <div class="p-2 border rounded"
-                       [class.bg-success]="selectedQuestion.correctAnswer === 'C'"
-                       [class.text-white]="selectedQuestion.correctAnswer === 'C'">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'C'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'C'">
                     <strong>C)</strong> {{ selectedQuestion.options?.C }}
                     <i *ngIf="selectedQuestion.correctAnswer === 'C'" class="fas fa-check float-end"></i>
                   </div>
                 </div>
                 <div class="col-md-6 mb-2">
-                  <div class="p-2 border rounded"
-                       [class.bg-success]="selectedQuestion.correctAnswer === 'D'"
-                       [class.text-white]="selectedQuestion.correctAnswer === 'D'">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'D'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'D'">
                     <strong>D)</strong> {{ selectedQuestion.options?.D }}
                     <i *ngIf="selectedQuestion.correctAnswer === 'D'" class="fas fa-check float-end"></i>
                   </div>
