@@ -9,6 +9,7 @@ import { StudentLayoutComponent } from './components/student/student-layout/stud
 import { StudentDashboardComponent } from './components/student/dashboard/dashboard.component';
 import { ResultsComponent } from './components/student/results/results.component';
 import { TakeExamComponent } from './components/student/take-exam/take-exam.component';
+import { LoginComponent } from './components/shared/login/login.component';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,8 @@ export const routes: Routes = [
       { path: 'questions/:code', component: QuestionsComponent }
     ]
   },
+
+  { path: '',  component: LoginComponent },
   {
     path: 'student',
     component: StudentLayoutComponent,
