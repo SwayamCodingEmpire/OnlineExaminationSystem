@@ -39,6 +39,9 @@ export class ExamComponent {
   examIndexToDelete: number | null = null;
   totalPages = Math.ceil(this.exams.length / this.pageSize);
   fb: FormBuilder = new FormBuilder();
+  selectedQuestions: any[] = []; // replace 'Question' with your actual interface
+
+
 
   ngOnInit(): void {
     console.log('examsComponent ngOnInit called');
@@ -62,6 +65,29 @@ export class ExamComponent {
       // Initialize the delete modal
       this.deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal')!);
     }, 500);
+
+    this.selectedQuestions = [
+  {
+    code: 'Q1',
+    topic: 'Math',
+    difficulty: 'Easy',
+    type: 'MCQ',
+    marks: 2,
+    questionText: 'What is 2 + 2?',
+    options: { A: '3', B: '4', C: '5', D: '6' },
+    correctAnswer: 'B'
+  },
+  {
+    code: 'Q2',
+    topic: 'English',
+    difficulty: 'Medium',
+    type: 'Subjective',
+    marks: 5,
+    questionText: 'Explain the use of passive voice.',
+    wordLimit: 100
+  }
+];
+
   }
 
     saveExam(index: number) {
