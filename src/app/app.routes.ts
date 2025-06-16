@@ -37,7 +37,7 @@ export const routes: Routes = [
 
       { path: 'dashboard', component: StudentDashboardComponent },
       { path: 'results', component: ResultsComponent },
-      { path: 'exams', component: TakeExamComponent }
+      { path: 'exams', component: ExamComponent }
     ]
   },
 ];

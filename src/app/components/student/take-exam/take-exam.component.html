@@ -1,1 +1,114 @@
-<p>take-exam works!</p>
+<div class="container pt-4">
+  <!-- Auto-section-change alert -->
+  <div *ngIf="sectionChangeMessage" class="alert alert-info text-center mt-2" role="alert">
+    {{ sectionChangeMessage }}
+  </div>
+
+  <!-- Guidelines -->
+  <div *ngIf="!examStarted" class="text-center">
+    <h3 class="mb-3">Exam Guidelines</h3>
+    <p>
+      Read all instructions carefully. Each section has a time limit. Questions may be multiple choice or
+      subjective. Click "Start Exam" when ready.
+    </p>
+    <button class="btn btn-primary mt-3" (click)="startExam()">Start Exam</button>
+  </div>
+
+  <!-- Exam UI -->
+  <div *ngIf="examStarted && currentSection">
+    <!-- Section Tabs -->
+    <nav class="nav nav-tabs mb-4">
+      <a *ngFor="let section of sections; let i = index"
+         class="nav-link"
+         [ngClass]="getSectionTabClass(i)"
+         (click)="loadSection(i)">
+        {{ section.title }}
+      </a>
+    </nav>
+
+    <!-- Timer and Title -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5>{{ currentSection.title }}</h5>
+      <div class="badge bg-warning text-dark fs-6">⏱️ {{ timerDisplay }}</div>
+    </div>
+
+    <div class="row">
+      <!-- Questions -->
+      <div class="col-md-9">
+        <div *ngFor="let q of currentSection.questions; let i = index">
+          <div class="card mb-3" [ngClass]="getQuestionCardClass(q)">
+            <div class="card-body">
+              <p class="fw-bold">Q{{ i + 1 }}. {{ q.text }}</p>
+              <div *ngIf="q.type === 'mcq'">
+                <div *ngFor="let opt of q.options">
+                  <input type="radio" name="q{{ i }}" (change)="markAsAnswered(q)"> {{ opt }}
+                </div>
+              </div>
+              <div *ngIf="q.type === 'subjective'">
+                <textarea class="form-control" rows="2" (input)="markAsAnswered(q)"></textarea>
+              </div>
+              <button class="btn btn-sm btn-outline-info mt-2" (click)="toggleBookmark(q)">
+                {{ q.bookmarked ? 'Remove Bookmark' : 'Bookmark' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-md-3">
+        <h6>Question Status</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <div *ngFor="let q of currentSection.questions; let i = index"
+               class="rounded-circle text-center"
+               [ngClass]="getGridClass(q)"
+               style="width: 32px; height: 32px; line-height: 32px;">
+            {{ i + 1 }}
+          </div>
+        </div>
+
+        <div class="mt-4 small">
+          <p><span class="badge bg-secondary">⬤</span> Not Viewed</p>
+          <p><span class="badge bg-danger">⬤</span> Viewed</p>
+          <p><span class="badge bg-success">⬤</span> Answered</p>
+          <p><span class="badge bg-info">⬤</span> Bookmarked</p>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+          <button class="btn btn-primary" (click)="nextSectionOrSubmit()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section Change Modal -->
+<div class="modal fade" id="sectionChangeModal" tabindex="-1" aria-hidden="true"
+     [ngClass]="{ 'show d-block': showSectionChangeModal }">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-body">
+        <p class="mb-3">Do you want to move to the next section?</p>
+        <div class="text-end">
+          <button class="btn btn-primary me-2" (click)="confirmNextSection()">Yes, Continue</button>
+          <button class="btn btn-outline-secondary" (click)="showSectionChangeModal = false">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Final Submit Modal -->
+<div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-body">
+        <p class="mb-3">Are you sure you want to submit the exam? This action cannot be undone.</p>
+        <div class="text-end">
+          <button class="btn btn-danger me-2" (click)="submitExam()">Yes, Submit</button>
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

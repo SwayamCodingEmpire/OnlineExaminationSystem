@@ -1,1 +1,22 @@
-<p>results works!</p>
+<div class="container py-4">
+  <h2 class="text-center mb-4">Your Results</h2>
+  <p class="text-center text-muted">Student: {{ studentName }}</p>
+
+  <div *ngFor="let test of results" class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <strong>{{ test.testTitle }}</strong>
+    </div>
+    <div class="card-body">
+      <ul class="list-group mb-3">
+        <li *ngFor="let sec of test.sections" class="list-group-item d-flex justify-content-between">
+          <span>{{ sec.sectionTitle }}</span>
+          <span><strong>{{ sec.scored }}</strong> / {{ sec.max }}</span>
+        </li>
+      </ul>
+
+      <div class="text-end">
+        <strong>Total: {{ getTotalScore(test.sections) }} / {{ getTotalMax(test.sections) }}</strong>
+      </div>
+    </div>
+  </div>
+</div>
