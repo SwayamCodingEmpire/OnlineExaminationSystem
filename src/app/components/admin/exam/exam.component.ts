@@ -10,7 +10,7 @@ import { StudentService } from '../../../services/student/student.service';
 @Component({
   selector: 'app-exam',
   imports: [
-        CommonModule,
+    CommonModule,
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
@@ -20,8 +20,8 @@ import { StudentService } from '../../../services/student/student.service';
   styleUrl: './exam.component.scss'
 })
 export class ExamComponent {
-   examCreated = false;
-   popupPosition = { top: 0, left: 0 };
+  examCreated = false;
+  popupPosition = { top: 0, left: 0 };
   descriptionForm!: FormGroup;
   originalexams: any[] = [];
   isDescriptionPopupOpen = false;
@@ -41,13 +41,15 @@ export class ExamComponent {
   totalPages = Math.ceil(this.exams.length / this.pageSize);
   fb: FormBuilder = new FormBuilder();
   selectedQuestions: any[] = []; // replace 'Question' with your actual interface
-    instantExamForm: FormGroup = this.fb.group({
+  instantExamForm: FormGroup = this.fb.group({
     examCode: [''],
     examName: [''],
     examDate: [''],
     examTime: [''],
     questions: this.fb.array([])
   });
+
+  examSelected:number|null = null;
 
 
 
@@ -75,30 +77,30 @@ export class ExamComponent {
     }, 500);
 
     this.selectedQuestions = [
-  {
-    code: 'Q1',
-    topic: 'Math',
-    difficulty: 'Easy',
-    type: 'MCQ',
-    marks: 2,
-    questionText: 'What is 2 + 2?',
-    options: { A: '3', B: '4', C: '5', D: '6' },
-    correctAnswer: 'B'
-  },
-  {
-    code: 'Q2',
-    topic: 'English',
-    difficulty: 'Medium',
-    type: 'Subjective',
-    marks: 5,
-    questionText: 'Explain the use of passive voice.',
-    wordLimit: 100
-  }
-];
+      {
+        code: 'Q1',
+        topic: 'Math',
+        difficulty: 'Easy',
+        type: 'MCQ',
+        marks: 2,
+        questionText: 'What is 2 + 2?',
+        options: { A: '3', B: '4', C: '5', D: '6' },
+        correctAnswer: 'B'
+      },
+      {
+        code: 'Q2',
+        topic: 'English',
+        difficulty: 'Medium',
+        type: 'Subjective',
+        marks: 5,
+        questionText: 'Explain the use of passive voice.',
+        wordLimit: 100
+      }
+    ];
 
   }
 
-    saveExam(index: number) {
+  saveExam(index: number) {
     if (this.examForm.valid) {
       const formValue = this.examForm.value;
       const updatedexam = {
@@ -144,7 +146,7 @@ export class ExamComponent {
     this.examForm.reset();
   }
 
-    closeDescriptionPopup() {
+  closeDescriptionPopup() {
     this.isDescriptionPopupOpen = false;
   }
 
@@ -299,38 +301,38 @@ export class ExamComponent {
     }
   }
 
-loadexams() {
-  // this.examService.getexams().subscribe((data: any[]) => {
-  //   // Sanitize: Ensure every exam has a topics array
-  //   this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
-  //     ...exam,
-  //     topics: exam.topics && exam.topics.length > 0
-  //       ? exam.topics
-  //       : exam.topicsString
-  //         ? exam.topicsString.split(',').map((t: string) => t.trim())
-  //         : this.generateDefaultTopics(exam.name)
-  //   }));
+  loadexams() {
+    // this.examService.getexams().subscribe((data: any[]) => {
+    //   // Sanitize: Ensure every exam has a topics array
+    //   this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
+    //     ...exam,
+    //     topics: exam.topics && exam.topics.length > 0
+    //       ? exam.topics
+    //       : exam.topicsString
+    //         ? exam.topicsString.split(',').map((t: string) => t.trim())
+    //         : this.generateDefaultTopics(exam.name)
+    //   }));
 
-  //   this.exams = [...this.originalexams];
+    //   this.exams = [...this.originalexams];
 
-  //   // Restore any search filtering that was applied
-  //   if (this.searchForm.get('searchTerm')?.value) {
-  //     this.filterexams();
-  //   }
+    //   // Restore any search filtering that was applied
+    //   if (this.searchForm.get('searchTerm')?.value) {
+    //     this.filterexams();
+    //   }
 
-  //   this.totalPages = Math.ceil(this.exams.length / this.pageSize);
-  // });
+    //   this.totalPages = Math.ceil(this.exams.length / this.pageSize);
+    // });
 
-  const data:any[] = [
-    {
-      code: 'S001',
-      name: 'John Doe',
-      date: '13/10/2023',
-      time: '10:00 AM',
-    }
-  ];
+    const data: any[] = [
+      {
+        code: 'S001',
+        name: 'John Doe',
+        date: '13/10/2023',
+        time: '10:00 AM',
+      }
+    ];
 
-  this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
+    this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
       ...exam,
       topics: exam.topics && exam.topics.length > 0
         ? exam.topics
@@ -347,22 +349,22 @@ loadexams() {
     }
 
     this.totalPages = Math.ceil(this.exams.length / this.pageSize);
-}
+  }
 
 
-generateDefaultTopics(examName: string): string[] {
-  const sampleTopics = [
-    ['Basics', 'Overview', 'Introduction'],
-    ['Advanced Concepts', 'Optimization', 'Deployment'],
-    ['Theory', 'Practice', 'Examples'],
-    ['Module 1', 'Module 2', 'Quiz'],
-    ['Getting Started', 'Intermediate', 'Expert Tips']
-  ];
+  generateDefaultTopics(examName: string): string[] {
+    const sampleTopics = [
+      ['Basics', 'Overview', 'Introduction'],
+      ['Advanced Concepts', 'Optimization', 'Deployment'],
+      ['Theory', 'Practice', 'Examples'],
+      ['Module 1', 'Module 2', 'Quiz'],
+      ['Getting Started', 'Intermediate', 'Expert Tips']
+    ];
 
-  // Use a hash to deterministically pick a set based on exam name
-  const index = examName ? examName.length % sampleTopics.length : 0;
-  return sampleTopics[index];
-}
+    // Use a hash to deterministically pick a set based on exam name
+    const index = examName ? examName.length % sampleTopics.length : 0;
+    return sampleTopics[index];
+  }
 
 
 
@@ -386,13 +388,13 @@ generateDefaultTopics(examName: string): string[] {
   }
 
 
-    hideTooltip(event: MouseEvent) {
+  hideTooltip(event: MouseEvent) {
     const target = event.target as HTMLElement;
     const tooltip = bootstrap.Tooltip.getInstance(target);
     if (tooltip) {
       tooltip.hide();
     }
-}
+  }
 
   openDescriptionPopup(event: MouseEvent, exam: any) {
     this.descriptionForm.get('description')?.setValue(exam.description);
@@ -413,14 +415,14 @@ generateDefaultTopics(examName: string): string[] {
     };
   }
 
-    getRemainingTopics(topics: string[]): string {
+  getRemainingTopics(topics: string[]): string {
     return topics.slice(2)
-                 .map((topic, index) => `${index + 1}. ${topic}`)
-                 .join('\n');
+      .map((topic, index) => `${index + 1}. ${topic}`)
+      .join('\n');
   }
 
 
-    calculateTotalPages(): void {
+  calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.exams.length / this.pageSize);
   }
 
@@ -459,28 +461,28 @@ generateDefaultTopics(examName: string): string[] {
   }
 
   questionForm1 = this.fb.group({
-  code: [''],
-  topic: [''],
-  difficulty: [''],
-  type: ['MCQ'],
-  marks: [1],
-  questionText: [''],
-  optionA: [''],
-  optionB: [''],
-  optionC: [''],
-  optionD: [''],
-  correctAnswer: [''],
-  wordLimit: [null]
-});
+    code: [''],
+    topic: [''],
+    difficulty: [''],
+    type: ['MCQ'],
+    marks: [1],
+    questionText: [''],
+    optionA: [''],
+    optionB: [''],
+    optionC: [''],
+    optionD: [''],
+    correctAnswer: [''],
+    wordLimit: [null]
+  });
 
-onSubmit() {
-  if (this.questionForm1.valid) {
-    console.log('Form Submitted', this.questionForm1.value);
-    // Call your API or emit event here
+  onSubmit() {
+    if (this.questionForm1.valid) {
+      console.log('Form Submitted', this.questionForm1.value);
+      // Call your API or emit event here
+    }
   }
-}
 
-get questions(): FormArray {
+  get questions(): FormArray {
     return this.instantExamForm.get('questions') as FormArray;
   }
 
@@ -509,8 +511,34 @@ get questions(): FormArray {
     } else {
       // Final submission logic here
       console.log('Final Exam Data:', this.instantExamForm.value);
+
     }
   }
 
+  removeQuestion(index: number) {
+    this.questions.removeAt(index);
+  }
+
+deleteQuestion(index: number) {
+  if (this.examSelected === null) {
+    console.warn('No exam selected.');
+    return;
+  }
+
+  const selectedExam = this.exams[this.examSelected];
+
+  if (!selectedExam || !selectedExam.questions || selectedExam.questions.length <= index) {
+    console.warn('Question not found at index:', index);
+    return;
+  }
+
+  const question = selectedExam.questions[index];
+  console.log('Selected Question:', question);
+}
+
+
+  examDetailsClicked(i: number){
+    this.examSelected = i;
+  }
 
 }
