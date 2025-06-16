@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
@@ -38,6 +38,7 @@ export class ExamComponent {
   deleteModal: any;
   examIndexToDelete: number | null = null;
   totalPages = Math.ceil(this.exams.length / this.pageSize);
+  fb: FormBuilder = new FormBuilder();
 
   ngOnInit(): void {
     console.log('examsComponent ngOnInit called');
@@ -422,6 +423,28 @@ generateDefaultTopics(examName: string): string[] {
     }
     this.initializeTooltips();
   }
+
+  questionForm1 = this.fb.group({
+  code: [''],
+  topic: [''],
+  difficulty: [''],
+  type: ['MCQ'],
+  marks: [1],
+  questionText: [''],
+  optionA: [''],
+  optionB: [''],
+  optionC: [''],
+  optionD: [''],
+  correctAnswer: [''],
+  wordLimit: [null]
+});
+
+onSubmit() {
+  if (this.questionForm1.valid) {
+    console.log('Form Submitted', this.questionForm1.value);
+    // Call your API or emit event here
+  }
+}
 
 
 }

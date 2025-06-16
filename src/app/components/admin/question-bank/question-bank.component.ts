@@ -507,7 +507,7 @@ export class QuestionBankComponent {
     }
   }
 
-  questionForm1 = this.fb.group({
+questionForm1 = this.fb.group({
   code: [''],
   topic: [''],
   difficulty: [''],

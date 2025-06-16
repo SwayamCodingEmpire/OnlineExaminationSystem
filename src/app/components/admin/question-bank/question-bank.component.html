@@ -272,7 +272,7 @@
 <!-- Add Question Modal -->
 <div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <form [formGroup]="questionForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="questionForm1" (ngSubmit)="onSubmit()">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="addQuestionModalLabel">Add New Question</h5>
@@ -315,38 +315,38 @@
               </div>
 
               <!-- MCQ Options with Radio Buttons -->
-              <div *ngIf="questionForm.get('type')?.value === 'MCQ'" class="mb-4">
+              <div *ngIf="questionForm1.get('type')?.value === 'MCQ'" class="mb-4">
                 <label class="fw-bold mb-2">Options (Select correct one):</label>
                 <div class="row g-3">
                   <div class="col-md-6 d-flex align-items-center">
                     <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'A'" (change)="questionForm.get('correctAnswer')?.setValue('A')"
-                           [checked]="questionForm.get('correctAnswer')?.value === 'A'" />
+                           [value]="'A'" (change)="questionForm1.get('correctAnswer')?.setValue('A')"
+                           [checked]="questionForm1.get('correctAnswer')?.value === 'A'" />
                     <input type="text" class="form-control" placeholder="Option A" formControlName="optionA" />
                   </div>
                   <div class="col-md-6 d-flex align-items-center">
                     <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'B'" (change)="questionForm.get('correctAnswer')?.setValue('B')"
-                           [checked]="questionForm.get('correctAnswer')?.value === 'B'" />
+                           [value]="'B'" (change)="questionForm1.get('correctAnswer')?.setValue('B')"
+                           [checked]="questionForm1.get('correctAnswer')?.value === 'B'" />
                     <input type="text" class="form-control" placeholder="Option B" formControlName="optionB" />
                   </div>
                   <div class="col-md-6 d-flex align-items-center">
                     <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'C'" (change)="questionForm.get('correctAnswer')?.setValue('C')"
-                           [checked]="questionForm.get('correctAnswer')?.value === 'C'" />
+                           [value]="'C'" (change)="questionForm1.get('correctAnswer')?.setValue('C')"
+                           [checked]="questionForm1.get('correctAnswer')?.value === 'C'" />
                     <input type="text" class="form-control" placeholder="Option C" formControlName="optionC" />
                   </div>
                   <div class="col-md-6 d-flex align-items-center">
                     <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'D'" (change)="questionForm.get('correctAnswer')?.setValue('D')"
-                           [checked]="questionForm.get('correctAnswer')?.value === 'D'" />
+                           [value]="'D'" (change)="questionForm1.get('correctAnswer')?.setValue('D')"
+                           [checked]="questionForm1.get('correctAnswer')?.value === 'D'" />
                     <input type="text" class="form-control" placeholder="Option D" formControlName="optionD" />
                   </div>
                 </div>
               </div>
 
               <!-- Subjective Word Limit -->
-              <div *ngIf="questionForm.get('type')?.value === 'Subjective'" class="mb-3">
+              <div *ngIf="questionForm1.get('type')?.value === 'Subjective'" class="mb-3">
                 <label class="fw-bold">Word Limit:</label>
                 <input type="number" class="form-control" placeholder="e.g. 250" formControlName="wordLimit" />
               </div>
@@ -355,7 +355,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success" [disabled]="questionForm.invalid">Add Question</button>
+          <button type="submit" class="btn btn-success" [disabled]="questionForm1.invalid">Add Question</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         </div>
       </div>
