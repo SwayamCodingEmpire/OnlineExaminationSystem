@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
@@ -20,6 +20,7 @@ import { StudentService } from '../../../services/student/student.service';
   styleUrl: './exam.component.scss'
 })
 export class ExamComponent {
+   examCreated = false;
    popupPosition = { top: 0, left: 0 };
   descriptionForm!: FormGroup;
   originalexams: any[] = [];
@@ -40,6 +41,13 @@ export class ExamComponent {
   totalPages = Math.ceil(this.exams.length / this.pageSize);
   fb: FormBuilder = new FormBuilder();
   selectedQuestions: any[] = []; // replace 'Question' with your actual interface
+    instantExamForm: FormGroup = this.fb.group({
+    examCode: [''],
+    examName: [''],
+    examDate: [''],
+    examTime: [''],
+    questions: this.fb.array([])
+  });
 
 
 
@@ -471,6 +479,38 @@ onSubmit() {
     // Call your API or emit event here
   }
 }
+
+get questions(): FormArray {
+    return this.instantExamForm.get('questions') as FormArray;
+  }
+
+  addQuestion() {
+    const questionForm = this.fb.group({
+      code: [''],
+      topic: [''],
+      difficulty: [''],
+      type: ['MCQ'],
+      marks: [1],
+      questionText: [''],
+      optionA: [''],
+      optionB: [''],
+      optionC: [''],
+      optionD: [''],
+      correctAnswer: [''],
+      wordLimit: [null]
+    });
+
+    this.questions.push(questionForm);
+  }
+
+  submitExam() {
+    if (!this.examCreated) {
+      this.examCreated = true;
+    } else {
+      // Final submission logic here
+      console.log('Final Exam Data:', this.instantExamForm.value);
+    }
+  }
 
 
 }

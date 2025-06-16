@@ -27,7 +27,7 @@
 
               <div class="col-6">
                 <button class="btn px-3 py-2 w-100 border border-secondary mx-3" [disabled]="false"
-                  data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                  data-bs-toggle="modal" data-bs-target="#addInstantExamModal">
                   Add Instant Exam
                 </button>
               </div>
@@ -349,98 +349,106 @@
 
 
 <!-- Add Question Modal -->
-<div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <form [formGroup]="questionForm1" (ngSubmit)="onSubmit()">
+<div class="modal fade" id="addInstantExamModal" tabindex="-1" aria-labelledby="addInstantExamModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <form [formGroup]="instantExamForm" (ngSubmit)="submitExam()">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addQuestionModalLabel">Add New Question</h5>
+          <h5 class="modal-title">Create Instant Exam</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <div class="modal-body">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <div>
-                <input class="form-control mb-2" placeholder="Question Code" formControlName="code" />
-                <div class="d-flex gap-2">
-                  <select class="form-select" formControlName="topic">
-                    <option value="">Select Topic</option>
-                    <option value="Angular">Angular</option>
-                    <option value="Spring boot">Spring boot</option>
-                    <option value="Java">Java</option>
-                  </select>
-                  <select class="form-select" formControlName="difficulty">
-                    <option value="">Select Difficulty</option>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <select class="form-select mb-2" formControlName="type">
-                  <option value="MCQ">MCQ</option>
-                  <option value="Subjective">Subjective</option>
-                </select>
-                <input type="number" class="form-control" placeholder="Marks" formControlName="marks" />
-              </div>
+          <!-- Exam Details -->
+          <div class="mb-4">
+            <input type="text" class="form-control mb-2" placeholder="Exam Code" formControlName="examCode">
+            <input type="text" class="form-control mb-2" placeholder="Exam Name" formControlName="examName">
+            <div class="d-flex gap-3">
+              <input type="date" class="form-control" formControlName="examDate">
+              <input type="time" class="form-control" formControlName="examTime">
             </div>
+          </div>
 
-            <div class="card-body">
-              <div class="mb-3">
-                <label class="fw-bold">Question:</label>
-                <textarea class="form-control" formControlName="questionText" rows="3"></textarea>
-              </div>
+          <!-- Add Question Button -->
+          <div *ngIf="examCreated" class="mb-3">
+            <button type="button" class="btn btn-outline-primary" (click)="addQuestion()">+ Add Question</button>
+          </div>
 
-              <!-- MCQ Options with Radio Buttons -->
-              <div *ngIf="questionForm1.get('type')?.value === 'MCQ'" class="mb-4">
-                <label class="fw-bold mb-2">Options (Select correct one):</label>
-                <div class="row g-3">
-                  <div class="col-md-6 d-flex align-items-center">
-                    <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'A'" (change)="questionForm1.get('correctAnswer')?.setValue('A')"
-                           [checked]="questionForm1.get('correctAnswer')?.value === 'A'" />
-                    <input type="text" class="form-control" placeholder="Option A" formControlName="optionA" />
+          <!-- Question Forms -->
+          <div formArrayName="questions">
+            <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i" class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <input class="form-control mb-2" placeholder="Question Code" formControlName="code">
+                  <div class="d-flex gap-2">
+                    <select class="form-select" formControlName="topic">
+                      <option value="">Select Topic</option>
+                      <option>Angular</option>
+                      <option>Spring boot</option>
+                      <option>Java</option>
+                    </select>
+                    <select class="form-select" formControlName="difficulty">
+                      <option value="">Select Difficulty</option>
+                      <option>Easy</option>
+                      <option>Medium</option>
+                      <option>Hard</option>
+                    </select>
                   </div>
-                  <div class="col-md-6 d-flex align-items-center">
-                    <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'B'" (change)="questionForm1.get('correctAnswer')?.setValue('B')"
-                           [checked]="questionForm1.get('correctAnswer')?.value === 'B'" />
-                    <input type="text" class="form-control" placeholder="Option B" formControlName="optionB" />
-                  </div>
-                  <div class="col-md-6 d-flex align-items-center">
-                    <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'C'" (change)="questionForm1.get('correctAnswer')?.setValue('C')"
-                           [checked]="questionForm1.get('correctAnswer')?.value === 'C'" />
-                    <input type="text" class="form-control" placeholder="Option C" formControlName="optionC" />
-                  </div>
-                  <div class="col-md-6 d-flex align-items-center">
-                    <input type="radio" name="correctOption" class="form-check-input me-2"
-                           [value]="'D'" (change)="questionForm1.get('correctAnswer')?.setValue('D')"
-                           [checked]="questionForm1.get('correctAnswer')?.value === 'D'" />
-                    <input type="text" class="form-control" placeholder="Option D" formControlName="optionD" />
-                  </div>
+                </div>
+                <div>
+                  <select class="form-select mb-2" formControlName="type">
+                    <option value="MCQ">MCQ</option>
+                    <option value="Subjective">Subjective</option>
+                  </select>
+                  <input type="number" class="form-control" placeholder="Marks" formControlName="marks">
                 </div>
               </div>
 
-              <!-- Subjective Word Limit -->
-              <div *ngIf="questionForm1.get('type')?.value === 'Subjective'" class="mb-3">
-                <label class="fw-bold">Word Limit:</label>
-                <input type="number" class="form-control" placeholder="e.g. 250" formControlName="wordLimit" />
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="fw-bold">Question:</label>
+                  <textarea class="form-control" formControlName="questionText" rows="3"></textarea>
+                </div>
+
+                <!-- MCQ Options -->
+                <div *ngIf="question.get('type')?.value === 'MCQ'" class="mb-3">
+                  <label class="fw-bold mb-2">Options (Select correct one):</label>
+                  <div class="row g-3">
+                    <ng-container *ngFor="let opt of ['A', 'B', 'C', 'D']">
+                      <div class="col-md-6 d-flex align-items-center">
+                        <input type="radio"
+                               class="form-check-input me-2"
+                               [name]="'correctOption' + i"
+                               [value]="opt"
+                               (change)="question.get('correctAnswer')?.setValue(opt)"
+                               [checked]="question.get('correctAnswer')?.value === opt">
+                        <input type="text" class="form-control" [placeholder]="'Option ' + opt" [formControlName]="'option' + opt">
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+
+                <!-- Subjective -->
+                <div *ngIf="question.get('type')?.value === 'Subjective'" class="mb-3">
+                  <label class="fw-bold">Word Limit:</label>
+                  <input type="number" class="form-control" placeholder="e.g. 250" formControlName="wordLimit">
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success" [disabled]="questionForm1.invalid">Add Question</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">
+            {{ examCreated ? 'Save Exam' : 'Create Exam' }}
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </form>
   </div>
 </div>
+
 
 
 
