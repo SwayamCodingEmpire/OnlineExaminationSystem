@@ -1,180 +1,267 @@
 <div class="container-fluid">
-  <div class="row pt-5">
+  <!-- Enhanced Statistics Cards with Real-Time Analytics -->
+  <div class="row pt-4">
     <div class="col-3 mb-4">
-      <div class="card shadow-sm w-100">
-
-        <!-- Card Header -->
+      <div class="card shadow-sm w-100 stat-card">
         <div class="card-header ms-3 bg-white" style="min-height: 80px;">
-
-          <!-- Overlapping Icon Box -->
           <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y">
-            <div class="bg-yellor-chart bg-gradient rounded-1 icon-div mx-0 my-0 text-center">
-              <i class="fa-regular fa-clone fa-flip-vertical fs-1 text-center text-light py-4"></i>
+            <div class="bg-primary bg-gradient rounded-1 icon-div mx-0 my-0 text-center">
+              <i class="fa-solid fa-users fs-1 text-center text-light py-4"></i>
             </div>
           </div>
-
-          <!-- Header Content -->
           <div class="text-end">
             <small class="text-muted">Total Students</small>
-            <h5 class=" mb-0 text-secondary">5487</h5>
+            <h5 class="mb-0 text-secondary">{{ stats.totalStudents.current | number }}</h5>
           </div>
         </div>
-
-        <!-- Card Body -->
         <div class="card-body pt-2">
-          <p class="text-danger small mb-0">
-            <i class="fa-solid fa-triangle-exclamation text-danger"></i> Get More Space...
+          <p class="small mb-0" [ngClass]="getTrendClass(stats.totalStudents.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIcon(stats.totalStudents.trend)"></i> 
+            {{ stats.totalStudents.percentage }}% from last month
           </p>
         </div>
-
       </div>
     </div>
 
     <div class="col-3 mb-4">
-      <div class="card shadow-sm w-100">
-
-        <!-- Card Header -->
+      <div class="card shadow-sm w-100 stat-card">
         <div class="card-header ms-3 me-3 bg-white" style="min-height: 80px;">
-
-          <!-- Overlapping Icon Box -->
           <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y">
-            <div class="bg-green-chart bg-gradient bg-opacity-100 rounded-1 icon-div">
-              <i class="fa-solid fa-shop text-white fs-3 text-center px-4 py-4"></i>
+            <div class="bg-warning bg-gradient bg-opacity-100 rounded-1 icon-div">
+              <i class="fa-solid fa-clock text-white fs-3 text-center px-4 py-4"></i>
             </div>
           </div>
-
-          <!-- Header Content -->
           <div class="text-end">
-            <small class="text-muted">Total Ongoing Exams</small>
-            <h5 class=" mb-0 text-secondary">237</h5>
+            <small class="text-muted">Ongoing Exams</small>
+            <h5 class="mb-0 text-secondary">{{ stats.ongoingExams.current }}</h5>
           </div>
         </div>
-
-        <!-- Card Body -->
         <div class="card-body pt-2">
-          <p class="text-secondary small mb-0">
-            <i class="fa-regular fa-calendar-range"></i> Last 24 hours
+          <p class="small mb-0" [ngClass]="getTrendClass(stats.ongoingExams.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIcon(stats.ongoingExams.trend)"></i> 
+            {{ stats.ongoingExams.percentage }}% from last week
           </p>
         </div>
-
       </div>
     </div>
 
     <div class="col-3 mb-4">
-      <div class="card shadow-sm w-100">
-
-        <!-- Card Header -->
+      <div class="card shadow-sm w-100 stat-card">
         <div class="card-header ms-3 me-3 bg-white">
-
-          <!-- Overlapping Icon Box -->
-          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1  start-0 translate-middle-y">
-            <div class="bg-danger bg-gradient rounded-1 icon-div">
-              <i class="fa-regular fa-circle-info fs-3 text-center my-1 px-4 py-4 text-white"></i>
+          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y">
+            <div class="bg-success bg-gradient rounded-1 icon-div">
+              <i class="fa-solid fa-check-circle fs-3 text-center my-1 px-4 py-4 text-white"></i>
             </div>
           </div>
-
-          <!-- Header Content -->
           <div class="text-end pe-0 pb-3">
-            <small class="text-muted">Total Exams Conducted</small>
-            <h5 class="mb-0 text-secondary">75</h5>
+            <small class="text-muted">Completed Exams</small>
+            <h5 class="mb-0 text-secondary">{{ stats.completedExams.current }}</h5>
           </div>
         </div>
-
-        <!-- Card Body -->
         <div class="card-body pt-2">
-          <p class="text-secondary small mb-0">
-            <i class="fa-solid fa-tag pe-2"></i>Last 2 years
+          <p class="small mb-0" [ngClass]="getTrendClass(stats.completedExams.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIcon(stats.completedExams.trend)"></i> 
+            {{ stats.completedExams.percentage }}% from last month
           </p>
         </div>
-
       </div>
     </div>
 
     <div class="col-3 mb-4">
-      <div class="card shadow-sm w-100">
-
-        <!-- Card Header -->
+      <div class="card shadow-sm w-100 stat-card">
         <div class="card-header ms-3 me-3 bg-white" style="min-height: 80px;">
-
-          <!-- Overlapping Icon Box -->
-          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1  start-0 translate-middle-y">
+          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y">
             <div class="bg-info bg-gradient rounded-1 icon-div">
-              <i class="fa-brands fa-twitter fs-3 text-white px-4 py-4 my-1"></i>
+              <i class="fa-solid fa-chart-line fs-3 text-white px-4 py-4 my-1"></i>
             </div>
           </div>
-
-          <!-- Header Content -->
           <div class="text-end">
-            <small class="text-muted me-0 pe-0">Upcoming Exams</small>
-            <h5 class=" mb-0 text-secondary">+245</h5>
+            <small class="text-muted me-0 pe-0">Average Score</small>
+            <h5 class="mb-0 text-secondary">{{ stats.averageScore.current }}%</h5>
           </div>
         </div>
-
-        <!-- Card Body -->
         <div class="card-body pt-2">
-          <p class="text-secondary small mb-0">
-            <i class="fa-regular fa-clock-rotate-left fa-flip-horizontal me-2"></i>
+          <p class="small mb-0" [ngClass]="getTrendClass(stats.averageScore.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIcon(stats.averageScore.trend)"></i> 
+            {{ stats.averageScore.percentage }}% from last month
           </p>
         </div>
-
       </div>
     </div>
   </div>
 
-  <div class="row mt-2">
+  <!-- Advanced Charts Row -->
+  <div class="row mt-3">
+    <!-- Performance Trends Line Chart -->
     <div class="col-6">
-
-      <div class="card">
-        <div class="card-body">
-          <div id="chart">
-            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [labels]="chartOptions.labels"
-              [responsive]="chartOptions.responsive"></apx-chart>
-          </div>
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Performance Trends</h5>
+          <small class="text-muted">Monthly average scores</small>
         </div>
-
+        <div class="card-body">
+          <apx-chart 
+            [series]="lineChartOptions.series" 
+            [chart]="lineChartOptions.chart" 
+            [xaxis]="lineChartOptions.xaxis"
+            [yaxis]="lineChartOptions.yaxis"
+            [stroke]="lineChartOptions.stroke"
+            [dataLabels]="lineChartOptions.dataLabels">
+          </apx-chart>
+        </div>
       </div>
+    </div>
 
+    <!-- Subject-wise Performance Bar Chart -->
+    <div class="col-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Subject-wise Performance</h5>
+          <small class="text-muted">Average scores by subject</small>
+        </div>
+        <div class="card-body">
+          <apx-chart 
+            [series]="barChartOptions.series" 
+            [chart]="barChartOptions.chart" 
+            [xaxis]="barChartOptions.xaxis"
+            [yaxis]="barChartOptions.yaxis"
+            [plotOptions]="barChartOptions.plotOptions">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pass/Fail & Completion Charts -->
+  <div class="row mt-3">
+    <div class="col-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Pass/Fail Ratio</h5>
+          <small class="text-muted">Overall exam results</small>
+        </div>
+        <div class="card-body">
+          <apx-chart 
+            [series]="pieChartOptions.series" 
+            [chart]="pieChartOptions.chart" 
+            [labels]="pieChartOptions.labels"
+            [responsive]="pieChartOptions.responsive">
+          </apx-chart>
+        </div>
+      </div>
     </div>
 
     <div class="col-6">
       <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Exam Completion Status</h5>
+          <small class="text-muted">Current exam progress</small>
+        </div>
+        <div class="card-body">
+          <apx-chart 
+            [series]="doughnutChartOptions.series" 
+            [chart]="doughnutChartOptions.chart" 
+            [labels]="doughnutChartOptions.labels"
+            [responsive]="doughnutChartOptions.responsive">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exam Calendar & Leaderboard -->
+  <div class="row mt-3">
+    <!-- Exam Calendar -->
+    <div class="col-7">
+      <div class="card shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Exam Leaderboard</h5>
+          <h5 class="mb-0">Exam Schedule</h5>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm" 
+                    [class]="calendarView === 'month' ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="switchCalendarView('month')">Month</button>
+            <button class="btn btn-sm" 
+                    [class]="calendarView === 'week' ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="switchCalendarView('week')">Week</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Calendar Header -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <button class="btn btn-sm btn-outline-secondary" (click)="previousMonth()">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <h6 class="mb-0">{{ selectedDate | date:'MMMM yyyy' }}</h6>
+            <button class="btn btn-sm btn-outline-secondary" (click)="nextMonth()">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- Upcoming Exams List -->
+          <div class="upcoming-exams">
+            <div *ngFor="let exam of examSchedules | slice:0:5" class="exam-schedule-item p-2 mb-2 border rounded">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">{{ exam.title }}</h6>
+                  <small class="text-muted">{{ exam.date | date:'mediumDate' }} at {{ exam.time }}</small>
+                </div>
+                <div class="text-end">
+                  <span class="badge" 
+                        [class]="exam.status === 'upcoming' ? 'bg-warning' : 
+                                exam.status === 'ongoing' ? 'bg-success' : 'bg-secondary'">
+                    {{ exam.status | titlecase }}
+                  </span>
+                  <small class="d-block text-muted">{{ exam.students }} students</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Leaderboard -->
+    <div class="col-5">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Top Performers</h5>
           <select class="form-select w-auto" [(ngModel)]="selectedExamCode" (change)="filterLeaderboard()">
             <option *ngFor="let code of examCodes" [value]="code">{{ code }}</option>
           </select>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-bordered table-hover mb-0">
+            <table class="table table-borderless table-hover mb-0">
               <thead class="table-light">
                 <tr>
                   <th scope="col">Rank</th>
-                  <th scope="col">Student Name</th>
+                  <th scope="col">Student</th>
                   <th scope="col">Score</th>
-                  <th scope="col">Time Taken</th>
+                  <th scope="col">Time</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let student of filteredLeaderboard; index as i">
-                  <td>{{ i + 1 }}</td>
+                  <td>
+                    <span class="rank-badge" 
+                          [class]="i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank- ' : 'rank-default'">
+                      {{ i + 1 }}
+                    </span>
+                  </td>
                   <td>{{ student.name }}</td>
-                  <td>{{ student.score }}</td>
+                  <td>
+                    <span class="badge bg-success">{{ student.score }}%</span>
+                  </td>
                   <td>{{ student.time }}</td>
                 </tr>
                 <tr *ngIf="filteredLeaderboard.length === 0">
-                  <td colspan="4" class="text-center">No data available for this exam</td>
+                  <td colspan="4" class="text-center text-muted">No data available</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-
-
     </div>
-
   </div>
-
-
 </div>
