@@ -18,26 +18,8 @@
     }
 }
 
-// Status classes
-.status-not-viewed {
-    background: #adb5bd;
-    border-color: #6c757d;
-}
 
-.status-viewed {
-    background: #dc3545;
-    border-color: #b02a37;
-}
 
-.status-answered {
-    background: #198754;
-    border-color: #157347;
-}
-
-.status-bookmarked {
-    background: #0dcaf0;
-    border-color: #0aa2c0;
-}
 
 // Legend styling
 .legend-box {
@@ -68,16 +50,11 @@
     display: inline-block;
 }
 
-.question-card {
-    border-radius: 12px;
-    padding: 1rem;
-    background-color: #fff;
+
+.form-check-input{
+    border-width: 3px;
 }
 
-.btn-pop {
-  transition: all 0.2s ease-in-out;
-}
-.btn-pop:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+.purpl{
+    background-color: #9426d4;
 }

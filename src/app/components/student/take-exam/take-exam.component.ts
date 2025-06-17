@@ -47,6 +47,8 @@ export class TakeExamComponent {
   currentQuestionIndex: number = 0;
   showSectionChangeModal: boolean = false;
   sectionChangeMessage: string = '';
+  
+
 
   constructor(private router: Router, private route: ActivatedRoute) {
     this.examId = this.route.snapshot.paramMap.get('id') || '';
@@ -136,14 +138,14 @@ export class TakeExamComponent {
     if (this.currentQuestionIndex < this.currentSection!.questions.length - 1) {
       this.currentQuestionIndex++;
     }
-    question.viewed = true;
+    this.currentSection!.questions[this.currentQuestionIndex].viewed = true;
   }
 
   prevQuestion(question: Question) {
     if (this.currentQuestionIndex > 0) {
       this.currentQuestionIndex--;
     }
-    question.viewed = true;
+    this.currentSection!.questions[this.currentQuestionIndex].viewed = true;
   }
 
   goToQuestion(question: number,q1 : Question){
@@ -161,7 +163,7 @@ export class TakeExamComponent {
     this.clearTimer();
     this.sectionIndex = index;
     this.currentSection = this.sections[index];
-
+    this.currentSection!.questions[this.currentQuestionIndex].viewed = true;
     // Mark all questions as viewed
    
 
@@ -201,17 +203,12 @@ export class TakeExamComponent {
     question.bookmarked = !question.bookmarked;
   }
 
-  getQuestionCardClass(q: Question): string {
-    if (q.bookmarked) return 'border-info';
-    if (q.answered) return 'border-success';
-    if (q.viewed) return 'border-danger';
-    return 'border-secondary';
-  }
+  
 
   getGridClass(q: Question): string {
-    if (q.bookmarked) return 'bg-info text-white';
+    if (q.bookmarked) return 'purpl text-white';
     if (q.answered) return 'bg-success text-white';
-    if (q.viewed) return 'bg-danger text-white';
+    if (q.viewed) return 'bg-warning text-white';
     return 'bg-secondary text-white';
   }
 

@@ -30,7 +30,7 @@
             <table class="table table-borderless table-responsive">
               <thead>
                 <tr>
-                  <th class="table-header-light">Actions</th>
+
 
                   <th class="table-header-light text-center">
                     <div class="d-flex flex-row align-items-center justify-content-start">
@@ -62,6 +62,7 @@
                   </th>
                   <th class="table-header-light">Exam Date</th>
                   <th class="table-header-light">Exam Time</th>
+                  <th class="table-header-light">Actions</th>
                 </tr>
               </thead>
 
@@ -73,37 +74,7 @@
                 let i = index
               ">
                   <!-- Actions (Edit & Delete) -->
-                  <td [ngStyle]="{
-                  background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                }">
-                    <!-- Take Exam Button -->
-                    <a [routerLink]="['/student/take-exam', i + pageSize * (currentPage - 1)]"
-                      class="btn px-3 py-1 border border-secondary" [class.disabled]="isAddingNewexam"
-                      [attr.aria-disabled]="isAddingNewexam">
-                      <small>Take Exam</small>
-                    </a>
 
-                    <!-- View Results Button -->
-                    <a 
-                      [routerLink]="['/student/results', i + pageSize * (currentPage - 1)]"
-                      class="btn px-3 py-1 border border-secondary mx-2">
-                      <small>View Results</small>
-                    </a>
-
-
-
-                    <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
-                      <span class="mx-2">|</span>
-                      <a class="bg-action text-primary text-decoration-underline"
-                        [routerLink]="['/admin/questions', exam.code]">Questions
-                      </a>
-                    </ng-container>
-
-
-
-                    <!-- Save & Cancel Buttons in Edit Mode -->
-
-                  </td>
 
                   <!-- Code Column -->
                   <td [ngStyle]="{
@@ -157,6 +128,31 @@
                       <input type="time" formControlName="time" class="form-control edit-mode"
                         placeholder="Enter exam time" />
                     </form>
+                  </td>
+                  <td [ngStyle]="{
+                  background: i % 2 === 0 ? '#f8fbff' : 'transparent'
+                }">
+                    <!-- Take Exam Button -->
+                    <a [routerLink]="['/student/take-exam', i + pageSize * (currentPage - 1)]"
+                      class="btn px-3 py-1 border border-secondary" [class.disabled]="isAddingNewexam"
+                      [attr.aria-disabled]="isAddingNewexam">
+                      <small>Take Exam</small>
+                    </a>
+
+                    <!-- View Results Button -->
+                    <a [routerLink]="['/student/results', i + pageSize * (currentPage - 1)]"
+                      class="btn py-1 border border-secondary mx-2">
+                      <small>View Results</small>
+                    </a>
+
+
+
+
+
+
+
+                    <!-- Save & Cancel Buttons in Edit Mode -->
+
                   </td>
                 </tr>
 

@@ -11,6 +11,7 @@ import { ResultsComponent } from './components/student/results/results.component
 import { TakeExamComponent } from './components/student/take-exam/take-exam.component';
 import { LoginComponent } from './components/shared/login/login.component';
 import { ExamsComponent } from './components/student/exams/exams.component';
+import { ResultListComponent } from './components/student/result-list/result-list/result-list.component';
 
 export const routes: Routes = [
   {
@@ -35,7 +36,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: StudentDashboardComponent },
       { path: 'results/:id', component: ResultsComponent },       // ✅ View specific result
       { path: 'exams', component: ExamsComponent },
-      { path: 'take-exam/:id', component: TakeExamComponent }      // ✅ New route for taking exam
+      { path: 'take-exam/:id', component: TakeExamComponent },
+      { path: 'student-history' , component:ResultListComponent }
     ]
   },
 ];

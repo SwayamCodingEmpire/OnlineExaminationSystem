@@ -1,0 +1,41 @@
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header header-font text-white py-3">
+          <h4 class="mb-0 text-center"><i class="fas fa-poll me-2"></i>Test Results Summary</h4>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col" class="ps-4">Test Name</th>
+                  <th scope="col" class="text-center">Total Marks</th>
+                  <th scope="col" class="text-center">Marks Secured</th>
+                  <th scope="col" class="text-center">Average</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let result of testResults" class="align-middle">
+                  <td class="ps-4 fw-semibold">{{result.testName}}</td>
+                  <td class="text-center">{{result.totalMarks}}</td>
+                  <td class="text-center">{{result.marksSecured}}</td>
+                  <td class="text-center fw-bold" 
+                      [ngClass]="{
+                        'text-success': calculateAverage(result.marksSecured, result.totalMarks) >= 70,
+                        'text-warning': calculateAverage(result.marksSecured, result.totalMarks) >= 50 && calculateAverage(result.marksSecured, result.totalMarks) < 70,
+                        'text-danger': calculateAverage(result.marksSecured, result.totalMarks) < 50
+                      }">
+                    {{calculateAverage(result.marksSecured, result.totalMarks)}}%
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
