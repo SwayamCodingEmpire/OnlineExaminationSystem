@@ -84,7 +84,7 @@ interface ExamSchedule {
 })
 export class AdminDashboardComponent {
   @ViewChild("chart") chart!: ChartComponent;
-  
+
   // Chart Options
   public pieChartOptions: ChartOptions;
   public lineChartOptions: LineChartOptions;
@@ -301,16 +301,16 @@ export class AdminDashboardComponent {
     const firstDay = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth(), 1);
     const lastDay = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth() + 1, 0);
     const days: Date[] = [];
-    
+
     for (let i = 1; i <= lastDay.getDate(); i++) {
       days.push(new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth(), i));
     }
-    
+
     return days;
   }
 
   getExamsForDate(date: Date): ExamSchedule[] {
-    return this.examSchedules.filter(exam => 
+    return this.examSchedules.filter(exam =>
       exam.date.toDateString() === date.toDateString()
     );
   }
@@ -334,4 +334,4 @@ export class AdminDashboardComponent {
   getTrendIcon(trend: number): string {
     return trend >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
   }
-} 
+}
