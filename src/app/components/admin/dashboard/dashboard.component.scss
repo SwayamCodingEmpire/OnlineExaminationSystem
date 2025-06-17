@@ -75,3 +75,71 @@
   border-radius: 50%;
   margin-right: 8px;
 }
+
+/* Enhanced Dashboard Styles */
+.stat-card {
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+/* Exam Schedule Styles */
+.exam-schedule-item {
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f8f9fa !important;
+    cursor: pointer;
+  }
+}
+
+.upcoming-exams {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Rank Badge Styles */
+.rank-badge {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 25px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.rank-gold {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #333;
+}
+
+.rank-silver {
+  background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+  color: #333;
+}
+
+.rank-bronze {
+  background: linear-gradient(135deg, #cd7f32, #daa520);
+  color: white;
+}
+
+.rank-default {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Chart Container Improvements */
+.card {
+  border: none;
+  border-radius: 10px;
+  
+  .card-header {
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 10px 10px 0 0 !important;
+  }
+}
