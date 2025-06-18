@@ -133,6 +133,7 @@
                   <th class="table-header-light">Exam Date</th>
                   <th class="table-header-light">Exam Time</th>
                   <th class="table-header-light">Questions</th>
+                  <th class="table-header-light">Students</th>
                 </tr>
               </thead>
 
@@ -315,13 +316,24 @@
                   </td>
 
                   <ng-container
-                    *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                  >
+                    *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
                     <td style="background-color: #f8fbff">
                       <a
                         class="bg-action text-primary text-decoration-underline"
-                        [routerLink]="['/admin/questions', exam.code]"
+                        [routerLink]="['/admin/exam/questions', exam.code]"
                         >Add Questions
+                      </a>
+                    </td>
+                  </ng-container>
+
+
+                    <ng-container
+                    *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
+                    <td style="background-color: #f8fbff">
+                      <a
+                        class="bg-action text-primary text-decoration-underline"
+                        [routerLink]="['/admin/exam/students', exam.code]"
+                        >Add Students
                       </a>
                     </td>
                   </ng-container>
