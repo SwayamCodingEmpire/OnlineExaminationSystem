@@ -4,7 +4,8 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
-import { StudentService } from '../../../services/student/student.service';
+import { ExamsService } from '../../../services/admin/exams/exams.service';
+
 
 
 @Component({
@@ -72,26 +73,26 @@ export class ExamsComponent {
 
       if (this.isAddingNewexam && index === 0) {
         // Adding a new exam
-        this.examService.addStudent(updatedexam).subscribe(() => {
+        // this.examService.addStudent(updatedexam).subscribe(() => {
           this.isAddingNewexam = false;
           this.cancelEdit();
           this.loadexams(); // Reload all exams from service
-        }, (error) => {
-          console.error('Error adding exam:', error);
-          // Handle error case
-          this.loadexams(); // Reload to restore original state
-        });
+        // }, (error) => {
+        //   console.error('Error adding exam:', error);
+        //   // Handle error case
+        //   this.loadexams(); // Reload to restore original state
+        // });
       } else {
         // Updating an existing exam
         const examId = this.exams[index].id;
-        this.examService.updateStudent(updatedexam).subscribe(() => {
+        // this.examService.updateStudent(updatedexam).subscribe(() => {
           this.cancelEdit();
           this.loadexams(); // Reload all exams from service
-        }, (error) => {
-          console.error('Error updating exam:', error);
-          // Handle error case
-          this.loadexams(); // Reload to restore original state
-        });
+        // }, (error) => {
+        //   console.error('Error updating exam:', error);
+        //   // Handle error case
+        //   this.loadexams(); // Reload to restore original state
+        // });
       }
     }
   }
@@ -114,7 +115,7 @@ export class ExamsComponent {
   }
 
 
-  constructor(private examService: StudentService) {
+  constructor(private examService: ExamsService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -252,15 +253,15 @@ export class ExamsComponent {
   confirmDeleteexam() {
     if (this.examIndexToDelete !== null) {
       const examId = this.exams[this.examIndexToDelete].code;
-      this.examService.deleteStudent(examId).subscribe(() => {
+      // this.examService.deleteStudent(examId).subscribe(() => {
         this.examIndexToDelete = null;
         this.deleteModal.hide();
         this.loadexams(); // Reload exams after deletion
-      }, (error: any) => {
-        console.error('Error deleting exam:', error);
-        this.deleteModal.hide();
-        this.loadexams(); // Reload to restore original state
-      });
+      // }, (error: any) => {
+      //   console.error('Error deleting exam:', error);
+      //   this.deleteModal.hide();
+      //   this.loadexams(); // Reload to restore original state
+      // });
     }
   }
 

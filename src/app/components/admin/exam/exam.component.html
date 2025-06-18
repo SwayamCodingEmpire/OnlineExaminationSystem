@@ -133,7 +133,7 @@
                   <th class="table-header-light">Exam Date</th>
                   <th class="table-header-light">Exam Time</th>
                   <th class="table-header-light">Questions</th>
-                  <th class="table-header-light">Students</th>
+                  <th class="table-header-light">Students Enrolled</th>
                 </tr>
               </thead>
 
@@ -315,28 +315,28 @@
                     </form>
                   </td>
 
-                  <ng-container
-                    *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
-                    <td style="background-color: #f8fbff">
-                      <a
-                        class="bg-action text-primary text-decoration-underline"
-                        [routerLink]="['/admin/exam/questions', exam.code]"
-                        >Add Questions
+
+                    <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
+                      <td style="background-color: #f8fbff;">
+                                              <a class="bg-action text-primary text-decoration-underline"
+                        [routerLink]="['/admin/questions', exam.code]">Add question
+                      </a>
+                      </td>
+
+
+                    </ng-container>
+
+
+                    <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
+                      <td style="background-color: #f8fbff;">
+                                              <a class="bg-action text-primary text-decoration-underline"
+                          [routerLink]="['/admin/add-student', exam.code]">Add Students
                       </a>
                     </td>
                   </ng-container>
 
 
-                    <ng-container
-                    *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
-                    <td style="background-color: #f8fbff">
-                      <a
-                        class="bg-action text-primary text-decoration-underline"
-                        [routerLink]="['/admin/exam/students', exam.code]"
-                        >Add Students
-                      </a>
-                    </td>
-                  </ng-container>
+
                 </tr>
               </tbody>
             </table>
@@ -710,14 +710,8 @@
 
                   <!-- ▸ RIGHT: Question Type + Marks (25%) -->
                   <div class="col-lg-3">
-                    <div class="h-100 d-flex flex-column gap-3">
-                      <div>
-                        <label class="fw-bold">Question Type:</label>
-                        <select class="form-select" formControlName="type">
-                          <option value="MCQ">MCQ</option>
-                          <option value="Subjective">Subjective</option>
-                        </select>
-                      </div>
+                    <div class="h-100 d-flex flex-column align-items-center justify-content-center gap-3">
+
 
                       <div>
                         <label class="fw-bold">Marks:</label>
@@ -726,6 +720,15 @@
                           class="form-control"
                           placeholder="Marks"
                           formControlName="marks"
+                        />
+                      </div>
+                      <div>
+                        <label class="fw-bold">Duration:</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          placeholder="Duration"
+                          formControlName="duration"
                         />
                       </div>
                     </div>

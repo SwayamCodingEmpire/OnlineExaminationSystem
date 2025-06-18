@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFo
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
-import { StudentService } from '../../../services/student/student.service';
+import { ExamsService } from '../../../services/admin/exams/exams.service';
 
 
 @Component({
@@ -36,6 +36,7 @@ export class ExamComponent {
   tempNewexam: any = null;
   editingIndex: number | null = null;
   pageSize = 10;
+  duration: string = '';
   deleteModal: any;
   examIndexToDelete: number | null = null;
   totalPages = Math.ceil(this.exams.length / this.pageSize);
@@ -109,11 +110,11 @@ export class ExamComponent {
 
       if (this.isAddingNewexam && index === 0) {
         // Adding a new exam
-        this.examService.addStudent(updatedexam).subscribe(() => {
+        this.examService.addExam(updatedexam).subscribe(() => {
           this.isAddingNewexam = false;
           this.cancelEdit();
           this.loadexams(); // Reload all exams from service
-        }, (error) => {
+        }, (error: any) => {
           console.error('Error adding exam:', error);
           // Handle error case
           this.loadexams(); // Reload to restore original state
@@ -121,10 +122,10 @@ export class ExamComponent {
       } else {
         // Updating an existing exam
         const examId = this.exams[index].id;
-        this.examService.updateStudent(updatedexam).subscribe(() => {
+        this.examService.updateExam(updatedexam).subscribe(() => {
           this.cancelEdit();
           this.loadexams(); // Reload all exams from service
-        }, (error) => {
+        }, (error: any) => {
           console.error('Error updating exam:', error);
           // Handle error case
           this.loadexams(); // Reload to restore original state
@@ -151,7 +152,7 @@ export class ExamComponent {
   }
 
 
-  constructor(private examService: StudentService) {
+  constructor(private examService: ExamsService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -289,7 +290,7 @@ export class ExamComponent {
   confirmDeleteexam() {
     if (this.examIndexToDelete !== null) {
       const examId = this.exams[this.examIndexToDelete].code;
-      this.examService.deleteStudent(examId).subscribe(() => {
+      this.examService.deleteExam(examId).subscribe(() => {
         this.examIndexToDelete = null;
         this.deleteModal.hide();
         this.loadexams(); // Reload exams after deletion
@@ -499,7 +500,7 @@ export class ExamComponent {
       optionC: [''],
       optionD: [''],
       correctAnswer: [''],
-      wordLimit: [null]
+      duration: ['']
     });
 
     this.questions.push(questionForm);

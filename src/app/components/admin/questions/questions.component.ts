@@ -4,7 +4,8 @@ import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsMo
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
-import { StudentService } from '../../../services/student/student.service';
+import { TopicsService } from '../../../services/admin/topics/topics.service';
+
 
 @Component({
   selector: 'app-questions',
@@ -19,17 +20,7 @@ import { StudentService } from '../../../services/student/student.service';
   styleUrl: './questions.component.scss'
 })
 export class QuestionsComponent {
-  //  examCode!: string;
 
-  // constructor(private route: ActivatedRoute) {}
-
-  // ngOnInit(): void {
-  //   // Access route param from URL
-  //   this.examCode = this.route.snapshot.paramMap.get('code') || '';
-  //   console.log('Exam Code:', this.examCode);
-
-  //   // You can now use this.examCode to fetch data
-  // }
 
   popupPosition = { top: 0, left: 0 };
   descriptionForm!: FormGroup;
@@ -55,11 +46,12 @@ export class QuestionsComponent {
   selectedTopicFilter: string = '';
   currentQuestionType: string = 'MCQ';
   selectedQuestion: any = null;
-  questionDetailsModal: any;
   fb: FormBuilder = new FormBuilder();
+  questionDetailsModal: any;
+  topics: any;
   selectedQuestions: boolean[] = [];
 
-  constructor(private questionService: StudentService) {
+  constructor( private topicService: TopicsService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -108,7 +100,9 @@ export class QuestionsComponent {
   ngOnInit(): void {
     console.log('QuestionBankComponent ngOnInit called');
     this.loadQuestions();
-
+    this.topicService.getTopics().subscribe((data) => {
+      this.topics = data;
+    });
     // Initialize search term change detection
     this.searchForm.get('searchTerm')?.valueChanges.subscribe(term => {
       this.filterQuestions();
@@ -153,6 +147,11 @@ export class QuestionsComponent {
     if (this.questionDetailsModal) {
       this.questionDetailsModal.show();
     }
+  }
+
+  getTopicName(topicCode: string): string {
+    const topic = this.topics?.find((t: any) => t.code === topicCode);
+    return topic ? topic.name : topicCode;
   }
 
   createQuestion() {

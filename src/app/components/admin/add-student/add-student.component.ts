@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
-// import { StudentService } from '../../../services/student/student.service';
+
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { StudentsService } from '../../../services/admin/students/students.service';
+
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
-  selector: 'app-student',
+  selector: 'app-add-student',
   imports: [
     CommonModule,
     RouterModule,
@@ -17,10 +18,11 @@ import { StudentsService } from '../../../services/admin/students/students.servi
     FormsModule,
     NgxPaginationModule
   ],
-  templateUrl: './student.component.html',
-  styleUrl: './student.component.scss'
+  templateUrl: './add-student.component.html',
+  styleUrl: './add-student.component.scss'
 })
-export class StudentComponent {
+
+export class AddStudentComponent {
   popupPosition = { top: 0, left: 0 };
   descriptionForm!: FormGroup;
   originalStudents: any[] = [];
@@ -40,7 +42,25 @@ export class StudentComponent {
   StudentIndexToDelete: number | null = null;
   totalPages = Math.ceil(this.Students.length / this.pageSize);
 
+  examCode: string | null = null;
+  examName: string = '';
+  isExamSpecificView: boolean = false;
+  selectedQuestion: number | null = null;
+  checkedStudents: boolean[] = [];
+  studentService: any;
+
+
   ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.examCode = params['examCode'] || null;
+      this.isExamSpecificView = !!this.examCode;
+
+      if (this.isExamSpecificView) {
+      }
+
+      this.loadStudents();
+    });
+
     console.log('StudentsComponent ngOnInit called');
     this.loadStudents();
 
@@ -64,11 +84,13 @@ export class StudentComponent {
     }, 500);
   }
 
-    saveStudent(index: number) {
+  saveStudent(index: number) {
     if (this.StudentForm.valid) {
       const formValue = this.StudentForm.value;
       const updatedStudent = {
-        ...formValue
+        ...formValue,
+        // Add exam code to student if in exam-specific view
+        ...(this.isExamSpecificView && this.examCode && { exams: [this.examCode] })
       };
 
       if (this.isAddingNewStudent && index === 0) {
@@ -76,27 +98,24 @@ export class StudentComponent {
         this.studentService.addStudent(updatedStudent).subscribe(() => {
           this.isAddingNewStudent = false;
           this.cancelEdit();
-          this.loadStudents(); // Reload all Students from service
-        }, (error) => {
+          this.loadStudents();
+        }, (error: any) => {
           console.error('Error adding Student:', error);
-          // Handle error case
-          this.loadStudents(); // Reload to restore original state
+          this.loadStudents();
         });
       } else {
         // Updating an existing Student
         const StudentId = this.Students[index].id;
         this.studentService.updateStudent(updatedStudent).subscribe(() => {
           this.cancelEdit();
-          this.loadStudents(); // Reload all Students from service
-        }, (error) => {
+          this.loadStudents();
+        }, (error: any) => {
           console.error('Error updating Student:', error);
-          // Handle error case
-          this.loadStudents(); // Reload to restore original state
+          this.loadStudents();
         });
       }
     }
   }
-
 
   cancelEdit() {
     if (this.isAddingNewStudent) {
@@ -110,12 +129,12 @@ export class StudentComponent {
     this.StudentForm.reset();
   }
 
-    closeDescriptionPopup() {
+  closeDescriptionPopup() {
     this.isDescriptionPopupOpen = false;
   }
 
 
-    constructor(private studentService: StudentsService) {
+  constructor( private route: ActivatedRoute) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -150,21 +169,6 @@ export class StudentComponent {
       [...tooltipTriggerList].forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     }, 0);
   }
-
-  //   saveDescription() {
-  //   if (this.editingIndex !== null && this.descriptionForm.valid) {
-  //     const description = this.descriptionForm.get('description')?.value.trim();
-  //     if (description) {
-  //       this.Students[this.editingIndex].description = description;
-  //       // Also update the description in the Student form
-  //       this.StudentForm.get('description')?.setValue(description);
-  //     }
-  //   }
-  //   const modal = bootstrap.Modal.getInstance(document.getElementById('editDescriptionModal')!);
-  //   modal?.hide();
-  // }
-
-
 
   sortTable(column: string, ascending: boolean) {
     this.sortedColumn = column;
@@ -221,7 +225,6 @@ export class StudentComponent {
   }
 
 
-
   deleteStudent(index: number) {
     this.StudentIndexToDelete = index;
     const StudentCode = this.Students[index].code;
@@ -265,38 +268,20 @@ export class StudentComponent {
     }
   }
 
-loadStudents() {
-  // this.studentService.getStudents().subscribe((data: any[]) => {
-  //   // Sanitize: Ensure every Student has a topics array
-  //   this.originalStudents = data.map((Student: { topics: any; topicsString: string; name: string }) => ({
-  //     ...Student,
-  //     topics: Student.topics && Student.topics.length > 0
-  //       ? Student.topics
-  //       : Student.topicsString
-  //         ? Student.topicsString.split(',').map((t: string) => t.trim())
-  //         : this.generateDefaultTopics(Student.name)
-  //   }));
 
-  //   this.Students = [...this.originalStudents];
+  loadStudents() {
+    // For your current mock data approach:
+    const data: any[] = [
+      {
+        code: 'S001',
+        name: 'John Doe',
+        email: 'john.doe@email.com',
+        phoneNo: '1234567890',
+        exams: ['EX001'] // Add this exams array to track which exams the student is enrolled in
+      }
+    ];
 
-  //   // Restore any search filtering that was applied
-  //   if (this.searchForm.get('searchTerm')?.value) {
-  //     this.filterStudents();
-  //   }
-
-  //   this.totalPages = Math.ceil(this.Students.length / this.pageSize);
-  // });
-
-  const data:any[] = [
-    {
-      code: 'S001',
-      name: 'John Doe',
-      email: 'John Doe@email.com',
-      phoneNo: '1234567890',
-    }
-  ];
-
-  this.originalStudents = data.map((Student: { topics: any; topicsString: string; name: string }) => ({
+    this.originalStudents = data.map((Student: any) => ({
       ...Student,
       topics: Student.topics && Student.topics.length > 0
         ? Student.topics
@@ -304,6 +289,13 @@ loadStudents() {
           ? Student.topicsString.split(',').map((t: string) => t.trim())
           : this.generateDefaultTopics(Student.name)
     }));
+
+    // Filter students if we're in exam-specific view
+    if (this.isExamSpecificView && this.examCode) {
+      this.originalStudents = this.originalStudents.filter(student =>
+        student.exams && student.exams.includes(this.examCode)
+      );
+    }
 
     this.Students = [...this.originalStudents];
 
@@ -313,22 +305,21 @@ loadStudents() {
     }
 
     this.totalPages = Math.ceil(this.Students.length / this.pageSize);
-}
+  }
 
+  generateDefaultTopics(StudentName: string): string[] {
+    const sampleTopics = [
+      ['Basics', 'Overview', 'Introduction'],
+      ['Advanced Concepts', 'Optimization', 'Deployment'],
+      ['Theory', 'Practice', 'Examples'],
+      ['Module 1', 'Module 2', 'Quiz'],
+      ['Getting Started', 'Intermediate', 'Expert Tips']
+    ];
 
-generateDefaultTopics(StudentName: string): string[] {
-  const sampleTopics = [
-    ['Basics', 'Overview', 'Introduction'],
-    ['Advanced Concepts', 'Optimization', 'Deployment'],
-    ['Theory', 'Practice', 'Examples'],
-    ['Module 1', 'Module 2', 'Quiz'],
-    ['Getting Started', 'Intermediate', 'Expert Tips']
-  ];
-
-  // Use a hash to deterministically pick a set based on Student name
-  const index = StudentName ? StudentName.length % sampleTopics.length : 0;
-  return sampleTopics[index];
-}
+    // Use a hash to deterministically pick a set based on Student name
+    const index = StudentName ? StudentName.length % sampleTopics.length : 0;
+    return sampleTopics[index];
+  }
 
 
 
@@ -352,41 +343,23 @@ generateDefaultTopics(StudentName: string): string[] {
   }
 
 
-    hideTooltip(event: MouseEvent) {
+  hideTooltip(event: MouseEvent) {
     const target = event.target as HTMLElement;
     const tooltip = bootstrap.Tooltip.getInstance(target);
     if (tooltip) {
       tooltip.hide();
     }
-}
-
-  openDescriptionPopup(event: MouseEvent, Student: any) {
-    this.descriptionForm.get('description')?.setValue(Student.description);
-    this.isDescriptionPopupOpen = true;
-
-    const target = event.target as HTMLElement;
-    const rect = target.getBoundingClientRect();
-
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-
-    const popupWidth = 450; // Match with your .description-popup CSS width
-
-    const shiftLeftBy = 160;
-    this.popupPosition = {
-      top: rect.bottom + scrollTop + 10, // space below element
-      left: rect.left + scrollLeft + rect.width / 2 - popupWidth / 2 - shiftLeftBy // center horizontally
-    };
   }
 
-    getRemainingTopics(topics: string[]): string {
+
+  getRemainingTopics(topics: string[]): string {
     return topics.slice(2)
-                 .map((topic, index) => `${index + 1}. ${topic}`)
-                 .join('\n');
+      .map((topic, index) => `${index + 1}. ${topic}`)
+      .join('\n');
   }
 
 
-    calculateTotalPages(): void {
+  calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.Students.length / this.pageSize);
   }
 
@@ -394,6 +367,7 @@ generateDefaultTopics(StudentName: string): string[] {
   goToFirstPage(): void {
     this.currentPage = 1;
   }
+
 
   goToNextPage(): void {
     if (this.currentPage < this.totalPages) {
@@ -409,7 +383,6 @@ generateDefaultTopics(StudentName: string): string[] {
     }
   }
 
-
   // Navigate to last page
   goToLastPage(): void {
     this.currentPage = this.totalPages;
@@ -424,5 +397,25 @@ generateDefaultTopics(StudentName: string): string[] {
     this.initializeTooltips();
   }
 
+  // Add this method to filter students by exam
+  private filterStudentsByExam(students: any[]): any[] {
+    if (!this.examCode) return students;
+
+    // Implement your filtering logic here
+    // This is just an example - adjust based on your data structure
+    return students.filter(student =>
+      student.exams && student.exams.includes(this.examCode)
+    );
+  }
+
+  enrollStudentInExam() {
+    const selectedIndexes = this.checkedStudents
+      .map((isChecked, index) => (isChecked ? index : -1))
+      .filter(index => index !== -1);
+
+    console.log('Selected Indexes:', selectedIndexes);
+    // Now you can use selectedIndexes to get students or send to API
+  }
 
 }
+

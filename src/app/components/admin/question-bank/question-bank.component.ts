@@ -4,7 +4,10 @@ import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsMo
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
-import { StudentService } from '../../../services/student/student.service';
+import { QuestionBankService } from '../../../services/admin/questionbank/question-bank.service';
+import { TopicsService } from '../../../services/admin/topics/topics.service';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-question-bank',
@@ -13,7 +16,8 @@ import { StudentService } from '../../../services/student/student.service';
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    ToastrModule,
   ],
   templateUrl: './question-bank.component.html',
   styleUrl: './question-bank.component.scss'
@@ -38,6 +42,7 @@ export class QuestionBankComponent {
   pageSize = 10;
   deleteModal: any;
   addQuestionModal: any;
+  editQuestionModal: any;
   questionIndexToDelete: number | null = null;
   totalPages = Math.ceil(this.questions.length / this.pageSize);
   selectedTopicFilter: string = '';
@@ -45,16 +50,21 @@ export class QuestionBankComponent {
   selectedQuestion: any = null;
   questionDetailsModal: any;
   fb: FormBuilder = new FormBuilder();
+  topics: any;
 
-  constructor(private questionService: StudentService) {
+  constructor(
+    private questionService: QuestionBankService, 
+    private topicService: TopicsService,
+    private toastr: ToastrService,
+    ) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
 
     this.questionForm = new FormGroup({
       code: new FormControl('', Validators.required),
-      name: new FormControl('', Validators.required),
-      category: new FormControl('', Validators.required),
+      question: new FormControl('', Validators.required),
+      topicCode: new FormControl('', Validators.required),
       type: new FormControl('', Validators.required),
       difficulty: new FormControl('', Validators.required),
     });
@@ -62,13 +72,13 @@ export class QuestionBankComponent {
     // MCQ Form
     this.mcqForm = new FormGroup({
       code: new FormControl('', Validators.required),
-      topic: new FormControl('', Validators.required),
-      questionText: new FormControl('', Validators.required),
-      optionA: new FormControl('', Validators.required),
-      optionB: new FormControl('', Validators.required),
-      optionC: new FormControl('', Validators.required),
-      optionD: new FormControl('', Validators.required),
-      correctAnswer: new FormControl('', Validators.required),
+      topicCode: new FormControl('', Validators.required),
+      question: new FormControl('', Validators.required),
+      option0: new FormControl('', Validators.required),
+      option1: new FormControl('', Validators.required),
+      option2: new FormControl('', Validators.required),
+      option3: new FormControl('', Validators.required),
+      correctOption: new FormControl('', Validators.required),
       difficulty: new FormControl('', Validators.required),
       marks: new FormControl('', [Validators.required, Validators.min(1)])
     });
@@ -76,8 +86,8 @@ export class QuestionBankComponent {
     // Subjective Form
     this.subjectiveForm = new FormGroup({
       code: new FormControl('', Validators.required),
-      topic: new FormControl('', Validators.required),
-      questionText: new FormControl('', Validators.required),
+      topicCode: new FormControl('', Validators.required),
+      question: new FormControl('', Validators.required),
       wordLimit: new FormControl('', [Validators.required, Validators.min(1)]),
       difficulty: new FormControl('', Validators.required),
       marks: new FormControl('', [Validators.required, Validators.min(1)])
@@ -95,7 +105,9 @@ export class QuestionBankComponent {
   ngOnInit(): void {
     console.log('QuestionBankComponent ngOnInit called');
     this.loadQuestions();
-
+    this.topicService.getTopics().subscribe((data) => {
+      this.topics = data;
+    }); 
     // Initialize search term change detection
     this.searchForm.get('searchTerm')?.valueChanges.subscribe(term => {
       this.filterQuestions();
@@ -115,6 +127,11 @@ export class QuestionBankComponent {
       const modalElement = document.getElementById('deleteConfirmationModal');
       if (modalElement) {
         this.deleteModal = new bootstrap.Modal(modalElement);
+      }
+
+      const editModalElement = document.getElementById('editQuestionModal');
+      if (editModalElement) {
+        this.editQuestionModal = new bootstrap.Modal(editModalElement);
       }
 
       // Initialize add question modal
@@ -137,10 +154,13 @@ export class QuestionBankComponent {
 
   showQuestionDetails(question: any) {
     this.selectedQuestion = question;
-    if (this.questionDetailsModal) {
+      if (this.questionDetailsModal) {
       this.questionDetailsModal.show();
+      console.log('Selected question for details:', question);
+
     }
   }
+  
 
   createQuestion() {
     let formToValidate: FormGroup;
@@ -153,18 +173,20 @@ export class QuestionBankComponent {
         questionData = {
           id: this.questions.length + 1,
           code: formValue.code,
-          questionText: formValue.questionText,
-          topic: formValue.topic,
+          question: formValue.question,
+          topicCode: formValue.topicCode,
           type: 'MCQ',
           difficulty: formValue.difficulty,
           marks: formValue.marks,
-          options: {
-            A: formValue.optionA,
-            B: formValue.optionB,
-            C: formValue.optionC,
-            D: formValue.optionD
-          },
-          correctAnswer: formValue.correctAnswer
+          options: [
+            formValue.option0,
+            formValue.option1,
+            formValue.option2,
+            formValue.option3
+          ],
+          correctOption: formValue.correctOption,
+          enabled: true,
+          comments: ''
         };
       }
     } else {
@@ -174,34 +196,41 @@ export class QuestionBankComponent {
         questionData = {
           id: this.questions.length + 1,
           code: formValue.code,
-          questionText: formValue.questionText,
-          topic: formValue.topic,
+          question: formValue.question,
+          topicCode: formValue.topicCode,
           type: 'Subjective',
           difficulty: formValue.difficulty,
           marks: formValue.marks,
-          wordLimit: formValue.wordLimit
+          wordLimit: formValue.wordLimit,
+          enabled: true,
+          comments: ''
         };
       }
     }
 
     if (formToValidate.valid && questionData) {
-      // Add question to the list
-      this.questions.unshift(questionData);
-      this.originalQuestions = [...this.questions];
+      // Call API to add question
+      this.questionService.addQuestion(questionData).subscribe({
+        next: (response) => {
+          console.log('Question created successfully:', response);
+          
+          // Reload questions from API to get updated list
+          this.loadQuestions();
 
-      // Reset forms
-      this.mcqForm.reset();
-      this.subjectiveForm.reset();
+          // Reset forms
+          this.mcqForm.reset();
+          this.subjectiveForm.reset();
 
-      // Close modal
-      if (this.addQuestionModal) {
-        this.addQuestionModal.hide();
-      }
-
-      // Recalculate pagination
-      this.calculateTotalPages();
-
-      console.log('Question created:', questionData);
+          // Close modal
+          if (this.addQuestionModal) {
+            this.addQuestionModal.hide();
+          }
+        },
+        error: (error) => {
+          console.error('Error creating question:', error);
+          
+        }
+      });
     } else {
       console.log('Form is invalid');
       // Mark all fields as touched to show validation errors
@@ -221,7 +250,7 @@ export class QuestionBankComponent {
       this.questions = [...this.originalQuestions];
     } else {
       this.questions = this.originalQuestions.filter(question =>
-        question.topic === this.selectedTopicFilter
+        question.topicCode === this.selectedTopicFilter
       );
     }
     this.currentPage = 1;
@@ -235,107 +264,101 @@ export class QuestionBankComponent {
   }
 
   addRow() {
-    this.isAddingNewQuestion = true;
-
-    // Create a temporary question object
+    if (this.isAddingNewQuestion) {
+      return;
+    }
     this.tempNewQuestion = {
-      code: "",
-      name: "",
-      category: "",
-      type: "",
-      difficulty: ""
+      code: '',
+      question: '',
+      topicCode: '',
+      type: '',
+      difficulty: '',
+      isNew: true
     };
-
-    // Add the temporary question to the beginning of the array
-    this.questions.unshift(this.tempNewQuestion);
-
-    // Start editing the new question
-    this.editingIndex = 0;
-
-    // Reset the form with default values
-    this.questionForm.reset({
-      code: "",
-      name: "",
-      category: "",
-      type: "",
-      difficulty: ""
-    });
-
-    // Recalculate pagination
-    this.calculateTotalPages();
+    this.isAddingNewQuestion = true;
+    this.editingIndex = -1; 
   }
 
-  editQuestion(index: number) {
-    this.editingIndex = index;
-    const question = this.questions[index];
-
-    this.questionForm.patchValue({
-      code: question.code,
-      name: question.questionText,
-      category: question.topic,
-      type: question.type,
-      difficulty: question.difficulty
-    });
+  editQuestion(question: any) {
+    console.log('Editing question:', question);
+    this.selectedQuestion = { ...question };
+    this.questionForm1.patchValue(this.selectedQuestion);
+    if (this.selectedQuestion.type === 'MCQ' && this.selectedQuestion.options) {
+      console.log('Populating MCQ options:', this.selectedQuestion.options);
+      this.questionForm1.get('option0')?.setValue(this.selectedQuestion.options[0]);
+      this.questionForm1.get('option1')?.setValue(this.selectedQuestion.options[1]);
+      this.questionForm1.get('option2')?.setValue(this.selectedQuestion.options[2]);
+      this.questionForm1.get('option3')?.setValue(this.selectedQuestion.options[3]);
+    }
+    this.editQuestionModal.show();
   }
 
-  saveQuestion(index: number) {
-    if (this.questionForm.valid) {
-      const formValue = this.questionForm.value;
-      const updatedQuestion = {
-        ...this.questions[index],
-        code: formValue.code,
-        questionText: formValue.name,
-        topic: formValue.category,
-        type: formValue.type,
-        difficulty: formValue.difficulty
-      };
-
-      if (this.isAddingNewQuestion && index === 0) {
-        // Adding a new question
-        this.questions[0] = updatedQuestion;
-        this.originalQuestions = [...this.questions];
-        this.isAddingNewQuestion = false;
-        this.cancelEdit();
-      } else {
-        // Updating an existing question
-        this.questions[index] = updatedQuestion;
-        this.originalQuestions = [...this.questions];
-        this.cancelEdit();
+  onUpdate() {
+    if (this.questionForm1.valid) {
+      const updatedQuestion = { ...this.selectedQuestion, ...this.questionForm1.value };
+      if (updatedQuestion.type === 'MCQ') {
+        updatedQuestion.options = [
+          this.questionForm1.value.option0,
+          this.questionForm1.value.option1,
+          this.questionForm1.value.option2,
+          this.questionForm1.value.option3
+        ];
       }
+      this.questionService.updateQuestion(updatedQuestion).subscribe({
+        next: () => {
+          this.toastr.success('Question updated successfully');
+          this.editQuestionModal.hide();
+          this.loadQuestions();
+        },
+        error: (err) => {
+          this.toastr.error('Failed to update question');
+          console.error(err);
+        }
+      });
     }
   }
 
   deleteQuestion(index: number) {
     this.questionIndexToDelete = index;
-    const question = this.questions[index];
-
-    // Update the modal content
+    const questionToDelete = this.questions[index];
+    const modalElement = document.getElementById('deleteConfirmationModal');
     const questionCodeElement = document.getElementById('questionCodeToDelete');
-    if (questionCodeElement) {
-      questionCodeElement.textContent = question.code;
-    }
-
-    // Show the modal
-    if (this.deleteModal) {
+    if (modalElement && questionCodeElement) {
+      questionCodeElement.textContent = questionToDelete.code;
       this.deleteModal.show();
-    }
-
-    // Set up the confirm delete button click handler
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    if (confirmDeleteBtn) {
-      confirmDeleteBtn.onclick = () => this.confirmDeleteQuestion();
     }
   }
 
   confirmDeleteQuestion() {
     if (this.questionIndexToDelete !== null) {
-      // Remove question from array
-      this.questions.splice(this.questionIndexToDelete, 1);
-      this.originalQuestions = [...this.questions];
+      const questionToDelete = this.questions[this.questionIndexToDelete];
+      const questionCodeToDelete = questionToDelete.code;
+      this.questionService.deleteQuestion(questionCodeToDelete).subscribe({
+        next: (response) => {
+          this.toastr.success('Question deleted successfully!');
+          
+          const indexInOriginal = this.originalQuestions.findIndex(q => q.code === questionCodeToDelete);
+          if (indexInOriginal !== -1) {
+            this.originalQuestions.splice(indexInOriginal, 1);
+          }
 
-      this.deleteModal?.hide();
-      this.questionIndexToDelete = null;
-      this.calculateTotalPages();
+          const indexInCurrent = this.questions.findIndex(q => q.code === questionCodeToDelete);
+          if (indexInCurrent !== -1) {
+            this.questions.splice(indexInCurrent, 1);
+          }
+          
+          this.filterQuestions(); 
+          
+          this.questionIndexToDelete = null;
+          this.deleteModal.hide();
+        },
+        error: (error) => {
+          console.error('Error deleting question:', error);
+          this.toastr.error('Error deleting question. Please try again.');
+          this.questionIndexToDelete = null;
+          this.deleteModal.hide();
+        }
+      });
     }
   }
 
@@ -365,8 +388,8 @@ export class QuestionBankComponent {
 
       // Handle different column mappings
       if (column === 'name') {
-        valA = a.questionText?.toString().toLowerCase() || '';
-        valB = b.questionText?.toString().toLowerCase() || '';
+        valA = a.question?.toString().toLowerCase() || '';
+        valB = b.question?.toString().toLowerCase() || '';
       } else if (column === 'code') {
         valA = a.code?.toString().toLowerCase() || '';
         valB = b.code?.toString().toLowerCase() || '';
@@ -380,64 +403,20 @@ export class QuestionBankComponent {
   }
 
   loadQuestions() {
-    // Updated mock data with new structure including marks
-    this.questions = [
-      {
-        id: 1,
-        code: 'Q001',
-        questionText: 'What is the main concept of Object-Oriented Programming in Java?',
-        topic: 'Java',
-        type: 'MCQ',
-        difficulty: 'Easy',
-        marks: 2,
-        options: { A: 'Inheritance', B: 'Encapsulation', C: 'Polymorphism', D: 'All of the above' },
-        correctAnswer: 'D'
+    this.questionService.getQuestions().subscribe({
+      next: (data) => {
+        this.questions = data;
+        this.originalQuestions = [...this.questions];
+        this.calculateTotalPages();
       },
-      {
-        id: 2,
-        code: 'Q002',
-        questionText: 'Explain the concept of Dependency Injection in Spring Framework',
-        topic: 'Spring',
-        type: 'Subjective',
-        difficulty: 'Medium',
-        marks: 5,
-        wordLimit: 200
-      },
-      {
-        id: 3,
-        code: 'Q003',
-        questionText: 'What are Angular Components and how do they work?',
-        topic: 'Angular',
-        type: 'MCQ',
-        difficulty: 'Hard',
-        marks: 3,
-        options: { A: 'UI Building Blocks', B: 'Services', C: 'Modules', D: 'Directives' },
-        correctAnswer: 'A'
-      },
-      {
-        id: 4,
-        code: 'Q004',
-        questionText: 'Design a database schema for an e-commerce application',
-        topic: 'Database',
-        type: 'Subjective',
-        difficulty: 'Medium',
-        marks: 8,
-        wordLimit: 300
-      },
-      {
-        id: 5,
-        code: 'Q005',
-        questionText: 'What is the time complexity of Quick Sort algorithm?',
-        topic: 'Data Structures',
-        type: 'MCQ',
-        difficulty: 'Hard',
-        marks: 4,
-        options: { A: 'O(n)', B: 'O(n log n)', C: 'O(n²)', D: 'O(log n)' },
-        correctAnswer: 'B'
+      error: (error) => {
+        console.error('Error loading questions:', error);
+        // Fallback to empty array if API fails
+        this.questions = [];
+        this.originalQuestions = [];
+        this.calculateTotalPages();
       }
-    ];
-    this.originalQuestions = [...this.questions];
-    this.calculateTotalPages();
+    });
   }
 
   filterQuestions() {
@@ -448,7 +427,7 @@ export class QuestionBankComponent {
     // Apply topic filter first
     if (this.selectedTopicFilter) {
       filteredQuestions = filteredQuestions.filter(question =>
-        question.topic === this.selectedTopicFilter
+        question.topicCode === this.selectedTopicFilter
       );
     }
 
@@ -456,8 +435,8 @@ export class QuestionBankComponent {
     if (searchTerm.trim() !== '') {
       filteredQuestions = filteredQuestions.filter(question =>
         question.code.toLowerCase().includes(searchTerm) ||
-        question.questionText.toLowerCase().includes(searchTerm) ||
-        question.topic.toLowerCase().includes(searchTerm) ||
+        question.question.toLowerCase().includes(searchTerm) ||
+        question.topicCode.toLowerCase().includes(searchTerm) ||
         question.type.toLowerCase().includes(searchTerm) ||
         question.difficulty.toLowerCase().includes(searchTerm)
       );
@@ -478,6 +457,11 @@ export class QuestionBankComponent {
 
   calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.questions.length / this.pageSize);
+  }
+
+  getTopicName(topicCode: string): string {
+    const topic = this.topics?.find((t: any) => t.code === topicCode);
+    return topic ? topic.name : topicCode;
   }
 
   goToFirstPage(): void {
@@ -508,25 +492,52 @@ export class QuestionBankComponent {
   }
 
 questionForm1 = this.fb.group({
-  code: [''],
-  topic: [''],
-  difficulty: [''],
-  type: ['MCQ'],
-  marks: [1],
-  questionText: [''],
-  optionA: [''],
-  optionB: [''],
-  optionC: [''],
-  optionD: [''],
-  correctAnswer: [''],
+  id: [null],
+  code: ['', Validators.required],
+  question: ['', Validators.required],
+  topicCode: ['', Validators.required],
+  type: ['MCQ', Validators.required],
+  difficulty: ['', Validators.required],
+  marks: [0, [Validators.required, Validators.min(1)]],
+  options: this.fb.array([]),
+  option0: ['', Validators.required],
+  option1: ['', Validators.required],
+  option2: ['', Validators.required],
+  option3: ['', Validators.required],
+  correctOption: ['', Validators.required],
   wordLimit: [null]
 });
 
 onSubmit() {
-  if (this.questionForm.valid) {
-    console.log('Form Submitted', this.questionForm.value);
-    // Call your API or emit event here
+  if (this.questionForm1.invalid) {
+    this.toastr.error('Please fill all the required fields');
+    return;
   }
+
+  const questionData = this.questionForm1.value;
+  if (questionData.type === 'MCQ') {
+    questionData.options = [
+      questionData.option0,
+      questionData.option1,
+      questionData.option2,
+      questionData.option3
+    ];
+  }
+
+  this.questionService.addQuestion(questionData).subscribe({
+    next: (res) => {
+      this.toastr.success('Question added successfully');
+      this.addQuestionModal.hide();
+      this.loadQuestions();
+      this.questionForm1.reset({
+        type: 'MCQ' 
+      });
+    },
+    error: (err) => {
+      this.toastr.error('Failed to add question');
+      console.error(err);
+    }
+  });
 }
 
 }

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
-import { StudentService } from '../../../services/student/student.service';
+import { routes } from '../../../app.routes';
 
 @Component({
   selector: 'app-add-students',
@@ -47,7 +47,7 @@ export class AddStudentsComponent {
     fb: FormBuilder = new FormBuilder();
     selectedQuestions: boolean[] = [];
 
-    constructor(private questionService: StudentService) {
+    constructor(private route: ActivatedRoute) {
       this.searchForm = new FormGroup({
         searchTerm: new FormControl('')
       });

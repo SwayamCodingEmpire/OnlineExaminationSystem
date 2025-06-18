@@ -14,8 +14,8 @@ import { filter } from 'rxjs/operators';
 })
 export class NavbarComponent {
   isDropdownOpen = false;
-  userName: string = 'Swayam Prakash Mohanty';
-  userInitials: string = 'SPM';
+  userName: string = 'Mohit Kumar';
+  userInitials: string = 'MK';
   option: boolean = false;
 
   constructor(private router: Router) {
@@ -39,16 +39,18 @@ export class NavbarComponent {
     const storedUser = localStorage.getItem('user'); // Assuming 'user' key holds the user data
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      this.userName = user.email; // "user" key holds the full name
+      this.userName = user.name; // "user" key holds the full name
 
-      const nameParts = this.userName.trim().split(/\s+/);
-      let initials = '';
-      for (let i = 0; i < nameParts.length; i++) {
-        if (nameParts[i].length > 0) {
-          initials += nameParts[i][0].toUpperCase();
+      if (this.userName && this.userName.trim) {
+        const nameParts = this.userName.trim().split(/\s+/);
+        let initials = '';
+        for (let i = 0; i < nameParts.length; i++) {
+          if (nameParts[i].length > 0) {
+            initials += nameParts[i][0].toUpperCase();
+          }
         }
+        this.userInitials = initials;
       }
-      this.userInitials = initials;
     }
 
     // Check initial route
