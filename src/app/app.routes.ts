@@ -11,6 +11,8 @@ import { ResultsComponent } from './components/student/results/results.component
 import { TakeExamComponent } from './components/student/take-exam/take-exam.component';
 import { LoginComponent } from './components/shared/login/login.component';
 import { ExamsComponent } from './components/student/exams/exams.component';
+import { TopicComponent } from './components/admin/topics/topics/topics.component';
+import { AddStudentComponent } from './components/admin/add-student/add-student.component';
 
 export const routes: Routes = [
   {
@@ -24,7 +26,9 @@ export const routes: Routes = [
       { path: 'students', component: StudentComponent },
       { path: 'question-bank', component: QuestionBankComponent },
       { path: 'exam', component: ExamComponent },
-      { path: 'questions/:code', component: QuestionsComponent }
+      { path: 'questions/:code', component: QuestionsComponent },
+      { path: 'topics', component: TopicComponent },
+      { path: 'add-student/:code', component: AddStudentComponent }
     ]
   },
   {

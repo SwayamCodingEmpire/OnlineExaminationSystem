@@ -78,6 +78,7 @@
                   <th class="table-header-light">Exam Date</th>
                   <th class="table-header-light">Exam Time</th>
                   <th class="table-header-light">Questions</th>
+                  <th class="table-header-light">Students Enrolled</th>
                 </tr>
               </thead>
 
@@ -182,7 +183,18 @@
                     <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
                       <td style="background-color: #f8fbff;">
                                               <a class="bg-action text-primary text-decoration-underline"
-                        [routerLink]="['/admin/questions', exam.code]">Add Questions
+                        [routerLink]="['/admin/questions', exam.code]">Add question
+                      </a>
+                      </td>
+
+
+                    </ng-container>
+
+                    
+                    <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
+                      <td style="background-color: #f8fbff;">
+                                              <a class="bg-action text-primary text-decoration-underline"
+                          [routerLink]="['/admin/add-student', exam.code]">Add Students
                       </a>
                       </td>
 
@@ -349,100 +361,223 @@
 
 
 <!-- Add Question Modal -->
-<div class="modal fade" id="addInstantExamModal" tabindex="-1" aria-labelledby="addInstantExamModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="addInstantExamModal"
+  tabindex="-1"
+  aria-labelledby="addInstantExamModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-xl">
     <form [formGroup]="instantExamForm" (ngSubmit)="submitExam()">
-      <div class="modal-content">
-        <div class="modal-header">
+      <div class="modal-content bg-light border-0 shadow-sm">
+        <!-- Header -->
+        <div class="modal-header cozentus-bg text-white">
           <h5 class="modal-title">Create Instant Exam</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
 
-        <div class="modal-body">
+        <!-- Body -->
+        <div class="modal-body bg-body-secondary">
           <!-- Exam Details -->
           <div class="mb-4">
-            <input type="text" class="form-control mb-2" placeholder="Exam Code" formControlName="examCode">
-            <input type="text" class="form-control mb-2" placeholder="Exam Name" formControlName="examName">
-            <div class="d-flex gap-3">
-              <input type="date" class="form-control" formControlName="examDate">
-              <input type="time" class="form-control" formControlName="examTime">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Exam Code"
+                  formControlName="examCode"
+                />
+              </div>
+              <div class="col-md-6">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Exam Name"
+                  formControlName="examName"
+                />
+              </div>
+            </div>
+
+            <div class="row g-3 mt-2">
+              <div class="col-md-6">
+                <input
+                  type="date"
+                  class="form-control"
+                  formControlName="examDate"
+                />
+              </div>
+              <div class="col-md-6">
+                <input
+                  type="time"
+                  class="form-control"
+                  formControlName="examTime"
+                />
+              </div>
             </div>
           </div>
 
           <!-- Add Question Button -->
           <div *ngIf="examCreated" class="mb-3">
-            <button type="button" class="btn btn-outline-primary" (click)="addQuestion()">+ Add Question</button>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="addQuestion()"
+            >
+              + Add Question
+            </button>
           </div>
 
-          <!-- Question Forms -->
-          <div formArrayName="questions">
-            <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i" class="card mb-4">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                  <input class="form-control mb-2" placeholder="Question Code" formControlName="code">
-                  <div class="d-flex gap-2">
-                    <select class="form-select" formControlName="topic">
-                      <option value="">Select Topic</option>
-                      <option>Angular</option>
-                      <option>Spring boot</option>
-                      <option>Java</option>
-                    </select>
-                    <select class="form-select" formControlName="difficulty">
-                      <option value="">Select Difficulty</option>
-                      <option>Easy</option>
-                      <option>Medium</option>
-                      <option>Hard</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <select class="form-select mb-2" formControlName="type">
-                    <option value="MCQ">MCQ</option>
-                    <option value="Subjective">Subjective</option>
-                  </select>
-                  <input type="number" class="form-control" placeholder="Marks" formControlName="marks">
-                </div>
-              </div>
+          <!-- Question List -->
 
-              <div class="card-body">
-                <div class="mb-3">
-                  <label class="fw-bold">Question:</label>
-                  <textarea class="form-control" formControlName="questionText" rows="3"></textarea>
-                </div>
-
-                <!-- MCQ Options -->
-                <div *ngIf="question.get('type')?.value === 'MCQ'" class="mb-3">
-                  <label class="fw-bold mb-2">Options (Select correct one):</label>
-                  <div class="row g-3">
-                    <ng-container *ngFor="let opt of ['A', 'B', 'C', 'D']">
-                      <div class="col-md-6 d-flex align-items-center">
-                        <input type="radio"
-                               class="form-check-input me-2"
-                               [name]="'correctOption' + i"
-                               [value]="opt"
-                               (change)="question.get('correctAnswer')?.setValue(opt)"
-                               [checked]="question.get('correctAnswer')?.value === opt">
-                        <input type="text" class="form-control" [placeholder]="'Option ' + opt" [formControlName]="'option' + opt">
+          <div class="row">
+            <div class="col-12">
+              <div formArrayName="questions">
+                <!-- One row per question -->
+                <div
+                  *ngFor="let question of questions.controls; let i = index"
+                  [formGroupName]="i"
+                  class="row g-3 align-items-stretch mb-4"
+                >
+                  <!-- ▸ LEFT: Question card (75%) -->
+                  <div class="col-lg-9">
+                    <div class="card h-100 shadow-sm border-0">
+                      <!-- Code Centered -->
+                      <div
+                        class="card-header text-center bg-white border-bottom"
+                      >
+                        <input
+                          class="form-control w-50 mx-auto"
+                          placeholder="Question Code"
+                          formControlName="code"
+                        />
                       </div>
-                    </ng-container>
-                  </div>
-                </div>
 
-                <!-- Subjective -->
-                <div *ngIf="question.get('type')?.value === 'Subjective'" class="mb-3">
-                  <label class="fw-bold">Word Limit:</label>
-                  <input type="number" class="form-control" placeholder="e.g. 250" formControlName="wordLimit">
+                      <!-- Card Body -->
+                      <div class="card-body na-bg">
+                        <div class="mb-3">
+                          <label class="fw-bold">Question:</label>
+                          <textarea
+                            class="form-control"
+                            formControlName="questionText"
+                            rows="3"
+                          ></textarea>
+                        </div>
+
+                        <!-- MCQ Options -->
+                        <div
+                          *ngIf="question.get('type')?.value === 'MCQ'"
+                          class="mb-3"
+                        >
+                          <label class="fw-bold mb-2"
+                            >Options (Select correct one):</label
+                          >
+                          <div class="row g-3">
+                            <ng-container
+                              *ngFor="let opt of ['A', 'B', 'C', 'D']"
+                            >
+                              <div class="col-md-6 d-flex align-items-center">
+                                <input
+                                  type="radio"
+                                  class="form-check-input me-2"
+                                  [name]="'correctOption' + i"
+                                  [value]="opt"
+                                  (change)="
+                                    question.get('correctAnswer')?.setValue(opt)
+                                  "
+                                  [checked]="
+                                    question.get('correctAnswer')?.value === opt
+                                  "
+                                />
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  [placeholder]="'Option ' + opt"
+                                  [formControlName]="'option' + opt"
+                                />
+                              </div>
+                            </ng-container>
+                          </div>
+                        </div>
+
+                        <!-- Subjective -->
+                        <div
+                          *ngIf="question.get('type')?.value === 'Subjective'"
+                          class="mb-3"
+                        >
+                          <label class="fw-bold">Word Limit:</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            placeholder="e.g. 250"
+                            formControlName="wordLimit"
+                          />
+                        </div>
+
+                        <!-- Delete Button -->
+                        <div class="d-flex justify-content-end mt-2">
+                          <button
+                            class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px"
+                            (click)="removeQuestion(i)"
+                            title="Remove Question"
+                          >
+                            <i class="fa-regular fa-trash text-white"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ▸ RIGHT: Question Type + Marks (25%) -->
+                  <div class="col-lg-3">
+                    <div class="h-100 d-flex flex-column align-items-center justify-content-center gap-3">
+                      
+
+                      <div>
+                        <label class="fw-bold">Marks:</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          placeholder="Marks"
+                          formControlName="marks"
+                        />
+                      </div>
+                      <div>
+                        <label class="fw-bold">Duration:</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          placeholder="Duration"
+                          formControlName="duration"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="modal-footer">
+        <!-- Footer -->
+        <div class="modal-footer bg-white">
           <button type="submit" class="btn btn-success">
-            {{ examCreated ? 'Save Exam' : 'Create Exam' }}
+            {{ examCreated ? "Save Exam" : "Create Exam" }}
           </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
         </div>
       </div>
     </form>

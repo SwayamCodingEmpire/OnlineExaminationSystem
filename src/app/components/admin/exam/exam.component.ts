@@ -36,6 +36,7 @@ export class ExamComponent {
   tempNewexam: any = null;
   editingIndex: number | null = null;
   pageSize = 10;
+  duration: string = '';
   deleteModal: any;
   examIndexToDelete: number | null = null;
   totalPages = Math.ceil(this.exams.length / this.pageSize);
@@ -254,7 +255,9 @@ export class ExamComponent {
     });
   }
 
-
+  removeQuestion(index: number) {
+    this.questions.removeAt(index);
+  }
 
   deleteexam(index: number) {
     this.examIndexToDelete = index;
@@ -497,7 +500,7 @@ get questions(): FormArray {
       optionC: [''],
       optionD: [''],
       correctAnswer: [''],
-      wordLimit: [null]
+      duration: ['']
     });
 
     this.questions.push(questionForm);

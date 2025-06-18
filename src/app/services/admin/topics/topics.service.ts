@@ -7,7 +7,7 @@ import { environment } from '../../../../Enviornment/enviornment';
   providedIn: 'root'
 })
 export class TopicsService {
-  private baseUrl = `${environment.apiUrl}/topics`; 
+  private baseUrl = `${environment.apiUrl}/topic`; 
 
   constructor(private http: HttpClient) { }
 
@@ -45,10 +45,7 @@ export class TopicsService {
       .pipe(catchError(this.handleError));
   }
 
-  getAvailableTopics(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/basic`, this.getHttpOptions())
-      .pipe(catchError(this.handleError));
-  }
+ 
 
   // Additional methods for topic management if needed
   addTopic(topic: any): Observable<any> {
@@ -56,13 +53,14 @@ export class TopicsService {
       .pipe(catchError(this.handleError));
   }
 
-  updateTopic(topic: any): Observable<any> {
-    return this.http.put(this.baseUrl, topic, this.getHttpOptions())
+  updateTopic(code: string, topic: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${code}`, topic, this.getHttpOptions())
       .pipe(catchError(this.handleError));
   }
 
-  deleteTopic(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`, this.getHttpOptions())
+  deleteTopic(code: string): Observable<any> {
+    console.log('Deleting topic with code:', code);
+    return this.http.delete(`${this.baseUrl}/${code}`, this.getHttpOptions())
       .pipe(catchError(this.handleError));
   }
 }
