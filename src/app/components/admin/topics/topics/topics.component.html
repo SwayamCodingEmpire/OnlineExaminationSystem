@@ -22,13 +22,13 @@
                         Add topics
                     </button>
                 </div>
-                <ng-container *ngIf="false">
+                <ng-container *ngIf="originalTopics.length === 0">
                     <div class="d-flex justify-content-start align-items-center mt-2 mx-2 px-3 py-3 rounded"
                         style="background-color: #f8fbff">
                         <span class="px-3 fw-bold text-dark">Please add a topic to see content</span>
                     </div>
                 </ng-container>
-                <ng-container *ngIf="true">
+                <ng-container *ngIf="originalTopics.length !== 0">
                     <div class="table-responsive mt-4 ms-0 ps-0" style="overflow-x: auto">
                         <table class="table table-borderless table-responsive">
                             <thead>
@@ -247,4 +247,4 @@
             </div>
         </div>
     </div>
-</div>                                                                                                                                                                                                                                           
+</div>
