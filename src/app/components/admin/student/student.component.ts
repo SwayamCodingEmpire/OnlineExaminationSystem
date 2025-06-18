@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
-import { StudentService } from '../../../services/student/student.service';
+// import { StudentService } from '../../../services/student/student.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { StudentsService } from '../../../services/admin/students/students.service';
 
 
 @Component({
@@ -114,7 +115,7 @@ export class StudentComponent {
   }
 
 
-  constructor(private studentService: StudentService) {
+    constructor(private studentService: StudentsService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });

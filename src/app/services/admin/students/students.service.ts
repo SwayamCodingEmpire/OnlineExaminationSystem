@@ -2,11 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+
+
 @Injectable({
   providedIn: 'root'
 })
-export class StudentService {
-   private baseUrl ='http://localhost:8080/admin/Student'; // Replace with your API endpoint
+export class StudentsService {
+   private baseUrl ='http://localhost:8080/admin/Students'; // Replace with your API endpoint
 
   constructor(private http:HttpClient) {
 
@@ -36,7 +38,8 @@ getAvailableStudents(): Observable<any[]> {
     return this.http.put(this.baseUrl, Student);
   }
 
-  deleteStudent(id: string): Observable<any> {
+    deleteStudent(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }
+

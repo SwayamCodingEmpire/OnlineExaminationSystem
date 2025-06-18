@@ -199,7 +199,7 @@ export class AdminDashboardComponent {
     this.doughnutChartOptions = {
       series: [80, 15, 5],
       chart: {
-        width: 350,
+        width: 380,
         type: "donut"
       },
       labels: ["Completed", "In Progress", "Not Started"],
