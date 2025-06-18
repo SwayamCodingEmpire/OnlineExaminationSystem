@@ -1,0 +1,264 @@
+<div class="container-fluid">
+    <div class="row mx-2">
+        <div class="col-6 mt-3">
+            <label>Students</label>
+        </div>
+        <div class="col-6 text-end mt-2">
+            <button class="btn bg-white square-btn">
+                <i class="fa-solid fa-rotate-right text-primary"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row mx-3 align-items-center">
+        <div class="card mt-2 border-0 shadow-sm col-12">
+            <div class="card-body mt-2">
+                <div class="row mx-0 ps-0 ms-0 justify-content-start align-items-center">
+                    <form [formGroup]="searchForm" class="col-6">
+                        <input type="text" class="form-control w-50" placeholder="Search"
+                            formControlName="searchTerm" />
+                    </form>
+
+                    <div class="col-6 justify-content-end d-flex">
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn px-5 py-2 w-100 border border-secondary mx-2" [disabled]="false"
+                                    (click)="enrollStudentInExam()">
+                                    {{ isExamSpecificView ? "Enroll Student" : "Add Student" }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ng-container *ngIf="false">
+                    <div class="d-flex justify-content-start align-items-center mt-2 mx-2 px-3 py-3 rounded"
+                        style="background-color: #f8fbff">
+                        <span class="px-3 fw-bold text-dark">Please add a Student to see content</span>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="true">
+                    <div class="table-responsive mt-4 ms-2" style="overflow-x: auto">
+                        <table class="table table-borderless table-responsive">
+                            <thead>
+                                <tr>
+                                    <th class="table-header-light">Actions</th>
+
+                                    <th class="table-header-light text-center">
+                                        <div class="d-flex flex-row align-items-center justify-content-start">
+                                            Code
+                                            <div class="d-flex flex-column align-items-center small ms-2">
+                                                <i class="fa fa-chevron-up" (click)="sortTable('code', true)"
+                                                    [style.color]="
+                            sortedColumn === 'code' && isAscending
+                              ? 'blue'
+                              : 'black'
+                          ">
+                                                </i>
+                                                <i class="fas fa-chevron-down" (click)="sortTable('code', false)"
+                                                    [style.color]="
+                            sortedColumn === 'code' && !isAscending
+                              ? 'blue'
+                              : 'black'
+                          ">
+                                                </i>
+                                            </div>
+                                        </div>
+                                    </th>
+
+                                    <th class="table-header-light text-center">
+                                        <div class="d-flex flex-row align-items-center justify-content-start">
+                                            Student Name
+                                            <div class="d-flex flex-column align-items-center small ms-2">
+                                                <i class="fas fa-chevron-up" (click)="sortTable('name', true)"
+                                                    [style.color]="
+                            sortedColumn === 'name' && isAscending
+                              ? 'blue'
+                              : 'black'
+                          ">
+                                                </i>
+                                                <i class="fas fa-chevron-down" (click)="sortTable('name', false)"
+                                                    [style.color]="
+                            sortedColumn === 'name' && !isAscending
+                              ? 'blue'
+                              : 'black'
+                          ">
+                                                </i>
+                                            </div>
+                                            <i class="fa-light fa-filter ms-3"></i>
+                                        </div>
+                                    </th>
+                                    <th class="table-header-light">Email</th>
+                                    <th class="table-header-light">Phone No</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="
+                    let Student of Students
+                      | paginate
+                        : { itemsPerPage: pageSize, currentPage: currentPage };
+                    let i = index
+                  ">
+                                    <!-- Actions (Edit & Delete) -->
+                                    <td [ngStyle]="{
+                      background: i % 2 === 0 ? '#f8fbff' : 'transparent'
+                    }">
+                                        <input type="checkbox" class="form-check-input green-checkbox"
+                                            [(ngModel)]="checkedStudents[i]" name="checkbox{{ i }}" />
+                                    </td>
+
+                                    <!-- Code Column -->
+                                    <td [ngStyle]="{
+                      background: i % 2 === 0 ? '#f8fbff' : 'transparent'
+                    }" class="text-info text-decoration-underline" style="cursor: pointer; width: 15rem">
+                                        <a *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
+                                            data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                            [attr.title]="'Click to view or add topic'"
+                                            class="text-primary cursor-pointer" (click)="hideTooltip($event)">
+                                            {{ Student.code }}
+                                        </a>
+
+                                        <form [formGroup]="StudentForm"
+                                            *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                                            <input type="text" formControlName="code" class="form-control edit-mode"
+                                                placeholder="Enter Code" />
+                                        </form>
+                                    </td>
+
+                                    <!-- Student Name -->
+                                    <td class="w-25" [ngStyle]="{
+                      background: i % 2 === 0 ? '#f8fbff' : 'transparent'
+                    }">
+                                        <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ Student.name
+                                            }}</span>
+                                        <form [formGroup]="StudentForm"
+                                            *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                                            <input type="text" formControlName="name" class="form-control edit-mode"
+                                                placeholder="Enter Student Name" />
+                                        </form>
+                                    </td>
+
+                                    <!-- Description -->
+                                    <td class="" [ngStyle]="{
+                      background: i % 2 === 0 ? '#f8fbff' : 'transparent'
+                    }" style="max-width: 100px">
+                                        <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ Student.name
+                                            }}</span>
+                                        <form [formGroup]="StudentForm"
+                                            *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                                            <input type="text" formControlName="email" class="form-control edit-mode"
+                                                placeholder="Enter Student Name" />
+                                        </form>
+                                    </td>
+
+                                    <!-- Topics Column with Tooltip -->
+                                    <td class="" [ngStyle]="{
+                      background: i % 2 === 0 ? '#f8fbff' : 'transparent'
+                    }" style="max-width: 100px">
+                                        <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ Student.name
+                                            }}</span>
+                                        <form [formGroup]="StudentForm"
+                                            *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                                            <input type="text" formControlName="phoneNo" class="form-control edit-mode"
+                                                placeholder="Enter Student Name" />
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-container>
+            </div>
+
+            <div class="d-flex justify-content-end align-items-center w-100 custom-font">
+                <div class="d-flex justify-content-between align-items-center w-100 mb-4 flex-wrap gap-2">
+                    <!-- Entries Info -->
+                    <div class="ms-auto text-end me-1">
+                        <span>
+                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
+                            {{
+                            currentPage * pageSize > Students.length
+                            ? Students.length
+                            : currentPage * pageSize
+                            }}
+                            of {{ Students.length }} entries
+                        </span>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <div class="d-flex align-items-center gap-1">
+                        <button class="btn btn-outline-secondary btn-sm" (click)="goToFirstPage()"
+                            [disabled]="currentPage === 1">
+                            <i class="fa fa-angle-double-left"></i>
+                        </button>
+
+                        <button class="btn btn-outline-secondary btn-sm" (click)="goToPreviousPage()"
+                            [disabled]="currentPage === 1">
+                            <i class="fa fa-angle-left"></i>
+                        </button>
+
+                        <button class="btn btn-outline-primary btn-sm disabled">
+                            {{ currentPage }}
+                        </button>
+
+                        <button class="btn btn-outline-secondary btn-sm" (click)="goToNextPage()"
+                            [disabled]="currentPage === totalPages">
+                            <i class="fa fa-angle-right"></i>
+                        </button>
+
+                        <button class="btn btn-outline-secondary btn-sm" (click)="goToLastPage()"
+                            [disabled]="currentPage === totalPages">
+                            <i class="fa fa-angle-double-right"></i>
+                        </button>
+
+                        <!-- Page Size Dropdown -->
+                        <select class="form-select form-select-sm ms-2 w-auto" [(ngModel)]="pageSize"
+                            (change)="updatePagination()">
+                            <option [value]="10">10</option>
+                            <option [value]="25">25</option>
+                            <option [value]="50">50</option>
+                            <option [value]="100">100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header flex-column align-items-start pb-0" style="border-bottom: none">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">
+                    Delete Student
+                </h5>
+                <hr class="modal-title-line w-100 m-0 mt-3" />
+                <button type="button" class="btn-close position-absolute end-0 top-0 m-3" data-bs-dismiss="modal"
+                    aria-label="Close">
+                    <i class="fa-solid fa-xmark-large"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Are you sure that you want to delete Student
+                    <span id="StudentCodeToDelete"></span>?
+                </p>
+            </div>
+            <div class="modal-footer justify-content-end border-0 pt-0">
+                <button type="button" class="btn btn-primary px-4" id="confirmDeleteBtn" style="
+            background-color: #2962ff;
+            border-radius: 6px;
+            font-weight: 500;
+          ">
+                    Yes
+                </button>
+                <button type="button" class="btn btn-outline-secondary px-4 ms-2" data-bs-dismiss="modal"
+                    style="border-radius: 6px; font-weight: 500">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

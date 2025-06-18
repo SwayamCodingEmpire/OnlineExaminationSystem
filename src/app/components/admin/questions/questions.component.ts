@@ -520,30 +520,30 @@ export class QuestionsComponent {
     }
   }
 
-questionForm1 = this.fb.group({
-  code: [''],
-  topic: [''],
-  difficulty: [''],
-  type: ['MCQ'],
-  marks: [1],
-  questionText: [''],
-  optionA: [''],
-  optionB: [''],
-  optionC: [''],
-  optionD: [''],
-  correctAnswer: [''],
-  wordLimit: [null]
-});
+  questionForm1 = this.fb.group({
+    code: [''],
+    topic: [''],
+    difficulty: [''],
+    type: ['MCQ'],
+    marks: [1],
+    questionText: [''],
+    optionA: [''],
+    optionB: [''],
+    optionC: [''],
+    optionD: [''],
+    correctAnswer: [''],
+    wordLimit: [null]
+  });
 
-onSubmit() {
-  if (this.questionForm.valid) {
-    console.log('Form Submitted', this.questionForm.value);
-    // Call your API or emit event here
+  onSubmit() {
+    if (this.questionForm.valid) {
+      console.log('Form Submitted', this.questionForm.value);
+      // Call your API or emit event here
+    }
   }
-}
 
-addQuestion(){
-  console.log(this.selectedQuestions);
-}
+  addQuestion() {
+    console.log(this.selectedQuestions);
+  }
 
 }

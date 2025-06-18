@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="row mx-2">
     <div class="col-6 mt-3">
-      <label>exams</label>
+      <label>Exam</label>
     </div>
     <div class="col-6 text-end mt-2">
       <button class="btn bg-white square-btn">
@@ -12,37 +12,22 @@
   <div class="row mx-3 align-items-center">
     <div class="card mt-2 border-0 shadow-sm col-12">
       <div class="card-body mt-2">
-        <div
-          class="row mx-0 ps-0 ms-0 justify-content-start align-items-center"
-        >
+        <div class="row mx-0 ps-0 ms-0 justify-content-start align-items-center">
           <form [formGroup]="searchForm" class="col-6">
-            <input
-              type="text"
-              class="form-control w-50"
-              placeholder="Search"
-              formControlName="searchTerm"
-            />
+            <input type="text" class="form-control w-50" placeholder="Search" formControlName="searchTerm" />
           </form>
 
           <div class="col-6 justify-content-end d-flex">
             <div class="row">
               <div class="col-6">
-                <button
-                  class="btn px-5 py-2 w-100 border border-secondary mx-2"
-                  [disabled]="false"
-                  (click)="addRow()"
-                >
+                <button class="btn px-5 py-2 w-100 border border-secondary mx-2" [disabled]="false" (click)="addRow()">
                   Add exam
                 </button>
               </div>
 
               <div class="col-6">
-                <button
-                  class="btn px-3 py-2 w-100 border border-secondary mx-3"
-                  [disabled]="false"
-                  data-bs-toggle="modal"
-                  data-bs-target="#addInstantExamModal"
-                >
+                <button class="btn px-3 py-2 w-100 border border-secondary mx-3" [disabled]="false"
+                  data-bs-toggle="modal" data-bs-target="#addInstantExamModal">
                   Add Instant Exam
                 </button>
               </div>
@@ -50,13 +35,9 @@
           </div>
         </div>
         <ng-container *ngIf="false">
-          <div
-            class="d-flex justify-content-start align-items-center mt-2 mx-2 px-3 py-3 rounded"
-            style="background-color: #f8fbff"
-          >
-            <span class="px-3 fw-bold text-dark"
-              >Please add a exam to see content</span
-            >
+          <div class="d-flex justify-content-start align-items-center mt-2 mx-2 px-3 py-3 rounded"
+            style="background-color: #f8fbff">
+            <span class="px-3 fw-bold text-dark">Please add a exam to see content</span>
           </div>
         </ng-container>
         <ng-container *ngIf="true">
@@ -67,64 +48,40 @@
                   <th class="table-header-light">Actions</th>
 
                   <th class="table-header-light text-center">
-                    <div
-                      class="d-flex flex-row align-items-center justify-content-start"
-                    >
+                    <div class="d-flex flex-row align-items-center justify-content-start">
                       Code
-                      <div
-                        class="d-flex flex-column align-items-center small ms-2"
-                      >
-                        <i
-                          class="fa fa-chevron-up"
-                          (click)="sortTable('code', true)"
-                          [style.color]="
+                      <div class="d-flex flex-column align-items-center small ms-2">
+                        <i class="fa fa-chevron-up" (click)="sortTable('code', true)" [style.color]="
                             sortedColumn === 'code' && isAscending
                               ? 'blue'
                               : 'black'
-                          "
-                        >
+                          ">
                         </i>
-                        <i
-                          class="fas fa-chevron-down"
-                          (click)="sortTable('code', false)"
-                          [style.color]="
+                        <i class="fas fa-chevron-down" (click)="sortTable('code', false)" [style.color]="
                             sortedColumn === 'code' && !isAscending
                               ? 'blue'
                               : 'black'
-                          "
-                        >
+                          ">
                         </i>
                       </div>
                     </div>
                   </th>
 
                   <th class="table-header-light text-center">
-                    <div
-                      class="d-flex flex-row align-items-center justify-content-start"
-                    >
+                    <div class="d-flex flex-row align-items-center justify-content-start">
                       Exam Name
-                      <div
-                        class="d-flex flex-column align-items-center small ms-2"
-                      >
-                        <i
-                          class="fas fa-chevron-up"
-                          (click)="sortTable('name', true)"
-                          [style.color]="
+                      <div class="d-flex flex-column align-items-center small ms-2">
+                        <i class="fas fa-chevron-up" (click)="sortTable('name', true)" [style.color]="
                             sortedColumn === 'name' && isAscending
                               ? 'blue'
                               : 'black'
-                          "
-                        >
+                          ">
                         </i>
-                        <i
-                          class="fas fa-chevron-down"
-                          (click)="sortTable('name', false)"
-                          [style.color]="
+                        <i class="fas fa-chevron-down" (click)="sortTable('name', false)" [style.color]="
                             sortedColumn === 'name' && !isAscending
                               ? 'blue'
                               : 'black'
-                          "
-                        >
+                          ">
                         </i>
                       </div>
                       <i class="fa-light fa-filter ms-3"></i>
@@ -133,198 +90,121 @@
                   <th class="table-header-light">Exam Date</th>
                   <th class="table-header-light">Exam Time</th>
                   <th class="table-header-light">Questions</th>
+                  <th class="table-header-light">Students</th>
                 </tr>
               </thead>
 
               <tbody>
-                <tr
-                  *ngFor="
+                <tr *ngFor="
                     let exam of exams
                       | paginate
                         : { itemsPerPage: pageSize, currentPage: currentPage };
                     let i = index
-                  "
-                >
+                  ">
                   <!-- Actions (Edit & Delete) -->
-                  <td
-                    [ngStyle]="{
+                  <td [ngStyle]="{
                       background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                    }"
-                  >
-                    <button
-                      (click)="editexam(i + pageSize * (currentPage - 1))"
-                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                      class="bg-action"
-                      [disabled]="isAddingNewexam"
-                    >
+                    }">
+                    <button (click)="editexam(i + pageSize * (currentPage - 1))"
+                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)" class="bg-action"
+                      [disabled]="isAddingNewexam">
                       <i class="far fa-pencil"></i>
                     </button>
-                    <button
-                      (click)="deleteexam(i + pageSize * (currentPage - 1))"
-                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                      class="bg-action"
-                    >
+                    <button (click)="deleteexam(i + pageSize * (currentPage - 1))"
+                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)" class="bg-action">
                       <i class="far fa-trash"></i>
                     </button>
 
-                    <ng-container
-                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                    >
+                    <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
                       <span class="mx-0 fw-normal">|</span>
-                      <button
-                        class="btn text-primary text-decoration-underline"
-                        [disabled]="false"
-                        data-bs-toggle="modal"
-                        data-bs-target="#viewExamModal"
-                        (click)="examDetailsClicked(i)"
-                        style="font-size: inherit"
-                      >
+                      <button class="btn text-primary text-decoration-underline" [disabled]="false"
+                        data-bs-toggle="modal" data-bs-target="#viewExamModal" (click)="examDetailsClicked(i)"
+                        style="font-size: inherit">
                         Exam Details
                       </button>
                     </ng-container>
 
                     <!-- Save & Cancel Buttons in Edit Mode -->
-                    <button
-                      (click)="saveExam(i + pageSize * (currentPage - 1))"
-                      (click)="closeDescriptionPopup()"
-                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                      class="bg-action"
-                    >
+                    <button (click)="saveExam(i + pageSize * (currentPage - 1))" (click)="closeDescriptionPopup()"
+                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)" class="bg-action">
                       <i class="fa fa-check"></i>
                     </button>
-                    <button
-                      (click)="cancelEdit()"
-                      (click)="closeDescriptionPopup()"
-                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                      class="bg-action"
-                    >
+                    <button (click)="cancelEdit()" (click)="closeDescriptionPopup()"
+                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)" class="bg-action">
                       <i class="fa fa-xmark"></i>
                     </button>
                   </td>
 
                   <!-- Code Column -->
-                  <td
-                    [ngStyle]="{
+                  <td [ngStyle]="{
                       background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                    }"
-                    role="button"
-                    style="width: 15rem"
-                  >
-                    <a
-                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="bottom"
-                      [attr.title]="'Click to view or add topic'"
-                      class="text-primary text-decoration-underline"
-                      [routerLink]="[
+                    }" role="button" style="width: 15rem">
+                    <a *ngIf="editingIndex !== i + pageSize * (currentPage - 1)" data-bs-toggle="tooltip"
+                      data-bs-placement="bottom" [attr.title]="'Click to view or add topic'"
+                      class="text-primary text-decoration-underline" [routerLink]="[
                         '/admin/exam/details',
                         exam.code,
                         exam.name
-                      ]"
-                      (click)="hideTooltip($event)"
-                      role="button"
-                    >
+                      ]" (click)="hideTooltip($event)" role="button">
                       {{ exam.code }}
                     </a>
 
-                    <form
-                      [formGroup]="examForm"
-                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                    >
-                      <input
-                        type="text"
-                        formControlName="code"
-                        class="form-control edit-mode"
-                        placeholder="Enter Code"
-                      />
+                    <form [formGroup]="examForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <input type="text" formControlName="code" class="form-control edit-mode"
+                        placeholder="Enter Code" />
                     </form>
                   </td>
 
                   <!-- exam Name -->
-                  <td
-                    class="w-25"
-                    [ngStyle]="{
+                  <td class="w-25" [ngStyle]="{
                       background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                    }"
-                  >
-                    <span
-                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                      >{{ exam.name }}</span
-                    >
-                    <form
-                      [formGroup]="examForm"
-                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                    >
-                      <input
-                        type="text"
-                        formControlName="name"
-                        class="form-control edit-mode"
-                        placeholder="Enter exam Name"
-                      />
+                    }">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ exam.name }}</span>
+                    <form [formGroup]="examForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <input type="text" formControlName="name" class="form-control edit-mode"
+                        placeholder="Enter exam Name" />
                     </form>
                   </td>
 
                   <!-- Description -->
-                  <td
-                    class=""
-                    [ngStyle]="{
+                  <td class="" [ngStyle]="{
                       background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                    }"
-                    style="max-width: 100px"
-                  >
-                    <span
-                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                      >{{ exam.date }}</span
-                    >
-                    <form
-                      [formGroup]="examForm"
-                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                    >
-                      <input
-                        type="date"
-                        formControlName="date"
-                        class="form-control edit-mode"
-                        placeholder="Enter exam Name"
-                      />
+                    }" style="max-width: 100px">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ exam.date }}</span>
+                    <form [formGroup]="examForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <input type="date" formControlName="date" class="form-control edit-mode"
+                        placeholder="Enter exam Name" />
                     </form>
                   </td>
 
                   <!-- Topics Column with Tooltip -->
-                  <td
-                    class=""
-                    [ngStyle]="{
+                  <td class="" [ngStyle]="{
                       background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                    }"
-                    style="max-width: 100px"
-                  >
-                    <span
-                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                      >{{ exam.time }}</span
-                    >
-                    <form
-                      [formGroup]="examForm"
-                      *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                    >
-                      <input
-                        type="time"
-                        formControlName="time"
-                        class="form-control edit-mode"
-                        placeholder="Enter exam time"
-                      />
+                    }" style="max-width: 100px">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ exam.time }}</span>
+                    <form [formGroup]="examForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <input type="time" formControlName="time" class="form-control edit-mode"
+                        placeholder="Enter exam time" />
                     </form>
                   </td>
 
-                  <ng-container
-                    *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                  >
+                  <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
                     <td style="background-color: #f8fbff">
-                      <a
-                        class="bg-action text-primary text-decoration-underline"
-                        [routerLink]="['/admin/questions', exam.code]"
-                        >Add Questions
+                      <a class="bg-action text-primary text-decoration-underline"
+                        [routerLink]="['/admin/questions', exam.code]">Add Questions
                       </a>
                     </td>
                   </ng-container>
+
+                  <!-- In exam.component.html, add this inside the table row (tr) -->
+                  <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
+                    <td style="background-color: #f8fbff">
+                      <a class="bg-action text-primary text-decoration-underline"
+                        [routerLink]="['/admin/add-students', exam.code]">Add Students
+                      </a>
+                    </td>
+                  </ng-container>
+
                 </tr>
               </tbody>
             </table>
@@ -332,30 +212,17 @@
         </ng-container>
       </div>
 
-      <div
-        class="d-flex justify-content-end align-items-center w-100 custom-font"
-      >
-        <!-- <span class="me-3">
-          Showing {{ (currentPage - 1) * pageSize + 1 }} to
-          {{
-            currentPage * pageSize > exams.length
-              ? exams.length
-              : currentPage * pageSize
-          }}
-          of {{ exams.length }} entries
-        </span> -->
+      <div class="d-flex justify-content-end align-items-center w-100 custom-font">
 
-        <div
-          class="d-flex justify-content-between align-items-center w-100 mb-4 flex-wrap gap-2"
-        >
+        <div class="d-flex justify-content-between align-items-center w-100 mb-4 flex-wrap gap-2">
           <!-- Entries Info -->
           <div class="ms-auto text-end me-1">
             <span>
               Showing {{ (currentPage - 1) * pageSize + 1 }} to
               {{
-                currentPage * pageSize > exams.length
-                  ? exams.length
-                  : currentPage * pageSize
+              currentPage * pageSize > exams.length
+              ? exams.length
+              : currentPage * pageSize
               }}
               of {{ exams.length }} entries
             </span>
@@ -363,19 +230,12 @@
 
           <!-- Pagination Controls -->
           <div class="d-flex align-items-center gap-1">
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              (click)="goToFirstPage()"
-              [disabled]="currentPage === 1"
-            >
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToFirstPage()" [disabled]="currentPage === 1">
               <i class="fa fa-angle-double-left"></i>
             </button>
 
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              (click)="goToPreviousPage()"
-              [disabled]="currentPage === 1"
-            >
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToPreviousPage()"
+              [disabled]="currentPage === 1">
               <i class="fa fa-angle-left"></i>
             </button>
 
@@ -383,28 +243,18 @@
               {{ currentPage }}
             </button>
 
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              (click)="goToNextPage()"
-              [disabled]="currentPage === totalPages"
-            >
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToNextPage()"
+              [disabled]="currentPage === totalPages">
               <i class="fa fa-angle-right"></i>
             </button>
 
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              (click)="goToLastPage()"
-              [disabled]="currentPage === totalPages"
-            >
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToLastPage()"
+              [disabled]="currentPage === totalPages">
               <i class="fa fa-angle-double-right"></i>
             </button>
 
             <!-- Page Size Dropdown -->
-            <select
-              class="form-select form-select-sm ms-2 w-auto"
-              [(ngModel)]="pageSize"
-              (change)="updatePagination()"
-            >
+            <select class="form-select form-select-sm ms-2 w-auto" [(ngModel)]="pageSize" (change)="updatePagination()">
               <option [value]="10">10</option>
               <option [value]="25">25</option>
               <option [value]="50">50</option>
@@ -413,79 +263,23 @@
           </div>
         </div>
 
-        <!-- <form [formGroup]="pageSizeForm" class="d-flex align-items-center ms-2">
-          <input
-            type="number"
-            class="form-control"
-            style="width: 60px; height: 23px"
-            formControlName="pageSize"
-            min="1"
-            [max]="exams.length"
-          />
-        </form> -->
       </div>
     </div>
   </div>
 </div>
-<!-- Description Modal -->
-<!-- <div class="description-popup shadow-sm p-3" *ngIf="isDescriptionPopupOpen" [style.top.px]="popupPosition.top"
-  [style.left.px]="popupPosition.left">
 
-  <div class="d-flex justify-content-between align-items-center">
-    <h6 class="mb-2">Description</h6>
-    <button class="btn-close" (click)="closeDescriptionPopup()"></button>
-  </div>
-  <form [formGroup]="descriptionForm">
-    <textarea class="form-control" rows="3" formControlName="description" maxlength="40"></textarea>
-    <div *ngIf="
-        descriptionForm.get('description')?.invalid &&
-        descriptionForm.get('description')?.touched
-      " class="text-danger small">
-      <div *ngIf="descriptionForm.get('description')?.errors?.['required']">
-        Description is required.
-      </div>
-      <div *ngIf="descriptionForm.get('description')?.errors?.['maxlength']">
-        Description cannot exceed 40 characters.
-      </div>
-    </div>
-  </form>
-  <div class="d-flex justify-content-between align-items-center mt-3">
-    <small class="text-muted">{{ descriptionForm.get("description")?.value.length }}/40</small>
-    <div>
-      <button class="btn btn-primary me-2" style="min-width: 100px;"
-        (click)="saveDescription(); closeDescriptionPopup()" [disabled]="descriptionForm.invalid">
-        Save
-      </button>
-      <button class="btn btn-outline-secondary" style="min-width: 100px;" (click)="closeDescriptionPopup()">
-        Cancel
-      </button>
-    </div>
-  </div>
-</div>
 <!-- Delete Confirmation Modal -->
-<div
-  class="modal fade"
-  id="deleteConfirmationModal"
-  tabindex="-1"
-  aria-labelledby="deleteConfirmationModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div
-        class="modal-header flex-column align-items-start pb-0"
-        style="border-bottom: none"
-      >
+      <div class="modal-header flex-column align-items-start pb-0" style="border-bottom: none">
         <h5 class="modal-title" id="deleteConfirmationModalLabel">
           Delete exam
         </h5>
         <hr class="modal-title-line w-100 m-0 mt-3" />
-        <button
-          type="button"
-          class="btn-close position-absolute end-0 top-0 m-3"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="btn-close position-absolute end-0 top-0 m-3" data-bs-dismiss="modal"
+          aria-label="Close">
           <i class="fa-solid fa-xmark-large"></i>
         </button>
       </div>
@@ -496,24 +290,15 @@
         </p>
       </div>
       <div class="modal-footer justify-content-end border-0 pt-0">
-        <button
-          type="button"
-          class="btn btn-primary px-4"
-          id="confirmDeleteBtn"
-          style="
+        <button type="button" class="btn btn-primary px-4" id="confirmDeleteBtn" style="
             background-color: #2962ff;
             border-radius: 6px;
             font-weight: 500;
-          "
-        >
+          ">
           Yes
         </button>
-        <button
-          type="button"
-          class="btn btn-outline-secondary px-4 ms-2"
-          data-bs-dismiss="modal"
-          style="border-radius: 6px; font-weight: 500"
-        >
+        <button type="button" class="btn btn-outline-secondary px-4 ms-2" data-bs-dismiss="modal"
+          style="border-radius: 6px; font-weight: 500">
           No
         </button>
       </div>
@@ -522,25 +307,15 @@
 </div>
 
 <!-- Add Question Modal -->
-<div
-  class="modal fade"
-  id="addInstantExamModal"
-  tabindex="-1"
-  aria-labelledby="addInstantExamModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="addInstantExamModal" tabindex="-1" aria-labelledby="addInstantExamModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <form [formGroup]="instantExamForm" (ngSubmit)="submitExam()">
       <div class="modal-content bg-light border-0 shadow-sm">
         <!-- Header -->
         <div class="modal-header cozentus-bg text-white">
           <h5 class="modal-title">Create Instant Exam</h5>
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <!-- Body -->
@@ -549,48 +324,26 @@
           <div class="mb-4">
             <div class="row g-3">
               <div class="col-md-6">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Exam Code"
-                  formControlName="examCode"
-                />
+                <input type="text" class="form-control" placeholder="Exam Code" formControlName="examCode" />
               </div>
               <div class="col-md-6">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Exam Name"
-                  formControlName="examName"
-                />
+                <input type="text" class="form-control" placeholder="Exam Name" formControlName="examName" />
               </div>
             </div>
 
             <div class="row g-3 mt-2">
               <div class="col-md-6">
-                <input
-                  type="date"
-                  class="form-control"
-                  formControlName="examDate"
-                />
+                <input type="date" class="form-control" formControlName="examDate" />
               </div>
               <div class="col-md-6">
-                <input
-                  type="time"
-                  class="form-control"
-                  formControlName="examTime"
-                />
+                <input type="time" class="form-control" formControlName="examTime" />
               </div>
             </div>
           </div>
 
           <!-- Add Question Button -->
-          <div *ngIf="examCreated" class="mb-3">
-            <button
-              type="button"
-              class="btn btn-outline-primary"
-              (click)="addQuestion()"
-            >
+          <div class="mb-4">
+            <button type="button" class="btn custom-add-btn" (click)="addQuestion()">
               + Add Question
             </button>
           </div>
@@ -601,94 +354,53 @@
             <div class="col-12">
               <div formArrayName="questions">
                 <!-- One row per question -->
-                <div
-                  *ngFor="let question of questions.controls; let i = index"
-                  [formGroupName]="i"
-                  class="row g-3 align-items-stretch mb-4"
-                >
+                <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i"
+                  class="row g-3 align-items-stretch mb-4">
                   <!-- ▸ LEFT: Question card (75%) -->
                   <div class="col-lg-9">
                     <div class="card h-100 shadow-sm border-0">
                       <!-- Code Centered -->
-                      <div
-                        class="card-header text-center bg-white border-bottom"
-                      >
-                        <input
-                          class="form-control w-50 mx-auto"
-                          placeholder="Question Code"
-                          formControlName="code"
-                        />
+                      <div class="card-header text-center bg-white border-bottom">
+                        <input class="form-control w-50 mx-auto" placeholder="Question Code" formControlName="code" />
                       </div>
 
                       <!-- Card Body -->
                       <div class="card-body na-bg">
                         <div class="mb-3">
                           <label class="fw-bold">Question:</label>
-                          <textarea
-                            class="form-control"
-                            formControlName="questionText"
-                            rows="3"
-                          ></textarea>
+                          <textarea class="form-control" formControlName="questionText" rows="3"></textarea>
                         </div>
 
                         <!-- MCQ Options -->
-                        <div
-                          *ngIf="question.get('type')?.value === 'MCQ'"
-                          class="mb-3"
-                        >
-                          <label class="fw-bold mb-2"
-                            >Options (Select correct one):</label
-                          >
+                        <div *ngIf="question.get('type')?.value === 'MCQ'" class="mb-3">
+                          <label class="fw-bold mb-2">Options (Select correct one):</label>
                           <div class="row g-3">
-                            <ng-container
-                              *ngFor="let opt of ['A', 'B', 'C', 'D']"
-                            >
+                            <ng-container *ngFor="let opt of ['A', 'B', 'C', 'D']">
                               <div class="col-md-6 d-flex align-items-center">
-                                <input
-                                  type="radio"
-                                  class="form-check-input me-2"
-                                  [name]="'correctOption' + i"
-                                  [value]="opt"
-                                  (change)="
+                                <input type="radio" class="form-check-input me-2" [name]="'correctOption' + i"
+                                  [value]="opt" (change)="
                                     question.get('correctAnswer')?.setValue(opt)
-                                  "
-                                  [checked]="
+                                  " [checked]="
                                     question.get('correctAnswer')?.value === opt
-                                  "
-                                />
-                                <input
-                                  type="text"
-                                  class="form-control"
-                                  [placeholder]="'Option ' + opt"
-                                  [formControlName]="'option' + opt"
-                                />
+                                  " />
+                                <input type="text" class="form-control" [placeholder]="'Option ' + opt"
+                                  [formControlName]="'option' + opt" />
                               </div>
                             </ng-container>
                           </div>
                         </div>
 
                         <!-- Subjective -->
-                        <div
-                          *ngIf="question.get('type')?.value === 'Subjective'"
-                          class="mb-3"
-                        >
+                        <div *ngIf="question.get('type')?.value === 'Subjective'" class="mb-3">
                           <label class="fw-bold">Word Limit:</label>
-                          <input
-                            type="number"
-                            class="form-control"
-                            placeholder="e.g. 250"
-                            formControlName="wordLimit"
-                          />
+                          <input type="number" class="form-control" placeholder="e.g. 250"
+                            formControlName="wordLimit" />
                         </div>
 
                         <!-- Delete Button -->
                         <div class="d-flex justify-content-end mt-2">
-                          <button
-                            class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
-                            style="width: 32px; height: 32px"
-                            (click)="removeQuestion(i)"
-                            title="Remove Question"
-                          >
+                          <button class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px" (click)="removeQuestion(i)" title="Remove Question">
                             <i class="fa-regular fa-trash text-white"></i>
                           </button>
                         </div>
@@ -697,9 +409,9 @@
                   </div>
 
                   <!-- ▸ RIGHT: Question Type + Marks (25%) -->
-                  <div class="col-lg-3">
-                    <div class="h-100 d-flex flex-column gap-3">
-                      <div>
+                  <div class="col-lg-3 d-flex align-items-center">
+                    <div class="w-100">
+                      <div class="mb-3">
                         <label class="fw-bold">Question Type:</label>
                         <select class="form-select" formControlName="type">
                           <option value="MCQ">MCQ</option>
@@ -709,12 +421,7 @@
 
                       <div>
                         <label class="fw-bold">Marks:</label>
-                        <input
-                          type="number"
-                          class="form-control"
-                          placeholder="Marks"
-                          formControlName="marks"
-                        />
+                        <input type="number" class="form-control" placeholder="Marks" formControlName="marks" />
                       </div>
                     </div>
                   </div>
@@ -729,11 +436,7 @@
           <button type="submit" class="btn btn-success">
             {{ examCreated ? "Save Exam" : "Create Exam" }}
           </button>
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            data-bs-dismiss="modal"
-          >
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
             Close
           </button>
         </div>
@@ -742,54 +445,32 @@
   </div>
 </div>
 
-<div
-  class="modal fade"
-  id="viewExamModal"
-  tabindex="-1"
-  aria-labelledby="viewExamModalLable"
-  aria-hidden="true"
->
+<div class="modal fade" id="viewExamModal" tabindex="-1" aria-labelledby="viewExamModalLable" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="questionDetailsModalLabel">
           Exam Questions
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
       <div class="modal-body" *ngIf="selectedQuestions?.length">
-        <div
-          *ngFor="let question of selectedQuestions; let i = index"
-          class="card mb-4"
-        >
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
+        <div *ngFor="let question of selectedQuestions; let i = index" class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
             <div>
               <h6 class="mb-0">{{ question.code }}</h6>
-              <small class="text-muted"
-                >{{ question.topic }} • {{ question.difficulty }}</small
-              >
+              <small class="text-muted">{{ question.topic }} • {{ question.difficulty }}</small>
             </div>
             <div>
-              <span
-                [class]="
+              <span [class]="
                   question.type === 'MCQ'
                     ? 'badge bg-primary'
                     : 'badge bg-success'
-                "
-              >
+                ">
                 {{ question.type }}
               </span>
-              <span class="badge bg-warning ms-2"
-                >{{ question.marks }} Marks</span
-              >
+              <span class="badge bg-warning ms-2">{{ question.marks }} Marks</span>
             </div>
           </div>
 
@@ -803,21 +484,12 @@
             <div *ngIf="question.type === 'MCQ'" class="mb-4">
               <h6 class="fw-bold">Options:</h6>
               <div class="row">
-                <div
-                  class="col-md-6 mb-2"
-                  *ngFor="let option of ['A', 'B', 'C', 'D']"
-                >
-                  <div
-                    class="p-2 border rounded"
-                    [class.bg-success]="question.correctAnswer === option"
-                    [class.text-white]="question.correctAnswer === option"
-                  >
+                <div class="col-md-6 mb-2" *ngFor="let option of ['A', 'B', 'C', 'D']">
+                  <div class="p-2 border rounded" [class.bg-success]="question.correctAnswer === option"
+                    [class.text-white]="question.correctAnswer === option">
                     <strong>{{ option }})</strong>
                     {{ question.options?.[option] }}
-                    <i
-                      *ngIf="question.correctAnswer === option"
-                      class="fas fa-check float-end"
-                    ></i>
+                    <i *ngIf="question.correctAnswer === option" class="fas fa-check float-end"></i>
                   </div>
                 </div>
               </div>
@@ -829,12 +501,8 @@
 
               <!-- Delete Button -->
               <div class="d-flex justify-content-end mt-2">
-                <button
-                  class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
-                  style="width: 32px; height: 32px"
-                  (click)="deleteQuestion(i)"
-                  title="Remove Question"
-                >
+                <button class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                  style="width: 32px; height: 32px" (click)="deleteQuestion(i)" title="Remove Question">
                   <i class="fa-regular fa-trash text-white"></i>
                 </button>
               </div>
@@ -846,6 +514,13 @@
               <p class="mb-0 text-info">
                 <i class="fas fa-edit"></i> {{ question.wordLimit }} words
               </p>
+
+              <div class="d-flex justify-content-end mt-2">
+                <button class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                  style="width: 32px; height: 32px" (click)="deleteQuestion(i)" title="Remove Question">
+                  <i class="fa-regular fa-trash text-white"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>

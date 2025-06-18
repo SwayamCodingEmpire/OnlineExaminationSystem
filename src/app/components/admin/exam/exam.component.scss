@@ -1,1 +1,11 @@
+.custom-add-btn {
+  background-color: #3e5172 !important;
+  color: white !important;
+  border: none;
+}
 
+.custom-add-btn:hover {
+  background-color: #33405e !important;
+  /* slightly darker */
+  color: white;
+}

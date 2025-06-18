@@ -8,14 +8,22 @@
     </div>
     <div class="card-body">
       <ul class="list-group mb-3">
-        <li *ngFor="let sec of test.sections" class="list-group-item d-flex justify-content-between">
+        <li
+          *ngFor="let sec of test.sections"
+          class="list-group-item d-flex justify-content-between"
+        >
           <span>{{ sec.sectionTitle }}</span>
-          <span><strong>{{ sec.scored }}</strong> / {{ sec.max }}</span>
+          <span
+            ><strong>{{ sec.scored }}</strong> / {{ sec.max }}</span
+          >
         </li>
       </ul>
 
       <div class="text-end">
-        <strong>Total: {{ getTotalScore(test.sections) }} / {{ getTotalMax(test.sections) }}</strong>
+        <strong
+          >Total: {{ getTotalScore(test.sections) }} /
+          {{ getTotalMax(test.sections) }}</strong
+        >
       </div>
     </div>
   </div>

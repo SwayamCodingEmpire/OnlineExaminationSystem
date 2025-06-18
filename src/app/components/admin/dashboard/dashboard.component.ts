@@ -35,7 +35,7 @@ interface LeaderboardEntry {
 @Component({
   selector: 'app-admin-dashboard',
   imports: [
-            CommonModule,
+    CommonModule,
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
@@ -46,7 +46,7 @@ interface LeaderboardEntry {
   styleUrl: './dashboard.component.scss'
 })
 export class AdminDashboardComponent {
-   @ViewChild("chart") chart!: ChartComponent;
+  @ViewChild("chart") chart!: ChartComponent;
   public chartOptions: ChartOptions;
 
   constructor() {
@@ -56,7 +56,7 @@ export class AdminDashboardComponent {
         width: 500,
         type: "pie"
       },
-      labels: ["Pass","Fail"],
+      labels: ["Pass", "Fail"],
       responsive: [
         {
           breakpoint: 480,
@@ -73,7 +73,7 @@ export class AdminDashboardComponent {
     };
   }
 
-examCodes: string[] = [];
+  examCodes: string[] = [];
 
   // Selected exam code
   selectedExamCode: string = '';

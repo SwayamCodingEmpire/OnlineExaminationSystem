@@ -6,7 +6,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-navbar',
   imports: [
-        CommonModule,
+    CommonModule,
     RouterModule
   ],
   templateUrl: './navbar.component.html',
@@ -14,8 +14,8 @@ import { filter } from 'rxjs/operators';
 })
 export class NavbarComponent {
   isDropdownOpen = false;
-  userName: string = 'Swayam Prakash Mohanty';
-  userInitials: string = 'SPM';
+  userName: string = 'admin';
+  userInitials: string = 'A';
   option: boolean = false;
 
   constructor(private router: Router) {
@@ -98,7 +98,7 @@ export class NavbarComponent {
     return this.router.url.includes(route);
   }
 
-    isAdminRoute(): boolean {
+  isAdminRoute(): boolean {
     return this.router.url.startsWith('/admin');
   }
 

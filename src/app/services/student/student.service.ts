@@ -6,25 +6,25 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class StudentService {
-   private baseUrl ='http://localhost:8080/admin/Student'; // Replace with your API endpoint
+  private baseUrl = 'http://localhost:8080/admin/Student'; // Replace with your API endpoint
 
-  constructor(private http:HttpClient) {
+  constructor(private http: HttpClient) {
 
-   }
+  }
 
 
-getStudents(): Observable<any[]> {
-  // const token = localStorage.getItem('token'); // or retrieve from a service
-  // const headers = new HttpHeaders({
-  //   Authorization: `Bearer ${token}`
-  // });
+  getStudents(): Observable<any[]> {
+    // const token = localStorage.getItem('token'); // or retrieve from a service
+    // const headers = new HttpHeaders({
+    //   Authorization: `Bearer ${token}`
+    // });
 
-  return this.http.get<any[]>(`${this.baseUrl}/all`);
-}
+    return this.http.get<any[]>(`${this.baseUrl}/all`);
+  }
 
-getAvailableStudents(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.baseUrl}/basic`);
-}
+  getAvailableStudents(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/basic`);
+  }
 
 
 

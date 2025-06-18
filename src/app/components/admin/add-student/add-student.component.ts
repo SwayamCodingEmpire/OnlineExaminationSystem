@@ -6,9 +6,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 
+import { ActivatedRoute } from '@angular/router';
+
 @Component({
-  selector: 'app-student',
-  standalone: true,
+  selector: 'app-add-student',
   imports: [
     CommonModule,
     RouterModule,
@@ -16,10 +17,11 @@ import { NgxPaginationModule } from 'ngx-pagination';
     FormsModule,
     NgxPaginationModule
   ],
-  templateUrl: './student.component.html',
-  styleUrl: './student.component.scss'
+  templateUrl: './add-student.component.html',
+  styleUrl: './add-student.component.scss'
 })
-export class StudentComponent {
+
+export class AddStudentComponent {
   popupPosition = { top: 0, left: 0 };
   descriptionForm!: FormGroup;
   originalStudents: any[] = [];
@@ -37,12 +39,28 @@ export class StudentComponent {
   pageSize = 10;
   deleteModal: any;
   StudentIndexToDelete: number | null = null;
-  totalPages = 0;
+  totalPages = Math.ceil(this.Students.length / this.pageSize);
+
+  examCode: string | null = null;
+  examName: string = '';
+  isExamSpecificView: boolean = false;
+  selectedQuestion: number | null = null;
+  checkedStudents: boolean[] = [];
+
 
   ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.examCode = params['examCode'] || null;
+      this.isExamSpecificView = !!this.examCode;
+
+      if (this.isExamSpecificView) {
+      }
+
+      this.loadStudents();
+    });
+
     console.log('StudentsComponent ngOnInit called');
     this.loadStudents();
-    this.calculateTotalPages();
 
     // Initialize search term change detection
     this.searchForm.get('searchTerm')?.valueChanges.subscribe(term => {
@@ -52,7 +70,6 @@ export class StudentComponent {
     // Initialize page size change detection
     this.pageSizeForm.get('pageSize')?.valueChanges.subscribe(size => {
       this.pageSize = size;
-      this.calculateTotalPages();
     });
 
     // Initialize Bootstrap tooltips and modal
@@ -65,45 +82,13 @@ export class StudentComponent {
     }, 500);
   }
 
-  calculateTotalPages(): void {
-    this.totalPages = Math.ceil(this.Students.length / this.pageSize);
-  }
-
-  goToFirstPage(): void {
-    this.currentPage = 1;
-  }
-
-  goToPreviousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.initializeTooltips();
-    }
-  }
-
-  goToNextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.initializeTooltips();
-    }
-  }
-
-  goToLastPage(): void {
-    this.currentPage = this.totalPages;
-  }
-
-  updatePagination(): void {
-    this.calculateTotalPages();
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages || 1;
-    }
-    this.initializeTooltips();
-  }
-
   saveStudent(index: number) {
     if (this.StudentForm.valid) {
       const formValue = this.StudentForm.value;
       const updatedStudent = {
-        ...formValue
+        ...formValue,
+        // Add exam code to student if in exam-specific view
+        ...(this.isExamSpecificView && this.examCode && { exams: [this.examCode] })
       };
 
       if (this.isAddingNewStudent && index === 0) {
@@ -111,22 +96,20 @@ export class StudentComponent {
         this.studentService.addStudent(updatedStudent).subscribe(() => {
           this.isAddingNewStudent = false;
           this.cancelEdit();
-          this.loadStudents(); // Reload all Students from service
+          this.loadStudents();
         }, (error) => {
           console.error('Error adding Student:', error);
-          // Handle error case
-          this.loadStudents(); // Reload to restore original state
+          this.loadStudents();
         });
       } else {
         // Updating an existing Student
         const StudentId = this.Students[index].id;
         this.studentService.updateStudent(updatedStudent).subscribe(() => {
           this.cancelEdit();
-          this.loadStudents(); // Reload all Students from service
+          this.loadStudents();
         }, (error) => {
           console.error('Error updating Student:', error);
-          // Handle error case
-          this.loadStudents(); // Reload to restore original state
+          this.loadStudents();
         });
       }
     }
@@ -148,10 +131,12 @@ export class StudentComponent {
     this.isDescriptionPopupOpen = false;
   }
 
-  constructor(private studentService: StudentService) {
+
+  constructor(private studentService: StudentService, private route: ActivatedRoute) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
+
 
     this.StudentForm = new FormGroup({
       code: new FormControl('', Validators.required),
@@ -167,7 +152,9 @@ export class StudentComponent {
     this.pageSizeForm = new FormGroup({
       pageSize: new FormControl(8, [Validators.required, Validators.min(1)])
     });
+
   }
+
 
   initializeTooltips() {
     // Destroy existing tooltips
@@ -190,6 +177,7 @@ export class StudentComponent {
       return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
   }
+
 
   addRow() {
     this.isAddingNewStudent = true;
@@ -234,6 +222,7 @@ export class StudentComponent {
     });
   }
 
+
   deleteStudent(index: number) {
     this.StudentIndexToDelete = index;
     const StudentCode = this.Students[index].code;
@@ -242,7 +231,7 @@ export class StudentComponent {
     // Set the Student code in the modal
     const StudentCodeElement = document.getElementById('StudentCodeToDelete');
     if (StudentCodeElement) {
-      StudentCodeElement.textContent = `${StudentCode} / ${StudentName}`;
+      StudentCodeElement.textContent = `${StudentCode}/ ${StudentName}`;
     }
 
     // Show the modal
@@ -261,6 +250,7 @@ export class StudentComponent {
     }
   }
 
+
   confirmDeleteStudent() {
     if (this.StudentIndexToDelete !== null) {
       const StudentId = this.Students[this.StudentIndexToDelete].code;
@@ -276,17 +266,20 @@ export class StudentComponent {
     }
   }
 
+
   loadStudents() {
+    // For your current mock data approach:
     const data: any[] = [
       {
         code: 'S001',
         name: 'John Doe',
-        email: 'John Doe@email.com',
+        email: 'john.doe@email.com',
         phoneNo: '1234567890',
+        exams: ['EX001'] // Add this exams array to track which exams the student is enrolled in
       }
     ];
 
-    this.originalStudents = data.map((Student: { topics: any; topicsString: string; name: string }) => ({
+    this.originalStudents = data.map((Student: any) => ({
       ...Student,
       topics: Student.topics && Student.topics.length > 0
         ? Student.topics
@@ -295,6 +288,13 @@ export class StudentComponent {
           : this.generateDefaultTopics(Student.name)
     }));
 
+    // Filter students if we're in exam-specific view
+    if (this.isExamSpecificView && this.examCode) {
+      this.originalStudents = this.originalStudents.filter(student =>
+        student.exams && student.exams.includes(this.examCode)
+      );
+    }
+
     this.Students = [...this.originalStudents];
 
     // Restore any search filtering that was applied
@@ -302,7 +302,7 @@ export class StudentComponent {
       this.filterStudents();
     }
 
-    this.calculateTotalPages();
+    this.totalPages = Math.ceil(this.Students.length / this.pageSize);
   }
 
   generateDefaultTopics(StudentName: string): string[] {
@@ -318,6 +318,8 @@ export class StudentComponent {
     const index = StudentName ? StudentName.length % sampleTopics.length : 0;
     return sampleTopics[index];
   }
+
+
 
   filterStudents() {
     this.currentPage = 1;
@@ -335,9 +337,9 @@ export class StudentComponent {
         Student.phoneNo.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    this.calculateTotalPages();
     this.initializeTooltips();
   }
+
 
   hideTooltip(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -347,28 +349,70 @@ export class StudentComponent {
     }
   }
 
-  openDescriptionPopup(event: MouseEvent, Student: any) {
-    this.descriptionForm.get('description')?.setValue(Student.description);
-    this.isDescriptionPopupOpen = true;
-
-    const target = event.target as HTMLElement;
-    const rect = target.getBoundingClientRect();
-
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
-
-    const popupWidth = 450; // Match with your .description-popup CSS width
-
-    const shiftLeftBy = 160;
-    this.popupPosition = {
-      top: rect.bottom + scrollTop + 10, // space below element
-      left: rect.left + scrollLeft + rect.width / 2 - popupWidth / 2 - shiftLeftBy // center horizontally
-    };
-  }
 
   getRemainingTopics(topics: string[]): string {
     return topics.slice(2)
       .map((topic, index) => `${index + 1}. ${topic}`)
       .join('\n');
   }
+
+
+  calculateTotalPages(): void {
+    this.totalPages = Math.ceil(this.Students.length / this.pageSize);
+  }
+
+  // Navigate to first page
+  goToFirstPage(): void {
+    this.currentPage = 1;
+  }
+
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.initializeTooltips();
+    }
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.initializeTooltips();
+    }
+  }
+
+  // Navigate to last page
+  goToLastPage(): void {
+    this.currentPage = this.totalPages;
+  }
+
+  // Update pagination when page size changes
+  updatePagination(): void {
+    this.calculateTotalPages();
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages || 1;
+    }
+    this.initializeTooltips();
+  }
+
+  // Add this method to filter students by exam
+  private filterStudentsByExam(students: any[]): any[] {
+    if (!this.examCode) return students;
+
+    // Implement your filtering logic here
+    // This is just an example - adjust based on your data structure
+    return students.filter(student =>
+      student.exams && student.exams.includes(this.examCode)
+    );
+  }
+
+  enrollStudentInExam() {
+    const selectedIndexes = this.checkedStudents
+      .map((isChecked, index) => (isChecked ? index : -1))
+      .filter(index => index !== -1);
+
+    console.log('Selected Indexes:', selectedIndexes);
+    // Now you can use selectedIndexes to get students or send to API
+  }
+
 }

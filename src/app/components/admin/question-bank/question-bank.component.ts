@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
 import { StudentService } from '../../../services/student/student.service';
+import { TopicService, Topic } from '../../../services/topic/topic.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-question-bank',
@@ -18,7 +20,7 @@ import { StudentService } from '../../../services/student/student.service';
   templateUrl: './question-bank.component.html',
   styleUrl: './question-bank.component.scss'
 })
-export class QuestionBankComponent {
+export class QuestionBankComponent implements OnInit, OnDestroy {
   popupPosition = { top: 0, left: 0 };
   descriptionForm!: FormGroup;
   originalQuestions: any[] = [];
@@ -46,7 +48,15 @@ export class QuestionBankComponent {
   questionDetailsModal: any;
   fb: FormBuilder = new FormBuilder();
 
-  constructor(private questionService: StudentService) {
+  // Topic-related properties
+  topics: Topic[] = [];
+  topicNames: string[] = [];
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private questionService: StudentService,
+    private topicService: TopicService // Inject TopicService
+  ) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -94,17 +104,22 @@ export class QuestionBankComponent {
 
   ngOnInit(): void {
     console.log('QuestionBankComponent ngOnInit called');
+    this.loadTopics(); // Load topics first
     this.loadQuestions();
 
     // Initialize search term change detection
-    this.searchForm.get('searchTerm')?.valueChanges.subscribe(term => {
-      this.filterQuestions();
-    });
+    this.searchForm.get('searchTerm')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(term => {
+        this.filterQuestions();
+      });
 
     // Initialize page size change detection
-    this.pageSizeForm.get('pageSize')?.valueChanges.subscribe(size => {
-      this.pageSize = size;
-    });
+    this.pageSizeForm.get('pageSize')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(size => {
+        this.pageSize = size;
+      });
 
     // Initialize Bootstrap tooltips and modal
     setTimeout(() => {
@@ -129,6 +144,28 @@ export class QuestionBankComponent {
         this.questionDetailsModal = new bootstrap.Modal(detailsModalElement);
       }
     }, 500);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Load topics from the service
+   */
+  loadTopics(): void {
+    this.topicService.getActiveTopics()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (topics) => {
+          this.topics = topics;
+          console.log('Topics loaded:', this.topics);
+        },
+        error: (error) => {
+          console.error('Error loading topics:', error);
+        }
+      });
   }
 
   setQuestionType(type: string) {
@@ -507,26 +544,48 @@ export class QuestionBankComponent {
     }
   }
 
-questionForm1 = this.fb.group({
-  code: [''],
-  topic: [''],
-  difficulty: [''],
-  type: ['MCQ'],
-  marks: [1],
-  questionText: [''],
-  optionA: [''],
-  optionB: [''],
-  optionC: [''],
-  optionD: [''],
-  correctAnswer: [''],
-  wordLimit: [null]
-});
+  questionForm1 = this.fb.group({
+    code: [''],
+    topic: ['', Validators.required],  // Add required validator
+    difficulty: ['', Validators.required],
+    type: ['MCQ', Validators.required],
+    marks: [1, [Validators.required, Validators.min(1)]],
+    questionText: ['', Validators.required],
+    optionA: [''],
+    optionB: [''],
+    optionC: [''],
+    optionD: [''],
+    correctAnswer: [''],
+    wordLimit: [null]
+  });
 
-onSubmit() {
-  if (this.questionForm.valid) {
-    console.log('Form Submitted', this.questionForm.value);
-    // Call your API or emit event here
+  onSubmit() {
+    if (this.questionForm1.valid) {
+      const formValue = this.questionForm1.value;
+      const selectedTopic = this.topics.find(t => t.name === formValue.topic);
+
+      const newQuestion = {
+        id: this.questions.length + 1,
+        code: formValue.code,
+        questionText: formValue.questionText,
+        topic: formValue.topic,
+        topicCode: selectedTopic?.code, // Add topic code if needed
+        type: formValue.type,
+        difficulty: formValue.difficulty,
+        marks: formValue.marks,
+        // ... other fields based on question type
+      };
+
+      // Add the question to your array or send to API
+      this.questions.unshift(newQuestion);
+      this.originalQuestions = [...this.questions];
+
+      // Close modal and reset form
+      this.addQuestionModal.hide();
+      this.questionForm1.reset({
+        type: 'MCQ',
+        marks: 1
+      });
+    }
   }
-}
-
 }

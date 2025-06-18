@@ -2,51 +2,59 @@
   <div class="row pt-5">
     <div class="col-3 mb-4">
       <div class="card shadow-sm w-100">
-
         <!-- Card Header -->
-        <div class="card-header ms-3 bg-white" style="min-height: 80px;">
-
+        <div class="card-header ms-3 bg-white" style="min-height: 80px">
           <!-- Overlapping Icon Box -->
-          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y">
-            <div class="bg-yellor-chart bg-gradient rounded-1 icon-div mx-0 my-0 text-center">
-              <i class="fa-regular fa-clone fa-flip-vertical fs-1 text-center text-light py-4"></i>
+          <div
+            class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y"
+          >
+            <div
+              class="bg-yellor-chart bg-gradient rounded-1 icon-div mx-0 my-0 text-center"
+            >
+              <i
+                class="fa-regular fa-clone fa-flip-vertical fs-1 text-center text-light py-4"
+              ></i>
             </div>
           </div>
 
           <!-- Header Content -->
           <div class="text-end">
             <small class="text-muted">Total Students</small>
-            <h5 class=" mb-0 text-secondary">5487</h5>
+            <h5 class="mb-0 text-secondary">5487</h5>
           </div>
         </div>
 
         <!-- Card Body -->
         <div class="card-body pt-2">
           <p class="text-danger small mb-0">
-            <i class="fa-solid fa-triangle-exclamation text-danger"></i> Get More Space...
+            <i class="fa-solid fa-triangle-exclamation text-danger"></i> Get
+            More Space...
           </p>
         </div>
-
       </div>
     </div>
 
     <div class="col-3 mb-4">
       <div class="card shadow-sm w-100">
-
         <!-- Card Header -->
-        <div class="card-header ms-3 me-3 bg-white" style="min-height: 80px;">
-
+        <div class="card-header ms-3 me-3 bg-white" style="min-height: 80px">
           <!-- Overlapping Icon Box -->
-          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y">
-            <div class="bg-green-chart bg-gradient bg-opacity-100 rounded-1 icon-div">
-              <i class="fa-solid fa-shop text-white fs-3 text-center px-4 py-4"></i>
+          <div
+            class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y"
+          >
+            <div
+              class="bg-green-chart bg-gradient bg-opacity-100 rounded-1 icon-div"
+            >
+              <i
+                class="fa-solid fa-shop text-white fs-3 text-center px-4 py-4"
+              ></i>
             </div>
           </div>
 
           <!-- Header Content -->
           <div class="text-end">
             <small class="text-muted">Total Ongoing Exams</small>
-            <h5 class=" mb-0 text-secondary">237</h5>
+            <h5 class="mb-0 text-secondary">237</h5>
           </div>
         </div>
 
@@ -56,20 +64,21 @@
             <i class="fa-regular fa-calendar-range"></i> Last 24 hours
           </p>
         </div>
-
       </div>
     </div>
 
     <div class="col-3 mb-4">
       <div class="card shadow-sm w-100">
-
         <!-- Card Header -->
         <div class="card-header ms-3 me-3 bg-white">
-
           <!-- Overlapping Icon Box -->
-          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1  start-0 translate-middle-y">
+          <div
+            class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y"
+          >
             <div class="bg-danger bg-gradient rounded-1 icon-div">
-              <i class="fa-regular fa-circle-info fs-3 text-center my-1 px-4 py-4 text-white"></i>
+              <i
+                class="fa-regular fa-circle-info fs-3 text-center my-1 px-4 py-4 text-white"
+              ></i>
             </div>
           </div>
 
@@ -86,62 +95,73 @@
             <i class="fa-solid fa-tag pe-2"></i>Last 2 years
           </p>
         </div>
-
       </div>
     </div>
 
     <div class="col-3 mb-4">
       <div class="card shadow-sm w-100">
-
         <!-- Card Header -->
-        <div class="card-header ms-3 me-3 bg-white" style="min-height: 80px;">
-
+        <div class="card-header ms-3 me-3 bg-white" style="min-height: 80px">
           <!-- Overlapping Icon Box -->
-          <div class="position-absolute mt-3 ms-3 custom-shadow rounded-1  start-0 translate-middle-y">
+          <div
+            class="position-absolute mt-3 ms-3 custom-shadow rounded-1 start-0 translate-middle-y"
+          >
             <div class="bg-info bg-gradient rounded-1 icon-div">
-              <i class="fa-brands fa-twitter fs-3 text-white px-4 py-4 my-1"></i>
+              <i
+                class="fa-brands fa-twitter fs-3 text-white px-4 py-4 my-1"
+              ></i>
             </div>
           </div>
 
           <!-- Header Content -->
           <div class="text-end">
             <small class="text-muted me-0 pe-0">Upcoming Exams</small>
-            <h5 class=" mb-0 text-secondary">+245</h5>
+            <h5 class="mb-0 text-secondary">+245</h5>
           </div>
         </div>
 
         <!-- Card Body -->
         <div class="card-body pt-2">
           <p class="text-secondary small mb-0">
-            <i class="fa-regular fa-clock-rotate-left fa-flip-horizontal me-2"></i>
+            <i
+              class="fa-regular fa-clock-rotate-left fa-flip-horizontal me-2"
+            ></i>
           </p>
         </div>
-
       </div>
     </div>
   </div>
 
   <div class="row mt-2">
     <div class="col-6">
-
       <div class="card">
         <div class="card-body">
           <div id="chart">
-            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [labels]="chartOptions.labels"
-              [responsive]="chartOptions.responsive"></apx-chart>
+            <apx-chart
+              [series]="chartOptions.series"
+              [chart]="chartOptions.chart"
+              [labels]="chartOptions.labels"
+              [responsive]="chartOptions.responsive"
+            ></apx-chart>
           </div>
         </div>
-
       </div>
-
     </div>
 
     <div class="col-6">
       <div class="card shadow-sm">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <div
+          class="card-header bg-white d-flex justify-content-between align-items-center"
+        >
           <h5 class="mb-0">Exam Leaderboard</h5>
-          <select class="form-select w-auto" [(ngModel)]="selectedExamCode" (change)="filterLeaderboard()">
-            <option *ngFor="let code of examCodes" [value]="code">{{ code }}</option>
+          <select
+            class="form-select w-auto"
+            [(ngModel)]="selectedExamCode"
+            (change)="filterLeaderboard()"
+          >
+            <option *ngFor="let code of examCodes" [value]="code">
+              {{ code }}
+            </option>
           </select>
         </div>
         <div class="card-body p-0">
@@ -163,18 +183,15 @@
                   <td>{{ student.time }}</td>
                 </tr>
                 <tr *ngIf="filteredLeaderboard.length === 0">
-                  <td colspan="4" class="text-center">No data available for this exam</td>
+                  <td colspan="4" class="text-center">
+                    No data available for this exam
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-
-
     </div>
-
   </div>
-
-
 </div>

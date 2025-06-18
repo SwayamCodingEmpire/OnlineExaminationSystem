@@ -7,7 +7,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 @Component({
   selector: 'app-student-dashboard',
   imports: [
-            CommonModule,
+    CommonModule,
     RouterModule,
     ReactiveFormsModule,
     FormsModule,

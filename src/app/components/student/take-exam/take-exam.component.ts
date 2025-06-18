@@ -146,10 +146,10 @@ export class TakeExamComponent {
     question.viewed = true;
   }
 
-  goToQuestion(question: number,q1 : Question){
-    
-    this.currentQuestionIndex=question;
-    q1.viewed=true
+  goToQuestion(question: number, q1: Question) {
+
+    this.currentQuestionIndex = question;
+    q1.viewed = true
   }
 
   startExam() {
@@ -163,7 +163,7 @@ export class TakeExamComponent {
     this.currentSection = this.sections[index];
 
     // Mark all questions as viewed
-   
+
 
     this.timeLeft = this.currentSection.duration;
     this.startTimer();

@@ -75,9 +75,10 @@
 }
 
 .btn-pop {
-  transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
 }
+
 .btn-pop:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }

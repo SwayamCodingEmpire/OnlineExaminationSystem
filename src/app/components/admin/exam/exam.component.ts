@@ -6,6 +6,16 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
 import { StudentService } from '../../../services/student/student.service';
 
+import { Router } from '@angular/router'; // Add this import
+
+// At the top of your file (optional but recommended)
+interface Exam {
+  code: string;
+  name: string;
+  date: string;
+  time: string;
+  students?: any[]; // or use a proper Student interface
+}
 
 @Component({
   selector: 'app-exam',
@@ -49,7 +59,7 @@ export class ExamComponent {
     questions: this.fb.array([])
   });
 
-  examSelected:number|null = null;
+  examSelected: number | null = null;
 
 
 
@@ -151,7 +161,7 @@ export class ExamComponent {
   }
 
 
-  constructor(private examService: StudentService) {
+  constructor(private examService: StudentService, private router: Router) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -323,12 +333,21 @@ export class ExamComponent {
     //   this.totalPages = Math.ceil(this.exams.length / this.pageSize);
     // });
 
+    // const data: any[] = [
+    //   {
+    //     code: 'S001',
+    //     name: 'John Doe',
+    //     date: '13/10/2023',
+    //     time: '10:00 AM',
+    //   }
+
     const data: any[] = [
       {
-        code: 'S001',
-        name: 'John Doe',
+        code: 'EX001',
+        name: 'Midterm Exam',
         date: '13/10/2023',
         time: '10:00 AM',
+        students: [] // Add this empty array
       }
     ];
 
@@ -519,26 +538,31 @@ export class ExamComponent {
     this.questions.removeAt(index);
   }
 
-deleteQuestion(index: number) {
-  if (this.examSelected === null) {
-    console.warn('No exam selected.');
-    return;
+  deleteQuestion(index: number) {
+    if (this.examSelected === null) {
+      console.warn('No exam selected.');
+      return;
+    }
+
+    const selectedExam = this.exams[this.examSelected];
+
+    if (!selectedExam || !selectedExam.questions || selectedExam.questions.length <= index) {
+      console.warn('Question not found at index:', index);
+      return;
+    }
+
+    const question = selectedExam.questions[index];
+    console.log('Selected Question:', question);
   }
 
-  const selectedExam = this.exams[this.examSelected];
 
-  if (!selectedExam || !selectedExam.questions || selectedExam.questions.length <= index) {
-    console.warn('Question not found at index:', index);
-    return;
-  }
-
-  const question = selectedExam.questions[index];
-  console.log('Selected Question:', question);
-}
-
-
-  examDetailsClicked(i: number){
+  examDetailsClicked(i: number) {
     this.examSelected = i;
+  }
+
+  // Add this method to your component class
+  navigateToStudents(examCode: string): void {
+    this.router.navigate(['/admin/students', examCode]);
   }
 
 }
