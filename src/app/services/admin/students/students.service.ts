@@ -1,45 +1,39 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { UserInfo } from '../../../interfaces/admin/student.interface';
+
+
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class StudentsService {
-   private baseUrl ='http://localhost:8080/admin/Students'; // Replace with your API endpoint
+export class StudentService {
+  private baseUrl = 'http://localhost:8080/admin/Student';
 
-  constructor(private http:HttpClient) {
+  constructor(private http: HttpClient) { }
 
-   }
-
-
-getStudents(): Observable<any[]> {
-  // const token = localStorage.getItem('token'); // or retrieve from a service
-  // const headers = new HttpHeaders({
-  //   Authorization: `Bearer ${token}`
-  // });
-
-  return this.http.get<any[]>(`${this.baseUrl}/all`);
-}
-
-getAvailableStudents(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.baseUrl}/basic`);
-}
-
-
-
-  addStudent(Student: any): Observable<any> {
-    return this.http.post(this.baseUrl, Student);
+  getStudents(): Observable<UserInfo[]> {
+    return this.http.get<UserInfo[]>(`${this.baseUrl}/all`);
   }
 
-  updateStudent(Student: any): Observable<any> {
-    return this.http.put(this.baseUrl, Student);
+  addStudent(student: UserInfo): Observable<any> {
+    return this.http.post(this.baseUrl, student);
   }
 
-    deleteStudent(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+  updateStudent(student: UserInfo): Observable<any> {
+    return this.http.put(this.baseUrl, student);
   }
+
+  deleteStudent(code: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${code}`);
+  }
+
+  bulkUploadStudents(userInfo: UserInfo[]): Observable<any> {
+    console.log(userInfo);
+    return this.http.post(`${this.baseUrl}/bulk-upload`, userInfo);
+  }
+
 }
-
