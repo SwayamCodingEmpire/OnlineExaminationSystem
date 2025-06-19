@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../../../Enviornment/enviornment';
 import { SectionPayload } from '../../../models/SectionPayload';
+import { QuestionBankPayload } from '../../../models/QuestionBankPayload';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class ExamQuestionsService {
 
   constructor(private http: HttpClient) {}
 
-assignQuestionsToExam(examCode: string, questionCodes: String[]): Observable<any> {
-  const payload = { questionCodes };
+assignQuestionsToExam(examCode: string, codes: String[]): Observable<any> {
+  const payload = { codes };
   return this.http.post(`${this.apiUrl}/${examCode}/question`, payload, {
       responseType: 'text' as 'json' // accept plain text if server returns no JSON
     })
@@ -62,6 +63,25 @@ assignQuestionsToExam(examCode: string, questionCodes: String[]): Observable<any
     return this.http.get<any[]>(`${this.apiUrl}/${code}/questions/all`)
       .pipe(catchError(this.handleError));
 
+  }
+
+    addInstantExam(examCode: string, questions: QuestionBankPayload[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${examCode}/instant-exam`, questions, {
+      responseType: 'text' as 'json'
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  deleteQuestion(examCode: string, questionCode: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${examCode}/question/${questionCode}`, {
+      responseType: 'text' as 'json'
+    }).pipe(catchError(this.handleError));
+  }
+
+  getStudentsByExamCode(code: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${code}/students`)
+      .pipe(catchError(this.handleError));
   }
 
 }

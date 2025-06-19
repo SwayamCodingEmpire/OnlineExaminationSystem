@@ -8,7 +8,7 @@ import { TopicsService } from '../../../services/admin/topics/topics.service';
 import { ExamQuestionsService } from '../../../services/admin/exam-questions/exam-questions.service';
 import { QuestionBankService } from '../../../services/admin/questionbank/question-bank.service';
 import { SectionPayload } from '../../../models/SectionPayload';
-
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-questions',
@@ -17,7 +17,8 @@ import { SectionPayload } from '../../../models/SectionPayload';
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    ToastrModule,
   ],
   templateUrl: './questions.component.html',
   styleUrl: './questions.component.scss'
@@ -61,7 +62,7 @@ export class QuestionsComponent {
   modalInstance: any;
   examCode: string = '';
 
-  constructor( private topicService: TopicsService, private questionService: ExamQuestionsService, private route: ActivatedRoute, private questionBankService: QuestionBankService) {
+  constructor( private topicService: TopicsService, private questionService: ExamQuestionsService, private route: ActivatedRoute, private questionBankService: QuestionBankService, private toastr: ToastrService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -465,31 +466,38 @@ toggle(code: string, event: Event) {
 confirmAssign() {
   console.log('Selected Codes:', Array.from(this.selectedCodes));
 
-    this.questionService.assignQuestionsToExam("EXAM001", Array.from(this.selectedCodes))
-      .subscribe({
-        next: (response) => {
-          this.prepareSectionDurations();
-          this.modalStep = 'duration';
-        },
-        error: (err) => {
-          console.error('Assignment failed', err);
-          this.modalInstance.hide();
-        }
-      });
-  }
-prepareSectionDurations() {
-    this.groupedQuestions = this.questions.reduce((acc, q) => {
-      acc[q.topicCode] = acc[q.topicCode] || [];  // Fixed: use topicCode consistently
-      acc[q.topicCode].push(q);
-      return acc;
-    }, {} as Record<string, any[]>);
+  this.questionService.assignQuestionsToExam(this.examCode, Array.from(this.selectedCodes))
+    .subscribe({
+      next: (response) => {
+        // Update local question list based on selected codes
+        this.questions = this.questions.filter(q => this.selectedCodes.has(q.code));
 
-    this.sectionKeys = Object.keys(this.groupedQuestions);
-    this.sectionDurations = this.sectionKeys.reduce((acc, key) => {
-      acc[key] = 0;
-      return acc;
-    }, {} as Record<string, number>);
+        this.prepareSectionDurations();
+        this.modalStep = 'duration';
+      },
+      error: (err) => {
+        console.error('Assignment failed', err);
+        this.modalInstance.hide();
+      }
+    });
 }
+
+prepareSectionDurations() {
+  this.groupedQuestions = this.questions.reduce((acc, q) => {
+    acc[q.topicCode] = acc[q.topicCode] || [];
+    acc[q.topicCode].push(q);
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  this.sectionKeys = Object.keys(this.groupedQuestions);
+  this.sectionDurations = this.sectionKeys.reduce((acc, key) => {
+    acc[key] = 0;
+    return acc;
+  }, {} as Record<string, number>);
+
+  console.log("Grouped Questions:", this.groupedQuestions);
+}
+
 
 
   submitDurations() {
@@ -509,11 +517,13 @@ prepareSectionDurations() {
       next: (response) => {
         // Handle success
         console.log('Sections assigned successfully');
-        // Close modal or show success message
+        this.modalInstance.hide();
+        this.toastr.success('Sections assigned successfully', 'Success');
       },
       error: (error) => {
         console.error('Error assigning sections:', error);
-        // Handle error
+        this.modalInstance.hide();
+        this.toastr.error('Failed to assign sections', 'Error');
       }
     });
 }

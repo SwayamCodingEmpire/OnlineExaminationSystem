@@ -7,6 +7,8 @@ import * as bootstrap from 'bootstrap';
 import { ExamsService } from '../../../services/admin/exams/exams.service';
 import { ExamPayload } from '../../../models/ExamPayload';
 import { ExamQuestionsService } from '../../../services/admin/exam-questions/exam-questions.service';
+import { QuestionBankPayload } from '../../../models/QuestionBankPayload';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -16,7 +18,7 @@ import { ExamQuestionsService } from '../../../services/admin/exam-questions/exa
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    NgxPaginationModule
+    NgxPaginationModule,
   ],
   templateUrl: './exam.component.html',
   styleUrl: './exam.component.scss'
@@ -53,8 +55,12 @@ export class ExamComponent {
   });
 
   examQuestions: any[] = [];
-  examSelected:number|null = null;
+  examSelected: number | null = null;
   oldCode: string = ''; // Store the old code for potential updates
+  students: any[] = [];
+
+  examSelectedCode: string = '' // Store the selected exam code for fetching questions
+
 
 
 
@@ -107,32 +113,32 @@ export class ExamComponent {
 
   saveExam(index: number) {
     if (this.examForm.valid) {
- const formValue = this.examForm.value;
+      const formValue = this.examForm.value;
 
-    // Build ExamDTO structure
-    const updatedExam: ExamPayload = {
-      code: formValue.code,
-      name: formValue.name,
-      examDate: formValue.examDate, // assume it's already in 'YYYY-MM-DD' format
-      examTime: formValue.examTime  // assume it's 'HH:mm' or 'HH:mm:ss'
-    };
+      // Build ExamDTO structure
+      const updatedExam: ExamPayload = {
+        code: formValue.code,
+        name: formValue.name,
+        examDate: formValue.examDate, // assume it's already in 'YYYY-MM-DD' format
+        examTime: formValue.examTime  // assume it's 'HH:mm' or 'HH:mm:ss'
+      };
 
-    if (this.isAddingNewexam && index === 0) {
-      // Adding a new exam
-      this.examService.addExam(updatedExam).subscribe({
-        next: () => {
-          this.isAddingNewexam = false;
-          this.cancelEdit();
-          this.loadexams(); // Reload all exams from service
-        },
-        error: (error: any) => {
-          console.error('Error adding exam:', error);
-          // Optional: show user feedback here
-          this.loadexams(); // Reload to restore original state
-        }
-      });
-    }
-     else {
+      if (this.isAddingNewexam && index === 0) {
+        // Adding a new exam
+        this.examService.addExam(updatedExam).subscribe({
+          next: () => {
+            this.isAddingNewexam = false;
+            this.cancelEdit();
+            this.loadexams(); // Reload all exams from service
+          },
+          error: (error: any) => {
+            console.error('Error adding exam:', error);
+            // Optional: show user feedback here
+            this.loadexams(); // Reload to restore original state
+          }
+        });
+      }
+      else {
         // Updating an existing exam
 
         this.examService.updateExam(updatedExam, this.oldCode).subscribe(() => {
@@ -165,7 +171,7 @@ export class ExamComponent {
   }
 
 
-  constructor(private examService: ExamsService, private examQuestionsService: ExamQuestionsService) {
+  constructor(private examService: ExamsService, private examQuestionsService: ExamQuestionsService, private toastr: ToastrService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -317,55 +323,55 @@ export class ExamComponent {
   }
 
   // loadexams() {
-    // this.examService.getexams().subscribe((data: any[]) => {
-    //   // Sanitize: Ensure every exam has a topics array
-    //   this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
-    //     ...exam,
-    //     topics: exam.topics && exam.topics.length > 0
-    //       ? exam.topics
-    //       : exam.topicsString
-    //         ? exam.topicsString.split(',').map((t: string) => t.trim())
-    //         : this.generateDefaultTopics(exam.name)
-    //   }));
+  // this.examService.getexams().subscribe((data: any[]) => {
+  //   // Sanitize: Ensure every exam has a topics array
+  //   this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
+  //     ...exam,
+  //     topics: exam.topics && exam.topics.length > 0
+  //       ? exam.topics
+  //       : exam.topicsString
+  //         ? exam.topicsString.split(',').map((t: string) => t.trim())
+  //         : this.generateDefaultTopics(exam.name)
+  //   }));
 
-    //   this.exams = [...this.originalexams];
+  //   this.exams = [...this.originalexams];
 
-    //   // Restore any search filtering that was applied
-    //   if (this.searchForm.get('searchTerm')?.value) {
-    //     this.filterexams();
-    //   }
+  //   // Restore any search filtering that was applied
+  //   if (this.searchForm.get('searchTerm')?.value) {
+  //     this.filterexams();
+  //   }
 
-    //   this.totalPages = Math.ceil(this.exams.length / this.pageSize);
-    // });
+  //   this.totalPages = Math.ceil(this.exams.length / this.pageSize);
+  // });
 
   loadexams() {
-  this.examService.getExams().subscribe({
-    next: (data: any) => {
-      this.exams = data;
-      this.originalexams = [...this.exams];
-      this.calculateTotalPages();
-    },
-    error: (error: any) => {
-      console.error('Error loading exams:', error);
-      // Fallback to empty array if API fails
-      this.exams = [];
-      this.originalexams = [];
-      this.calculateTotalPages();
-    }
-  });
-}
+    this.examService.getExams().subscribe({
+      next: (data: any) => {
+        this.exams = data;
+        this.originalexams = [...this.exams];
+        this.calculateTotalPages();
+      },
+      error: (error: any) => {
+        console.error('Error loading exams:', error);
+        // Fallback to empty array if API fails
+        this.exams = [];
+        this.originalexams = [];
+        this.calculateTotalPages();
+      }
+    });
+  }
 
 
 
 
-    // const data: any[] = [
-    //   {
-    //     code: 'S001',
-    //     name: 'John Doe',
-    //     date: '13/10/2023',
-    //     time: '10:00 AM',
-    //   }
-    // ];
+  // const data: any[] = [
+  //   {
+  //     code: 'S001',
+  //     name: 'John Doe',
+  //     date: '13/10/2023',
+  //     time: '10:00 AM',
+  //   }
+  // ];
 
 
 
@@ -525,7 +531,7 @@ export class ExamComponent {
 
   submitExam() {
 
- const formValue = this.instantExamForm.value;
+    const formValue = this.instantExamForm.value;
 
     // Build ExamDTO structure
     const updatedExam: ExamPayload = {
@@ -551,7 +557,28 @@ export class ExamComponent {
       this.examCreated = true;
     } else {
       // Final submission logic here
-      console.log('Final Exam Data:', this.instantExamForm.value);
+      const examPayload: QuestionBankPayload[] = this.questions.value.map((q: any) => ({
+        code: q.code,
+        question: q.questionText,
+        options: [q.optionA, q.optionB, q.optionC, q.optionD],
+        correctOption: q.correctAnswer,
+        marks: Number(q.marks),
+        topicCode: 'INSTANT_EXAM', // Assuming a static topic code for instant exams
+        duration: Number(q.duration)
+      }));
+      this.examQuestionsService.addInstantExam(formValue.examCode, examPayload).subscribe({
+        next: () => {
+          console.log('Questions assigned successfully');
+          // Optionally reset the form or show success message
+          this.instantExamForm.reset();
+          this.questions.clear(); // Clear the questions array
+        },
+        error: (error: any) => {
+          console.error('Error assigning questions:', error);
+          // Handle error case
+        }
+      });
+
 
     }
   }
@@ -561,39 +588,54 @@ export class ExamComponent {
   }
 
 deleteQuestion(index: number) {
-  if (this.examSelected === null) {
-    console.warn('No exam selected.');
-    return;
+    if (this.examSelected && confirm(`Are you sure you want to delete this question?`)) {
+      const questionCode = this.examQuestions[index].code;
+      this.examSelectedCode = this.exams[this.examSelected].code;
+      this.examQuestionsService.deleteQuestion(this.examSelectedCode, questionCode).subscribe({
+        next: () => {
+          this.toastr.success('Question deleted successfully');
+          this.examQuestions.splice(index, 1);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to delete question');
+          console.error(err);
+        }
+      });
+    }
   }
-
-  const selectedExam = this.exams[this.examSelected];
-
-  if (!selectedExam || !selectedExam.questions || selectedExam.questions.length <= index) {
-    console.warn('Question not found at index:', index);
-    return;
-  }
-
-  const question = selectedExam.questions[index];
-  console.log('Selected Question:', question);
-}
 
 
 examDetailsClicked(examCode: string) {
-  this.examQuestionsService.getExamQuestionsByExamCode(examCode).subscribe({
-    next: (questions) => {
-      this.examQuestions = questions;
-      // Optional: Store original copy for filtering/reset
-      this.examQuestions = [...questions];
+    this.examSelectedCode = examCode;
+    this.examQuestionsService.getExamQuestionsByExamCode(examCode).subscribe(
+      (questions: any[]) => {
+        this.examQuestions = questions;
+      },
+      (error) => {
+        console.error('Error fetching exam questions:', error);
+        this.examQuestions = [];
+      }
+    );
+  }
 
 
-    },
-    error: (error) => {
-      console.error('Error loading exam questions:', error);
-      this.examQuestions = [];
+  getOptionLabel(index: number): string {
+    return String.fromCharCode(65 + index); // Converts 0 → 'A', 1 → 'B', etc.
+  }
 
-
-    }
-  });
-}
+  studentDetailsClicked(examCode: string) {
+    console.log('Exam code clicked:', examCode);
+    this.examSelectedCode = examCode;
+    this.examQuestionsService.getStudentsByExamCode(examCode).subscribe(
+      (students: any[]) => {
+        this.students = students;
+        console.log('Fetched students:', this.students);
+      },
+      (error) => {
+        console.error('Error fetching students:', error);
+        this.students = [];
+      }
+    );
+  }
 
 }
