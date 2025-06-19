@@ -36,7 +36,7 @@
               </div>
 
               <div class="col-6">
-                <button class="btn px-5 py-2 w-100 border border-secondary" [disabled]="false" (click)="bulkUpload()">
+                <button class="btn px-5 py-2 w-100 border border-secondary" (click)="openBulkUploadModal()">
                   Bulk Upload
                 </button>
               </div>
@@ -553,5 +553,46 @@
         </div>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Bulk Upload Modal -->
+<div class="modal fade" id="bulkUploadModal" tabindex="-1" aria-labelledby="bulkUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header pb-0 border-0">
+        <h5 class="modal-title" id="bulkUploadModalLabel">Bulk Upload Questions</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <hr class="m-0" />
+      <div class="modal-body">
+        <form (ngSubmit)="uploadBulkFile()" #bulkUploadForm="ngForm">
+          <div class="mb-3">
+            <input
+              type="file"
+              class="form-control"
+              accept=".csv, .xlsx, .xls"
+              (change)="onBulkFileSelected($event)"
+              required
+            >
+            <div class="form-text">Accepted: .csv, .xlsx, .xls</div>
+            <div *ngIf="bulkQuestions.length > 0" class="mt-2 small text-success">
+              {{ bulkQuestions.length }} records loaded.
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button
+          type="button"
+          class="btn btn-primary px-4"
+          (click)="uploadBulkFile()"
+          [disabled]="!selectedBulkFile || bulkQuestions.length === 0"
+        >
+          Upload
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-4 ms-2" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>

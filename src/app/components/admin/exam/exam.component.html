@@ -184,6 +184,22 @@
                       </button>
                     </ng-container>
 
+                    <ng-container
+                      *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
+                    >
+                      <span class="mx-0 fw-normal">|</span>
+                      <button
+                        class="btn text-primary text-decoration-underline"
+                        [disabled]="false"
+                        data-bs-toggle="modal"
+                        data-bs-target="#viewStudentModal"
+                        (click)="studentDetailsClicked(exam.code)"
+                        style="font-size: inherit"
+                      >
+                        Student Details
+                      </button>
+                    </ng-container>
+
                     <!-- Save & Cancel Buttons in Edit Mode -->
                     <button
                       (click)="saveExam(i + pageSize * (currentPage - 1))"
@@ -757,6 +773,8 @@
   </div>
 </div>
 
+<!-- View exam modal -->
+
 <div
   class="modal fade"
   id="viewExamModal"
@@ -778,93 +796,116 @@
         ></button>
       </div>
 
-      <div class="modal-body" *ngIf="selectedQuestions?.length">
-        <div
-          *ngFor="let question of examQuestions; let i = index"
-          class="card mb-4"
-        >
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <h6 class="mb-0">{{ question.code }}</h6>
-              <small class="text-muted"
-                >{{ question.topic }} • {{ question.difficulty }}</small
-              >
-            </div>
-            <div>
-              <span
-                [class]="
-                  question.type === 'MCQ'
-                    ? 'badge bg-primary'
-                    : 'badge bg-success'
-                "
-              >
-                {{ question.type }}
-              </span>
-              <span class="badge bg-warning ms-2"
-                >{{ question.marks }} Marks</span
-              >
-            </div>
+        <ng-container *ngIf="!examQuestions?.length" #noQuestionsAdded>
+        <div class="message-container">
+          <div class="message-content">
+            <h5 class="text-center p-3">No questions added yet</h5>
+            <br>
+            <p class="text-center p-3">Add questions to view them here</p>
           </div>
+        </div>
+      </ng-container>
 
-          <div class="card-body">
-            <div class="mb-4">
-              <h6 class="fw-bold">Question:</h6>
-              <p class="mb-0">{{ question.question }}</p>
-            </div>
-
-            <!-- MCQ Options -->
-            <div *ngIf="question.type === 'MCQ'" class="mb-4">
-              <h6 class="fw-bold">Options:</h6>
-              <div class="row">
-                <div
-                  class="col-md-6 mb-2"
-                  *ngFor="let option of ['A', 'B', 'C', 'D']"
+        <div class="modal-body" *ngIf="examQuestions?.length">
+          <div class="accordion" id="questionsAccordion">
+            <div
+              *ngFor="let question of examQuestions; let i = index"
+              class="accordion-item mb-3 border rounded"
+            >
+              <h2 class="accordion-header" [id]="'questionHeader' + i">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#questionCollapse' + i"
+                  aria-expanded="false"
+                  [attr.aria-controls]="'questionCollapse' + i"
                 >
                   <div
-                    class="p-2 border rounded"
-                    [class.bg-success]="question.correctAnswer === option"
-                    [class.text-white]="question.correctAnswer === option"
+                    class="d-flex justify-content-between w-100 align-items-center"
                   >
-                    <strong>{{ option }})</strong>
-                    {{ question.options?.[option] }}
-                    <i
-                      *ngIf="question.correctAnswer === option"
-                      class="fas fa-check float-end"
-                    ></i>
+                    <span class="fw-bold me-3">{{ question.code }}</span>
+                    <span
+                      class="text-start flex-grow-1 me-3 text-truncate"
+                      style="max-width: 450px"
+                      [title]="question.question"
+                      >{{ question.question }}</span
+                    >
+                    <div class="d-flex align-items-center">
+                      
+                      <span class="badge bg-info text-dark ms-2">{{
+                        question.marks
+                      }} Marks</span>
+                      <button
+                        class="btn btn-danger btn-sm ms-3"
+                        style="width: 32px; height: 32px"
+                        (click)="$event.stopPropagation(); deleteQuestion(i)"
+                        title="Remove Question"
+                      >
+                        <i class="fa-regular fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </button>
+              </h2>
+              <div
+                [id]="'questionCollapse' + i"
+                class="accordion-collapse collapse"
+                [attr.aria-labelledby]="'questionHeader' + i"
+                data-bs-parent="#questionsAccordion"
+              >
+                <div class="accordion-body">
+                  <div class="mb-3">
+                    <h6 class="fw-bold">Question Details:</h6>
+                    <p class="mb-1">
+                      <span class="fw-semibold">Full Question:</span>
+                      {{ question.question }}
+                    </p>
+                    <p class="mb-1">
+                      <span class="fw-semibold">Topic:</span>
+                      {{ question.topicName }}
+                    </p>
+                    <p class="mb-1">
+                      <span class="fw-semibold">Difficulty:</span>
+                      {{ question.difficulty }}
+                    </p>
+                    <p *ngIf="question.type === 'Subjective'" class="mb-1">
+                      <span class="fw-semibold">Word Limit:</span>
+                      {{ question.wordLimit }} words
+                    </p>
+                  </div>
+                  
+                  <!-- MCQ Options -->
+
+                  <div >
+                    
+                    <h6 class="fw-bold">Options:</h6>
+                    <div class="row">
+                      <div class="col-md-6 mb-2" *ngFor="let option of question.options; let optIndex = index">
+                        <div *ngIf="option" class="p-2 border rounded" [class.bg-success-subtle]="question.correctOption === getOptionLabel(optIndex)" [class.border-success]="question.correctOption === getOptionLabel(optIndex)">
+                          <strong class="me-2">{{ getOptionLabel(optIndex) }}.</strong> {{ option }}
+
+                          {{ option }}
+                          <i *ngIf="question.correctOption === getOptionLabel(optIndex)" class="fas fa-check float-end text-success"></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mt-3" *ngIf="question.correctOption">
+                      <h6 class="fw-bold text-success">
+                        Correct Answer: Option {{ question.correctOption }}
+                      </h6>
+                    </div>
+                    
                   </div>
                 </div>
               </div>
-              <div class="mt-3">
-                <h6 class="fw-bold text-success">
-                  Correct Answer: Option {{ question.correctAnswer }}
-                </h6>
-              </div>
-
-              <!-- Delete Button -->
-              <div class="d-flex justify-content-end mt-2">
-                <button
-                  class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
-                  style="width: 32px; height: 32px"
-                  (click)="deleteQuestion(i)"
-                  title="Remove Question"
-                >
-                  <i class="fa-regular fa-trash text-white"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- Subjective Word Limit -->
-            <div *ngIf="question.type === 'Subjective'" class="mb-3">
-              <h6 class="fw-bold">Word Limit:</h6>
-              <p class="mb-0 text-info">
-                <i class="fas fa-edit"></i> {{ question.wordLimit }} words
-              </p>
             </div>
           </div>
         </div>
+        
       </div>
+
+      
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -872,5 +913,73 @@
         </button>
       </div>
     </div>
-  </div>
+
+</div>
+
+
+<!-- View student modal -->
+<div
+  class="modal fade"
+  id="viewStudentModal"
+  tabindex="-1"
+  aria-labelledby="viewStudentModalLable"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="questionDetailsModalLabel">
+          Student Details
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+        <ng-container *ngIf="!students?.length" #noStudentsAdded>
+        <div class="message-container">
+          <div class="message-content">
+            <h5 class="text-center p-3">No students  added yet</h5>
+            <br>
+            <p class="text-center p-3">Add students  to view them here</p>
+          </div>
+        </div>
+      </ng-container>
+
+
+<ng-container *ngIf="students?.length">
+    <div  class="table-responsive mt-4 ms-2" style="overflow-x: auto">
+      <table class="table table-borderless table-responsive">
+        <thead>
+          <tr>
+            <th class="table-header-light">Name</th>
+            <th class="table-header-light">Email</th>
+            <th class="table-header-light">Phone</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let student of students">
+            <td>{{ student.name }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.phoneNo }}</td>  
+            
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </ng-container>
+     
+
+      
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+
 </div>

@@ -4,6 +4,7 @@ import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsMo
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
+import * as XLSX from 'xlsx';
 import { QuestionBankService } from '../../../services/admin/questionbank/question-bank.service';
 import { TopicsService } from '../../../services/admin/topics/topics.service';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
@@ -51,6 +52,10 @@ export class QuestionBankComponent {
   questionDetailsModal: any;
   fb: FormBuilder = new FormBuilder();
   topics: any;
+  // For bulk upload
+  selectedBulkFile: File | null = null;
+  bulkQuestions: any[] = [];
+  bulkUploadModal: any = null;
 
   constructor(
     private questionService: QuestionBankService, 
@@ -144,6 +149,12 @@ export class QuestionBankComponent {
       const detailsModalElement = document.getElementById('questionDetailsModal');
       if (detailsModalElement) {
         this.questionDetailsModal = new bootstrap.Modal(detailsModalElement);
+      }
+
+      // Initialize bulk upload modal
+      const bulkUploadModalElement = document.getElementById('bulkUploadModal');
+      if (bulkUploadModalElement) {
+        this.bulkUploadModal = new bootstrap.Modal(bulkUploadModalElement);
       }
     }, 500);
   }
@@ -243,6 +254,74 @@ export class QuestionBankComponent {
   bulkUpload() {
     console.log('Bulk upload functionality to be implemented');
     // Implement bulk upload functionality here
+  }
+
+  openBulkUploadModal() {
+    this.selectedBulkFile = null;
+    this.bulkQuestions = [];
+    if (this.bulkUploadModal) {
+      this.bulkUploadModal.show();
+    }
+  }
+
+  onBulkFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) {
+      this.selectedBulkFile = null;
+      return;
+    }
+    this.selectedBulkFile = file;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheet];
+        const jsonArr: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+        this.bulkQuestions = jsonArr.map(row => ({
+          code: row['code'],
+          question: row['question'],
+          topicCode: row['topicCode'],
+          difficulty: row['difficulty'],
+          marks: row['marks'],
+          options: [
+            row['optionA'],
+            row['optionB'],
+            row['optionC'],
+            row['optionD']
+          ],
+          correctOption: row['correctOption'],
+          type: 'MCQ',
+        }));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  uploadBulkFile() {
+    if (!this.bulkQuestions || this.bulkQuestions.length === 0) {
+      this.toastr.error('No valid question records found in the file.');
+      return;
+    }
+
+    this.questionService.bulkUploadQuestions(this.bulkQuestions).subscribe({
+      next: (res: any) => {
+        this.toastr.success('Bulk upload successful!');
+        this.bulkUploadModal.hide();
+        this.selectedBulkFile = null;
+        this.bulkQuestions = [];
+        this.loadQuestions();
+      },
+      error: (err: any) => {
+        const errorMessage = err?.error?.message || err?.error || 'Bulk upload failed.';
+        this.toastr.error(errorMessage);
+      }
+    });
   }
 
   filterByTopic() {

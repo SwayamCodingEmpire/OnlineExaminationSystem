@@ -7,6 +7,7 @@ import * as bootstrap from 'bootstrap';
 import { ExamsService } from '../../../services/admin/exams/exams.service';
 import { ExamPayload } from '../../../models/ExamPayload';
 import { ExamQuestionsService } from '../../../services/admin/exam-questions/exam-questions.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -53,10 +54,9 @@ export class ExamComponent {
   });
 
   examQuestions: any[] = [];
-  examSelected:number|null = null;
+  examSelected:string|null = null;
   oldCode: string = ''; // Store the old code for potential updates
-
-
+  students: any[] = [];
 
   ngOnInit(): void {
     console.log('examsComponent ngOnInit called');
@@ -165,7 +165,7 @@ export class ExamComponent {
   }
 
 
-  constructor(private examService: ExamsService, private examQuestionsService: ExamQuestionsService) {
+  constructor(private examService: ExamsService, private examQuestionsService: ExamQuestionsService, private toastr: ToastrService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -561,39 +561,54 @@ export class ExamComponent {
   }
 
 deleteQuestion(index: number) {
-  if (this.examSelected === null) {
-    console.warn('No exam selected.');
-    return;
+    if (this.examSelected && confirm(`Are you sure you want to delete this question?`)) {
+      const questionCode = this.examQuestions[index].code;
+      this.examQuestionsService.deleteQuestion(this.examSelected, questionCode).subscribe({
+        next: () => {
+          this.toastr.success('Question deleted successfully');
+          this.examQuestions.splice(index, 1);
+        },
+        error: (err) => {
+          this.toastr.error('Failed to delete question');
+          console.error(err);
+        }
+      });
+    }
   }
-
-  const selectedExam = this.exams[this.examSelected];
-
-  if (!selectedExam || !selectedExam.questions || selectedExam.questions.length <= index) {
-    console.warn('Question not found at index:', index);
-    return;
-  }
-
-  const question = selectedExam.questions[index];
-  console.log('Selected Question:', question);
-}
-
 
 examDetailsClicked(examCode: string) {
-  this.examQuestionsService.getExamQuestionsByExamCode(examCode).subscribe({
-    next: (questions) => {
-      this.examQuestions = questions;
-      // Optional: Store original copy for filtering/reset
-      this.examQuestions = [...questions];
+    this.examSelected = examCode;
+    this.examQuestionsService.getExamQuestionsByExamCode(examCode).subscribe(
+      (questions: any[]) => {
+        this.examQuestions = questions;
+      },
+      (error) => {
+        console.error('Error fetching exam questions:', error);
+        this.examQuestions = [];
+      }
+    );
+  }
+
+  studentDetailsClicked(examCode: string) {
+    this.examSelected = examCode;
+    this.examQuestionsService.getStudentsByExamCode(examCode).subscribe(
+      (students: any[]) => {
+        this.students = students;
+      },
 
 
-    },
-    error: (error) => {
-      console.error('Error loading exam questions:', error);
-      this.examQuestions = [];
+      
+      (error) => {
+        console.error('Error fetching students:', error);
+        this.students = [];
+      }
+    );
+  }
 
+  getOptionLabel(index: number): string {
+    return String.fromCharCode(65 + index); // Converts 0 → 'A', 1 → 'B', etc.
+  }
+  
 
-    }
-  });
-}
 
 }

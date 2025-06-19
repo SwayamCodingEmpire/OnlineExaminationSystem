@@ -7,12 +7,12 @@ import { environment } from '../../../../Enviornment/enviornment';
   providedIn: 'root'
 })
 export class QuestionBankService {
-  private baseUrl = `${environment.apiUrl}/question-bank`; // Replace with your API endpoint
+  private baseUrl = `${environment.apiUrl}/question-bank`; 
 
   constructor(private http: HttpClient) {}
 
   private getHttpOptions() {
-    const token = localStorage.getItem('token'); // Get token from localStorage
+    const token = localStorage.getItem('token'); 
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -80,9 +80,8 @@ export class QuestionBankService {
       .pipe(catchError(this.handleError));
   } 
 
-  // Additional method for bulk operations if needed
   bulkUploadQuestions(questions: any[]): Observable<any> {
-    return this.http.post(`${this.baseUrl}/bulk`, questions, this.getHttpOptions())
+    return this.http.post(`${this.baseUrl}/bulk-upload`, questions, { ...this.getHttpOptions(), responseType: 'text' as 'json' })
       .pipe(catchError(this.handleError));
   }
 }

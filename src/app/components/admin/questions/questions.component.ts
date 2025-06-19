@@ -465,7 +465,7 @@ toggle(code: string, event: Event) {
 confirmAssign() {
   console.log('Selected Codes:', Array.from(this.selectedCodes));
 
-    this.questionService.assignQuestionsToExam("EXAM001", Array.from(this.selectedCodes))
+    this.questionService.assignQuestionsToExam(this.examCode, Array.from(this.selectedCodes))
       .subscribe({
         next: (response) => {
           this.prepareSectionDurations();
