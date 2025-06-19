@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
 import { TopicsService } from '../../../services/admin/topics/topics.service';
+import { ExamQuestionsService } from '../../../services/admin/exam-questions/exam-questions.service';
+import { QuestionBankService } from '../../../services/admin/questionbank/question-bank.service';
+import { SectionPayload } from '../../../models/SectionPayload';
 
 
 @Component({
@@ -50,8 +53,15 @@ export class QuestionsComponent {
   questionDetailsModal: any;
   topics: any;
   selectedQuestions: boolean[] = [];
+  readonly selectedCodes = new Set<String>();
+  modalStep: 'confirm' | 'duration' = 'confirm';
+  groupedQuestions: Record<string, any[]> = {};
+  sectionKeys: string[] = [];
+  sectionDurations: Record<string, number> = {};
+  modalInstance: any;
+  examCode: string = '';
 
-  constructor( private topicService: TopicsService) {
+  constructor( private topicService: TopicsService, private questionService: ExamQuestionsService, private route: ActivatedRoute, private questionBankService: QuestionBankService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -99,6 +109,8 @@ export class QuestionsComponent {
 
   ngOnInit(): void {
     console.log('QuestionBankComponent ngOnInit called');
+    this.examCode = this.route.snapshot.paramMap.get('code') || '';
+    console.log('Exam Code:', this.examCode);
     this.loadQuestions();
     this.topicService.getTopics().subscribe((data) => {
       this.topics = data;
@@ -138,6 +150,10 @@ export class QuestionsComponent {
     }, 500);
   }
 
+  getSelectedCodesArray(): String[] {
+    return Array.from(this.selectedCodes);
+  }
+
   setQuestionType(type: string) {
     this.currentQuestionType = type;
   }
@@ -151,6 +167,10 @@ export class QuestionsComponent {
 
   getTopicName(topicCode: string): string {
     const topic = this.topics?.find((t: any) => t.code === topicCode);
+    console.log('getTopicName called with:', topicCode, 'found:', topic);
+    if (!topicCode) {
+      return 'No Topic';
+    }
     return topic ? topic.name : topicCode;
   }
 
@@ -290,82 +310,7 @@ export class QuestionsComponent {
     });
   }
 
-  saveQuestion(index: number) {
-    if (this.questionForm.valid) {
-      const formValue = this.questionForm.value;
-      const updatedQuestion = {
-        ...this.questions[index],
-        code: formValue.code,
-        questionText: formValue.name,
-        topic: formValue.category,
-        type: formValue.type,
-        difficulty: formValue.difficulty
-      };
 
-      if (this.isAddingNewQuestion && index === 0) {
-        // Adding a new question
-        this.questions[0] = updatedQuestion;
-        this.originalQuestions = [...this.questions];
-        this.isAddingNewQuestion = false;
-        this.cancelEdit();
-      } else {
-        // Updating an existing question
-        this.questions[index] = updatedQuestion;
-        this.originalQuestions = [...this.questions];
-        this.cancelEdit();
-      }
-    }
-  }
-
-  deleteQuestion(index: number) {
-    this.questionIndexToDelete = index;
-    const question = this.questions[index];
-
-    // Update the modal content
-    const questionCodeElement = document.getElementById('questionCodeToDelete');
-    if (questionCodeElement) {
-      questionCodeElement.textContent = question.code;
-    }
-
-    // Show the modal
-    if (this.deleteModal) {
-      this.deleteModal.show();
-    }
-
-    // Set up the confirm delete button click handler
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    if (confirmDeleteBtn) {
-      confirmDeleteBtn.onclick = () => this.confirmDeleteQuestion();
-    }
-  }
-
-  confirmDeleteQuestion() {
-    if (this.questionIndexToDelete !== null) {
-      // Remove question from array
-      this.questions.splice(this.questionIndexToDelete, 1);
-      this.originalQuestions = [...this.questions];
-
-      this.deleteModal?.hide();
-      this.questionIndexToDelete = null;
-      this.calculateTotalPages();
-    }
-  }
-
-  cancelEdit() {
-    if (this.isAddingNewQuestion) {
-      // Remove the temporary new question
-      this.questions.shift();
-      this.isAddingNewQuestion = false;
-      this.loadQuestions(); // Refresh the table
-    }
-
-    this.editingIndex = null;
-    this.questionForm.reset();
-  }
-
-  closeDescriptionPopup() {
-    this.isDescriptionPopupOpen = false;
-  }
 
   sortTable(column: string, ascending: boolean) {
     this.sortedColumn = column;
@@ -392,64 +337,20 @@ export class QuestionsComponent {
   }
 
   loadQuestions() {
-    // Updated mock data with new structure including marks
-    this.questions = [
-      {
-        id: 1,
-        code: 'Q001',
-        questionText: 'What is the main concept of Object-Oriented Programming in Java?',
-        topic: 'Java',
-        type: 'MCQ',
-        difficulty: 'Easy',
-        marks: 2,
-        options: { A: 'Inheritance', B: 'Encapsulation', C: 'Polymorphism', D: 'All of the above' },
-        correctAnswer: 'D'
+    this.questionBankService.getQuestions().subscribe({
+      next: (data) => {
+        this.questions = data;
+        this.originalQuestions = [...this.questions];
+        this.calculateTotalPages();
       },
-      {
-        id: 2,
-        code: 'Q002',
-        questionText: 'Explain the concept of Dependency Injection in Spring Framework',
-        topic: 'Spring',
-        type: 'Subjective',
-        difficulty: 'Medium',
-        marks: 5,
-        wordLimit: 200
-      },
-      {
-        id: 3,
-        code: 'Q003',
-        questionText: 'What are Angular Components and how do they work?',
-        topic: 'Angular',
-        type: 'MCQ',
-        difficulty: 'Hard',
-        marks: 3,
-        options: { A: 'UI Building Blocks', B: 'Services', C: 'Modules', D: 'Directives' },
-        correctAnswer: 'A'
-      },
-      {
-        id: 4,
-        code: 'Q004',
-        questionText: 'Design a database schema for an e-commerce application',
-        topic: 'Database',
-        type: 'Subjective',
-        difficulty: 'Medium',
-        marks: 8,
-        wordLimit: 300
-      },
-      {
-        id: 5,
-        code: 'Q005',
-        questionText: 'What is the time complexity of Quick Sort algorithm?',
-        topic: 'Data Structures',
-        type: 'MCQ',
-        difficulty: 'Hard',
-        marks: 4,
-        options: { A: 'O(n)', B: 'O(n log n)', C: 'O(n²)', D: 'O(log n)' },
-        correctAnswer: 'B'
+      error: (error) => {
+        console.error('Error loading questions:', error);
+        // Fallback to empty array if API fails
+        this.questions = [];
+        this.originalQuestions = [];
+        this.calculateTotalPages();
       }
-    ];
-    this.originalQuestions = [...this.questions];
-    this.calculateTotalPages();
+    });
   }
 
   filterQuestions() {
@@ -544,5 +445,88 @@ onSubmit() {
 addQuestion(){
   console.log(this.selectedQuestions);
 }
+
+  isSelected(code: String) {
+    return this.selectedCodes.has(code);
+  }
+
+toggle(code: string, event: Event) {
+  const input = event.target as HTMLInputElement;
+  const checked = input.checked;
+
+  // Do something with `checked`
+  if (checked) {
+    this.selectedCodes.add(code);
+  } else {
+    this.selectedCodes.delete(code);
+  }
+}
+
+confirmAssign() {
+  console.log('Selected Codes:', Array.from(this.selectedCodes));
+
+    this.questionService.assignQuestionsToExam("EXAM001", Array.from(this.selectedCodes))
+      .subscribe({
+        next: (response) => {
+          this.prepareSectionDurations();
+          this.modalStep = 'duration';
+        },
+        error: (err) => {
+          console.error('Assignment failed', err);
+          this.modalInstance.hide();
+        }
+      });
+  }
+prepareSectionDurations() {
+    this.groupedQuestions = this.questions.reduce((acc, q) => {
+      acc[q.topicCode] = acc[q.topicCode] || [];  // Fixed: use topicCode consistently
+      acc[q.topicCode].push(q);
+      return acc;
+    }, {} as Record<string, any[]>);
+
+    this.sectionKeys = Object.keys(this.groupedQuestions);
+    this.sectionDurations = this.sectionKeys.reduce((acc, key) => {
+      acc[key] = 0;
+      return acc;
+    }, {} as Record<string, number>);
+}
+
+
+  submitDurations() {
+  const sectionPayloads: SectionPayload[] = this.sectionKeys.map(section => {
+    const topicQuestions = this.groupedQuestions[section];
+    const totalMarks = topicQuestions.reduce((sum, q) => sum + (q.marks || 0), 0);
+
+    return {
+      topicCode: section,
+      duration: this.sectionDurations[section],
+      totalMarks: totalMarks
+    };
+  });
+
+  this.questionService.addSectionsToExam(this.examCode, sectionPayloads)
+    .subscribe({
+      next: (response) => {
+        // Handle success
+        console.log('Sections assigned successfully');
+        // Close modal or show success message
+      },
+      error: (error) => {
+        console.error('Error assigning sections:', error);
+        // Handle error
+      }
+    });
+}
+openAssignModal() {
+  this.modalStep = 'confirm';
+  const el = document.getElementById('assignModal');
+  if (el) {
+    this.modalInstance = new bootstrap.Modal(el);
+    this.modalInstance.show();
+  } else {
+    console.error('Modal element not found!');
+  }
+}
+
 
 }

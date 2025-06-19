@@ -5,6 +5,8 @@ import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
 import { ExamsService } from '../../../services/admin/exams/exams.service';
+import { ExamPayload } from '../../../models/ExamPayload';
+import { ExamQuestionsService } from '../../../services/admin/exam-questions/exam-questions.service';
 
 
 @Component({
@@ -50,7 +52,9 @@ export class ExamComponent {
     questions: this.fb.array([])
   });
 
+  examQuestions: any[] = [];
   examSelected:number|null = null;
+  oldCode: string = ''; // Store the old code for potential updates
 
 
 
@@ -103,26 +107,35 @@ export class ExamComponent {
 
   saveExam(index: number) {
     if (this.examForm.valid) {
-      const formValue = this.examForm.value;
-      const updatedexam = {
-        ...formValue
-      };
+ const formValue = this.examForm.value;
 
-      if (this.isAddingNewexam && index === 0) {
-        // Adding a new exam
-        this.examService.addExam(updatedexam).subscribe(() => {
+    // Build ExamDTO structure
+    const updatedExam: ExamPayload = {
+      code: formValue.code,
+      name: formValue.name,
+      examDate: formValue.examDate, // assume it's already in 'YYYY-MM-DD' format
+      examTime: formValue.examTime  // assume it's 'HH:mm' or 'HH:mm:ss'
+    };
+
+    if (this.isAddingNewexam && index === 0) {
+      // Adding a new exam
+      this.examService.addExam(updatedExam).subscribe({
+        next: () => {
           this.isAddingNewexam = false;
           this.cancelEdit();
           this.loadexams(); // Reload all exams from service
-        }, (error: any) => {
+        },
+        error: (error: any) => {
           console.error('Error adding exam:', error);
-          // Handle error case
+          // Optional: show user feedback here
           this.loadexams(); // Reload to restore original state
-        });
-      } else {
+        }
+      });
+    }
+     else {
         // Updating an existing exam
-        const examId = this.exams[index].id;
-        this.examService.updateExam(updatedexam).subscribe(() => {
+
+        this.examService.updateExam(updatedExam, this.oldCode).subscribe(() => {
           this.cancelEdit();
           this.loadexams(); // Reload all exams from service
         }, (error: any) => {
@@ -152,7 +165,7 @@ export class ExamComponent {
   }
 
 
-  constructor(private examService: ExamsService) {
+  constructor(private examService: ExamsService, private examQuestionsService: ExamQuestionsService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -161,8 +174,8 @@ export class ExamComponent {
     this.examForm = new FormGroup({
       code: new FormControl('', Validators.required),
       name: new FormControl('', Validators.required),
-      date: new FormControl('', Validators.required),
-      time: new FormControl('', Validators.required),
+      examDate: new FormControl('', Validators.required),
+      examTime: new FormControl('', Validators.required),
     });
 
     this.descriptionForm = new FormGroup({
@@ -235,8 +248,8 @@ export class ExamComponent {
     this.examForm.reset({
       code: "",
       name: "",
-      date: "",
-      time: ""
+      examDate: "",
+      examTime: ""
     });
 
     // Make sure we're on the first page to see the new row
@@ -247,13 +260,14 @@ export class ExamComponent {
   editexam(index: number) {
     this.editingIndex = index;
     const exam = this.exams[index];
+    this.oldCode = exam.code; // Store the old code for potential updates
 
     // Set form values from the selected exam
     this.examForm.setValue({
       code: exam.code,
       name: exam.name,
-      date: exam.date,
-      time: exam.time,
+      examDate: exam.examDate,
+      examTime: exam.examDate,
     });
   }
 
@@ -302,7 +316,7 @@ export class ExamComponent {
     }
   }
 
-  loadexams() {
+  // loadexams() {
     // this.examService.getexams().subscribe((data: any[]) => {
     //   // Sanitize: Ensure every exam has a topics array
     //   this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
@@ -324,33 +338,36 @@ export class ExamComponent {
     //   this.totalPages = Math.ceil(this.exams.length / this.pageSize);
     // });
 
-    const data: any[] = [
-      {
-        code: 'S001',
-        name: 'John Doe',
-        date: '13/10/2023',
-        time: '10:00 AM',
-      }
-    ];
-
-    this.originalexams = data.map((exam: { topics: any; topicsString: string; name: string }) => ({
-      ...exam,
-      topics: exam.topics && exam.topics.length > 0
-        ? exam.topics
-        : exam.topicsString
-          ? exam.topicsString.split(',').map((t: string) => t.trim())
-          : this.generateDefaultTopics(exam.name)
-    }));
-
-    this.exams = [...this.originalexams];
-
-    // Restore any search filtering that was applied
-    if (this.searchForm.get('searchTerm')?.value) {
-      this.filterexams();
+  loadexams() {
+  this.examService.getExams().subscribe({
+    next: (data: any) => {
+      this.exams = data;
+      this.originalexams = [...this.exams];
+      this.calculateTotalPages();
+    },
+    error: (error: any) => {
+      console.error('Error loading exams:', error);
+      // Fallback to empty array if API fails
+      this.exams = [];
+      this.originalexams = [];
+      this.calculateTotalPages();
     }
+  });
+}
 
-    this.totalPages = Math.ceil(this.exams.length / this.pageSize);
-  }
+
+
+
+    // const data: any[] = [
+    //   {
+    //     code: 'S001',
+    //     name: 'John Doe',
+    //     date: '13/10/2023',
+    //     time: '10:00 AM',
+    //   }
+    // ];
+
+
 
 
   generateDefaultTopics(examName: string): string[] {
@@ -507,7 +524,30 @@ export class ExamComponent {
   }
 
   submitExam() {
+
+ const formValue = this.instantExamForm.value;
+
+    // Build ExamDTO structure
+    const updatedExam: ExamPayload = {
+      code: formValue.examCode,
+      name: formValue.examName,
+      examDate: formValue.examDate, // assume it's already in 'YYYY-MM-DD' format
+      examTime: formValue.examTime  // assume it's 'HH:mm' or 'HH:mm:ss'
+    };
+
     if (!this.examCreated) {
+      this.examService.addExam(updatedExam).subscribe({
+        next: () => {
+          this.isAddingNewexam = false;
+          this.cancelEdit();
+          this.loadexams(); // Reload all exams from service
+        },
+        error: (error: any) => {
+          console.error('Error adding exam:', error);
+          // Optional: show user feedback here
+          this.loadexams(); // Reload to restore original state
+        }
+      });
       this.examCreated = true;
     } else {
       // Final submission logic here
@@ -538,8 +578,22 @@ deleteQuestion(index: number) {
 }
 
 
-  examDetailsClicked(i: number){
-    this.examSelected = i;
-  }
+examDetailsClicked(examCode: string) {
+  this.examQuestionsService.getExamQuestionsByExamCode(examCode).subscribe({
+    next: (questions) => {
+      this.examQuestions = questions;
+      // Optional: Store original copy for filtering/reset
+      this.examQuestions = [...questions];
+
+
+    },
+    error: (error) => {
+      console.error('Error loading exam questions:', error);
+      this.examQuestions = [];
+
+
+    }
+  });
+}
 
 }

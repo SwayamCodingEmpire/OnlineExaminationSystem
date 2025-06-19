@@ -3,809 +3,568 @@
 <p>{{examCode}}</p> -->
 
 <div class="container-fluid">
-    <div class="row mx-2">
-      <div class="col-6 mt-3">
-        <label>Questions</label>
-      </div>
-      <div class="col-6 text-end mt-2">
-        <button class="btn bg-white square-btn">
-          <i class="fa-solid fa-rotate-right text-primary"></i>
-        </button>
-      </div>
+  <div class="row mx-2">
+    <div class="col-6 mt-3">
+      <label>Questions</label>
     </div>
-    <div class="row mx-3 align-items-center">
-      <div class="card mt-2 border-0 shadow-sm col-12">
-        <div class="card-body mt-2">
-          <div
-            class="row mx-0 ps-0 ms-0 justify-content-start align-items-center"
-          >
-            <form [formGroup]="searchForm" class="col-4">
-              <input
-                type="text"
-                class="form-control w-75"
-                placeholder="Search"
-                formControlName="searchTerm"
-              />
-            </form>
+    <div class="col-6 text-end mt-2">
+      <button class="btn bg-white square-btn">
+        <i class="fa-solid fa-rotate-right text-primary"></i>
+      </button>
+    </div>
+  </div>
+  <div class="row mx-3 align-items-center">
+    <div class="card mt-2 border-0 shadow-sm col-12">
+      <div class="card-body mt-2">
+        <div class="row mx-0 ps-0 ms-0 justify-content-start align-items-center">
+          <form [formGroup]="searchForm" class="col-4">
+            <input type="text" class="form-control w-75" placeholder="Search" formControlName="searchTerm" />
+          </form>
 
-            <!-- Topic Filter Dropdown -->
-            <div class="col-2">
-                <select class="form-select" [(ngModel)]="selectedTopicFilter" (change)="filterByTopic()">
-                  <option value="">All Topics</option>
-                  <option *ngFor="let topic of topics" [value]="topic.code">{{ topic.name }}</option>
-                </select>
-              </div>
+          <!-- Topic Filter Dropdown -->
+          <div class="col-2">
+            <select class="form-select" [(ngModel)]="selectedTopicFilter" (change)="filterByTopic()">
+              <option value="">All Topics</option>
+              <option *ngFor="let topic of topics" [value]="topic.code">{{ topic.name }}</option>
+            </select>
+          </div>
 
-            <div class="col-6 justify-content-end d-flex">
-              <div class="row">
-                <div class="col-12">
-                  <button
-                    class="btn px-5 py-2 w-100 border border-secondary mx-2"
-                    [disabled]="false"
-                    (click)="addQuestion()"
-                  >
-                    Add Question
-                  </button>
-                </div>
+          <div class="col-6 justify-content-end d-flex">
+            <div class="row">
+              <div class="col-12">
+                <button class="btn px-5 py-2 w-100 border border-secondary mx-2" [disabled]="false"
+                  (click)="openAssignModal()">
+                  Assign Questions
+                </button>
               </div>
             </div>
           </div>
-          <ng-container *ngIf="questions.length === 0">
-            <div
-              class="d-flex justify-content-start align-items-center mt-2 mx-2 px-3 py-3 rounded"
-              style="background-color: #f8fbff"
-            >
-              <span class="px-3 fw-bold text-dark"
-                >Please add a question to see content</span
-              >
-            </div>
-          </ng-container>
-          <ng-container *ngIf="questions.length > 0">
-            <div class="table-responsive mt-4 ms-2" style="overflow-x: auto">
-              <table class="table table-borderless table-responsive">
-                <thead>
-                  <tr>
-                    <th class="table-header-light">Actions</th>
+        </div>
+        <ng-container *ngIf="questions.length === 0">
+          <div class="d-flex justify-content-start align-items-center mt-2 mx-2 px-3 py-3 rounded"
+            style="background-color: #f8fbff">
+            <span class="px-3 fw-bold text-dark">Please add a question to see content</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="questions.length > 0">
+          <div class="table-responsive mt-4 ms-2" style="overflow-x: auto">
+            <table class="table table-borderless table-responsive">
+              <thead>
+                <tr>
+                  <th class="table-header-light">Actions</th>
 
-                    <th class="table-header-light text-center">
-                      <div
-                        class="d-flex flex-row align-items-center justify-content-start"
-                      >
-                        Code
-                        <div
-                          class="d-flex flex-column align-items-center small ms-2"
-                        >
-                          <i
-                            class="fa fa-chevron-up"
-                            (click)="sortTable('code', true)"
-                            [style.color]="
+                  <th class="table-header-light text-center">
+                    <div class="d-flex flex-row align-items-center justify-content-start">
+                      Code
+                      <div class="d-flex flex-column align-items-center small ms-2">
+                        <i class="fa fa-chevron-up" (click)="sortTable('code', true)" [style.color]="
                               sortedColumn === 'code' && isAscending
                                 ? 'blue'
                                 : 'black'
-                            "
-                          >
-                          </i>
-                          <i
-                            class="fas fa-chevron-down"
-                            (click)="sortTable('code', false)"
-                            [style.color]="
+                            ">
+                        </i>
+                        <i class="fas fa-chevron-down" (click)="sortTable('code', false)" [style.color]="
                               sortedColumn === 'code' && !isAscending
                                 ? 'blue'
                                 : 'black'
-                            "
-                          >
-                          </i>
-                        </div>
+                            ">
+                        </i>
                       </div>
-                    </th>
+                    </div>
+                  </th>
 
-                    <th class="table-header-light text-center">
-                      <div
-                        class="d-flex flex-row align-items-center justify-content-start"
-                      >
-                        Question
-                        <div
-                          class="d-flex flex-column align-items-center small ms-2"
-                        >
-                          <i
-                            class="fas fa-chevron-up"
-                            (click)="sortTable('name', true)"
-                            [style.color]="
+                  <th class="table-header-light text-center">
+                    <div class="d-flex flex-row align-items-center justify-content-start">
+                      Question
+                      <div class="d-flex flex-column align-items-center small ms-2">
+                        <i class="fas fa-chevron-up" (click)="sortTable('name', true)" [style.color]="
                               sortedColumn === 'name' && isAscending
                                 ? 'blue'
                                 : 'black'
-                            "
-                          >
-                          </i>
-                          <i
-                            class="fas fa-chevron-down"
-                            (click)="sortTable('name', false)"
-                            [style.color]="
+                            ">
+                        </i>
+                        <i class="fas fa-chevron-down" (click)="sortTable('name', false)" [style.color]="
                               sortedColumn === 'name' && !isAscending
                                 ? 'blue'
                                 : 'black'
-                            "
-                          >
-                          </i>
-                        </div>
+                            ">
+                        </i>
                       </div>
-                    </th>
-                    <th class="table-header-light">Topic</th>
-                    <th class="table-header-light">Type</th>
-                    <th class="table-header-light">Difficulty</th>
-                  </tr>
-                </thead>
+                    </div>
+                  </th>
+                  <th class="table-header-light">Topic</th>
+                  <th class="table-header-light">Type</th>
+                  <th class="table-header-light">Difficulty</th>
+                </tr>
+              </thead>
 
-                <tbody>
-                  <tr
-                    *ngFor="
+              <tbody>
+                <tr *ngFor="
                       let question of questions
                         | paginate
                           : { itemsPerPage: pageSize, currentPage: currentPage };
                       let i = index
-                    "
-                  >
-                    <!-- Actions (Edit & Delete) -->
-                    <td
-                      [ngStyle]="{
+                    ">
+                  <!-- Actions (Edit & Delete) -->
+                  <td [ngStyle]="{
                         background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                      }"
-                    >
-                      <input
-                        type="checkbox"
-                        [(ngModel)]="
-                          selectedQuestions[i + pageSize * (currentPage - 1)]
-                        "
-                      />
+                      }">
+                    <input type="checkbox" [checked]="isSelected(question.code)"
+                      (change)="toggle(question.code, $event)" />
 
-                      <ng-container
-                        *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                      >
-                        <span class="mx-2">|</span>
-                        <button
-                          class="bg-action text-primary text-decoration-underline border-0 bg-transparent p-0"
-                          (click)="showQuestionDetails(question)"
-                        >
-                          Details
-                        </button>
-                      </ng-container>
-                    </td>
 
-                    <!-- Code Column -->
-                    <td
-                      [ngStyle]="{
+                    <ng-container *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">
+                      <span class="mx-2">|</span>
+                      <button class="bg-action text-primary text-decoration-underline border-0 bg-transparent p-0"
+                        (click)="showQuestionDetails(question)">
+                        Details
+                      </button>
+                    </ng-container>
+                  </td>
+
+                  <!-- Code Column -->
+                  <td [ngStyle]="{
                         background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                      }"
-                      role="button"
-                      style="width: 15rem"
-                    >
-                      <a
-                        *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="bottom"
-                        [attr.title]="'Click to view question details'"
-                        class="text-primary text-decoration-underline"
-                        [routerLink]="[
+                      }" role="button" style="width: 15rem">
+                    <a *ngIf="editingIndex !== i + pageSize * (currentPage - 1)" data-bs-toggle="tooltip"
+                      data-bs-placement="bottom" [attr.title]="'Click to view question details'"
+                      class="text-primary text-decoration-underline" [routerLink]="[
                           '/admin/question-details',
                           question.code,
                           question.name
-                        ]"
-                        (click)="hideTooltip($event)"
-                        role="button"
-                      >
-                        {{ question.code }}
-                      </a>
+                        ]" (click)="hideTooltip($event)" role="button">
+                      {{ question.code }}
+                    </a>
 
-                      <form
-                        [formGroup]="questionForm"
-                        *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                      >
-                        <input
-                          type="text"
-                          formControlName="code"
-                          class="form-control edit-mode"
-                          placeholder="Enter Code"
-                        />
-                      </form>
-                    </td>
+                    <form [formGroup]="questionForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <input type="text" formControlName="code" class="form-control edit-mode"
+                        placeholder="Enter Code" />
+                    </form>
+                  </td>
 
-                    <!-- Question Name -->
-                    <td
-                      class="w-25"
-                      [ngStyle]="{
+                  <!-- Question Name -->
+                  <td class="w-25" [ngStyle]="{
                         background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                      }"
-                    >
-                      <span
-                        *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                        >{{ question.questionText | slice : 0 : 50
-                        }}{{
-                          question.questionText.length > 50 ? "..." : ""
-                        }}</span
-                      >
-                      <form
-                        [formGroup]="questionForm"
-                        *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                      >
-                        <input
-                          type="text"
-                          formControlName="name"
-                          class="form-control edit-mode"
-                          placeholder="Enter Question"
-                        />
-                      </form>
-                    </td>
+                      }">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ question.question | slice : 0
+                      : 50
+                      }}{{
+                      question.question.length > 50 ? "..." : ""
+                      }}</span>
+                    <form [formGroup]="questionForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <input type="text" formControlName="name" class="form-control edit-mode"
+                        placeholder="Enter Question" />
+                    </form>
+                  </td>
 
-                    <!-- Topic -->
-                    <td
-                      class=""
-                      [ngStyle]="{
+                  <!-- Topic -->
+                  <td class="" [ngStyle]="{
                         background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                      }"
-                      style="max-width: 100px"
-                    >
-                      <span
-                        *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                        >{{ question.topic }}</span
-                      >
-                      <form
-                        [formGroup]="questionForm"
-                        *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                      >
-                        <select
-                          formControlName="category"
-                          class="form-control edit-mode"
+                      }" style="max-width: 100px">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ getTopicName(question.topicCode) }}</span>
+                    <form [formGroup]="questionForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <select formControlName="category" class="form-control edit-mode">
+                        <option value="">Select Topic</option>
+                        <option value="Java">Java</option>
+                        <option value="Spring">Spring</option>
+                        <option value="Angular">Angular</option>
+                        <option value="Database">Database</option>
+                        <option value="Data Structures">Data Structures</option>
+                        <option value="Algorithms">Algorithms</option>
+                        <option value="System Design">System Design</option>
+                      </select>
+                    </form>
+                  </td>
+
+                  <!-- Type Column -->
+                  <td class="" [ngStyle]="{
+                        background: i % 2 === 0 ? '#f8fbff' : 'transparent'
+                      }" style="max-width: 100px">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)" class=
+
+                            "badge bg-success"
+
                         >
-                          <option value="">Select Topic</option>
-                          <option value="Java">Java</option>
-                          <option value="Spring">Spring</option>
-                          <option value="Angular">Angular</option>
-                          <option value="Database">Database</option>
-                          <option value="Data Structures">Data Structures</option>
-                          <option value="Algorithms">Algorithms</option>
-                          <option value="System Design">System Design</option>
-                        </select>
-                      </form>
-                    </td>
+                      MCQ
+                    </span>
+                    <form [formGroup]="questionForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <select formControlName="type" class="form-control edit-mode">
+                        <option value="">Select Type</option>
+                        <option value="MCQ">MCQ</option>
+                        <option value="Subjective">Subjective</option>
+                      </select>
+                    </form>
+                  </td>
 
-                    <!-- Type Column -->
-                    <td
-                      class=""
-                      [ngStyle]="{
+                  <!-- Difficulty Column -->
+                  <td class="" [ngStyle]="{
                         background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                      }"
-                      style="max-width: 100px"
-                    >
-                      <span
-                        *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                        [class]="
-                          question.type === 'MCQ'
-                            ? 'badge bg-primary'
-                            : 'badge bg-success'
-                        "
-                      >
-                        {{ question.type }}
-                      </span>
-                      <form
-                        [formGroup]="questionForm"
-                        *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                      >
-                        <select
-                          formControlName="type"
-                          class="form-control edit-mode"
-                        >
-                          <option value="">Select Type</option>
-                          <option value="MCQ">MCQ</option>
-                          <option value="Subjective">Subjective</option>
-                        </select>
-                      </form>
-                    </td>
+                      }" style="max-width: 100px">
+                    <span *ngIf="editingIndex !== i + pageSize * (currentPage - 1)">{{ question.difficulty }}</span>
+                    <form [formGroup]="questionForm" *ngIf="editingIndex === i + pageSize * (currentPage - 1)">
+                      <select formControlName="difficulty" class="form-control edit-mode">
+                        <option value="">Select Difficulty</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+      </div>
 
-                    <!-- Difficulty Column -->
-                    <td
-                      class=""
-                      [ngStyle]="{
-                        background: i % 2 === 0 ? '#f8fbff' : 'transparent'
-                      }"
-                      style="max-width: 100px"
-                    >
-                      <span
-                        *ngIf="editingIndex !== i + pageSize * (currentPage - 1)"
-                        >{{ question.difficulty }}</span
-                      >
-                      <form
-                        [formGroup]="questionForm"
-                        *ngIf="editingIndex === i + pageSize * (currentPage - 1)"
-                      >
-                        <select
-                          formControlName="difficulty"
-                          class="form-control edit-mode"
-                        >
-                          <option value="">Select Difficulty</option>
-                          <option value="Easy">Easy</option>
-                          <option value="Medium">Medium</option>
-                          <option value="Hard">Hard</option>
-                        </select>
-                      </form>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </ng-container>
-        </div>
+      <div class="d-flex justify-content-end align-items-center w-100 custom-font">
+        <div class="d-flex justify-content-between align-items-center w-100 mb-4 flex-wrap gap-2">
+          <!-- Entries Info -->
+          <div class="ms-auto text-end me-1">
+            <span>
+              Showing {{ (currentPage - 1) * pageSize + 1 }} to
+              {{
+              currentPage * pageSize > questions.length
+              ? questions.length
+              : currentPage * pageSize
+              }}
+              of {{ questions.length }} entries
+            </span>
+          </div>
 
-        <div
-          class="d-flex justify-content-end align-items-center w-100 custom-font"
-        >
-          <div
-            class="d-flex justify-content-between align-items-center w-100 mb-4 flex-wrap gap-2"
-          >
-            <!-- Entries Info -->
-            <div class="ms-auto text-end me-1">
-              <span>
-                Showing {{ (currentPage - 1) * pageSize + 1 }} to
-                {{
-                  currentPage * pageSize > questions.length
-                    ? questions.length
-                    : currentPage * pageSize
-                }}
-                of {{ questions.length }} entries
-              </span>
-            </div>
+          <!-- Pagination Controls -->
+          <div class="d-flex align-items-center gap-1">
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToFirstPage()" [disabled]="currentPage === 1">
+              <i class="fa fa-angle-double-left"></i>
+            </button>
 
-            <!-- Pagination Controls -->
-            <div class="d-flex align-items-center gap-1">
-              <button
-                class="btn btn-outline-secondary btn-sm"
-                (click)="goToFirstPage()"
-                [disabled]="currentPage === 1"
-              >
-                <i class="fa fa-angle-double-left"></i>
-              </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToPreviousPage()"
+              [disabled]="currentPage === 1">
+              <i class="fa fa-angle-left"></i>
+            </button>
 
-              <button
-                class="btn btn-outline-secondary btn-sm"
-                (click)="goToPreviousPage()"
-                [disabled]="currentPage === 1"
-              >
-                <i class="fa fa-angle-left"></i>
-              </button>
+            <button class="btn btn-outline-primary btn-sm disabled">
+              {{ currentPage }}
+            </button>
 
-              <button class="btn btn-outline-primary btn-sm disabled">
-                {{ currentPage }}
-              </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToNextPage()"
+              [disabled]="currentPage === totalPages">
+              <i class="fa fa-angle-right"></i>
+            </button>
 
-              <button
-                class="btn btn-outline-secondary btn-sm"
-                (click)="goToNextPage()"
-                [disabled]="currentPage === totalPages"
-              >
-                <i class="fa fa-angle-right"></i>
-              </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToLastPage()"
+              [disabled]="currentPage === totalPages">
+              <i class="fa fa-angle-double-right"></i>
+            </button>
 
-              <button
-                class="btn btn-outline-secondary btn-sm"
-                (click)="goToLastPage()"
-                [disabled]="currentPage === totalPages"
-              >
-                <i class="fa fa-angle-double-right"></i>
-              </button>
-
-              <!-- Page Size Dropdown -->
-              <select
-                class="form-select form-select-sm ms-2 w-auto"
-                [(ngModel)]="pageSize"
-                (change)="updatePagination()"
-              >
-                <option [value]="10">10</option>
-                <option [value]="25">25</option>
-                <option [value]="50">50</option>
-                <option [value]="100">100</option>
-              </select>
-            </div>
+            <!-- Page Size Dropdown -->
+            <select class="form-select form-select-sm ms-2 w-auto" [(ngModel)]="pageSize" (change)="updatePagination()">
+              <option [value]="10">10</option>
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
+              <option [value]="100">100</option>
+            </select>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Add Question Modal -->
-  <div
-    class="modal fade"
-    id="addQuestionModal"
-    tabindex="-1"
-    aria-labelledby="addQuestionModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg">
-      <form [formGroup]="questionForm1" (ngSubmit)="onSubmit()">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addQuestionModalLabel">
-              Add New Question
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-
-          <div class="modal-body">
-            <div class="card">
-              <div
-                class="card-header d-flex justify-content-between align-items-center"
-              >
-                <div>
-                  <input
-                    class="form-control mb-2"
-                    placeholder="Question Code"
-                    formControlName="code"
-                  />
-                  <div class="d-flex gap-2">
-                    <select class="form-select" formControlName="topic">
-                      <option value="">Select Topic</option>
-                      <option value="Angular">Angular</option>
-                      <option value="Spring boot">Spring boot</option>
-                      <option value="Java">Java</option>
-                    </select>
-                    <select class="form-select" formControlName="difficulty">
-                      <option value="">Select Difficulty</option>
-                      <option value="Easy">Easy</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Hard">Hard</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <select class="form-select mb-2" formControlName="type">
-                    <option value="MCQ">MCQ</option>
-                    <option value="Subjective">Subjective</option>
-                  </select>
-                  <input
-                    type="number"
-                    class="form-control"
-                    placeholder="Marks"
-                    formControlName="marks"
-                  />
-                </div>
-              </div>
-
-              <div class="card-body">
-                <div class="mb-3">
-                  <label class="fw-bold">Question:</label>
-                  <textarea
-                    class="form-control"
-                    formControlName="questionText"
-                    rows="3"
-                  ></textarea>
-                </div>
-
-                <!-- MCQ Options with Radio Buttons -->
-                <div
-                  *ngIf="questionForm1.get('type')?.value === 'MCQ'"
-                  class="mb-4"
-                >
-                  <label class="fw-bold mb-2"
-                    >Options (Select correct one):</label
-                  >
-                  <div class="row g-3">
-                    <div class="col-md-6 d-flex align-items-center">
-                      <input
-                        type="radio"
-                        name="correctOption"
-                        class="form-check-input me-2"
-                        [value]="'A'"
-                        (change)="
-                          questionForm1.get('correctAnswer')?.setValue('A')
-                        "
-                        [checked]="
-                          questionForm1.get('correctAnswer')?.value === 'A'
-                        "
-                      />
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Option A"
-                        formControlName="optionA"
-                      />
-                    </div>
-                    <div class="col-md-6 d-flex align-items-center">
-                      <input
-                        type="radio"
-                        name="correctOption"
-                        class="form-check-input me-2"
-                        [value]="'B'"
-                        (change)="
-                          questionForm1.get('correctAnswer')?.setValue('B')
-                        "
-                        [checked]="
-                          questionForm1.get('correctAnswer')?.value === 'B'
-                        "
-                      />
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Option B"
-                        formControlName="optionB"
-                      />
-                    </div>
-                    <div class="col-md-6 d-flex align-items-center">
-                      <input
-                        type="radio"
-                        name="correctOption"
-                        class="form-check-input me-2"
-                        [value]="'C'"
-                        (change)="
-                          questionForm1.get('correctAnswer')?.setValue('C')
-                        "
-                        [checked]="
-                          questionForm1.get('correctAnswer')?.value === 'C'
-                        "
-                      />
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Option C"
-                        formControlName="optionC"
-                      />
-                    </div>
-                    <div class="col-md-6 d-flex align-items-center">
-                      <input
-                        type="radio"
-                        name="correctOption"
-                        class="form-check-input me-2"
-                        [value]="'D'"
-                        (change)="
-                          questionForm1.get('correctAnswer')?.setValue('D')
-                        "
-                        [checked]="
-                          questionForm1.get('correctAnswer')?.value === 'D'
-                        "
-                      />
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Option D"
-                        formControlName="optionD"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Subjective Word Limit -->
-                <div
-                  *ngIf="questionForm1.get('type')?.value === 'Subjective'"
-                  class="mb-3"
-                >
-                  <label class="fw-bold">Word Limit:</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    placeholder="e.g. 250"
-                    formControlName="wordLimit"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              type="submit"
-              class="btn btn-success"
-              [disabled]="questionForm1.invalid"
-            >
-              Add Question
-            </button>
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Question Details Modal -->
-  <div
-    class="modal fade"
-    id="questionDetailsModal"
-    tabindex="-1"
-    aria-labelledby="questionDetailsModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg">
+<!-- Add Question Modal -->
+<div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form [formGroup]="questionForm1" (ngSubmit)="onSubmit()">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="questionDetailsModalLabel">
-            Question Details
+          <h5 class="modal-title" id="addQuestionModalLabel">
+            Add New Question
           </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" *ngIf="selectedQuestion">
+
+        <div class="modal-body">
           <div class="card">
-            <div
-              class="card-header d-flex justify-content-between align-items-center"
-            >
+            <div class="card-header d-flex justify-content-between align-items-center">
               <div>
-                <h6 class="mb-0">{{ selectedQuestion.code }}</h6>
-                <small class="text-muted"
-                  >{{ selectedQuestion.topic }} •
-                  {{ selectedQuestion.difficulty }}</small
-                >
+                <input class="form-control mb-2" placeholder="Question Code" formControlName="code" />
+                <div class="d-flex gap-2">
+                  <select class="form-select" formControlName="topic">
+                    <option value="">Select Topic</option>
+                    <option value="Angular">Angular</option>
+                    <option value="Spring boot">Spring boot</option>
+                    <option value="Java">Java</option>
+                  </select>
+                  <select class="form-select" formControlName="difficulty">
+                    <option value="">Select Difficulty</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
               </div>
               <div>
-                <span
-                  [class]="
-                    selectedQuestion.type === 'MCQ'
-                      ? 'badge bg-primary'
-                      : 'badge bg-success'
-                  "
-                >
-                  {{ selectedQuestion.type }}
-                </span>
-                <span class="badge bg-warning ms-2"
-                  >{{ selectedQuestion.marks }} Marks</span
-                >
+                <select class="form-select mb-2" formControlName="type">
+                  <option value="MCQ">MCQ</option>
+                  <option value="Subjective">Subjective</option>
+                </select>
+                <input type="number" class="form-control" placeholder="Marks" formControlName="marks" />
               </div>
             </div>
+
             <div class="card-body">
-              <div class="mb-4">
-                <h6 class="fw-bold">Question:</h6>
-                <p class="mb-0">{{ selectedQuestion.questionText }}</p>
+              <div class="mb-3">
+                <label class="fw-bold">Question:</label>
+                <textarea class="form-control" formControlName="questionText" rows="3"></textarea>
               </div>
 
-              <!-- MCQ Options -->
-              <div *ngIf="selectedQuestion.type === 'MCQ'" class="mb-4">
-                <h6 class="fw-bold">Options:</h6>
-                <div class="row">
-                  <div class="col-md-6 mb-2">
-                    <div
-                      class="p-2 border rounded"
-                      [class.bg-success]="selectedQuestion.correctAnswer === 'A'"
-                      [class.text-white]="selectedQuestion.correctAnswer === 'A'"
-                    >
-                      <strong>A)</strong> {{ selectedQuestion.options?.A }}
-                      <i
-                        *ngIf="selectedQuestion.correctAnswer === 'A'"
-                        class="fas fa-check float-end"
-                      ></i>
-                    </div>
+              <!-- MCQ Options with Radio Buttons -->
+              <div *ngIf="questionForm1.get('type')?.value === 'MCQ'" class="mb-4">
+                <label class="fw-bold mb-2">Options (Select correct one):</label>
+                <div class="row g-3">
+                  <div class="col-md-6 d-flex align-items-center">
+                    <input type="radio" name="correctOption" class="form-check-input me-2" [value]="'A'" (change)="
+                          questionForm1.get('correctAnswer')?.setValue('A')
+                        " [checked]="
+                          questionForm1.get('correctAnswer')?.value === 'A'
+                        " />
+                    <input type="text" class="form-control" placeholder="Option A" formControlName="optionA" />
                   </div>
-                  <div class="col-md-6 mb-2">
-                    <div
-                      class="p-2 border rounded"
-                      [class.bg-success]="selectedQuestion.correctAnswer === 'B'"
-                      [class.text-white]="selectedQuestion.correctAnswer === 'B'"
-                    >
-                      <strong>B)</strong> {{ selectedQuestion.options?.B }}
-                      <i
-                        *ngIf="selectedQuestion.correctAnswer === 'B'"
-                        class="fas fa-check float-end"
-                      ></i>
-                    </div>
+                  <div class="col-md-6 d-flex align-items-center">
+                    <input type="radio" name="correctOption" class="form-check-input me-2" [value]="'B'" (change)="
+                          questionForm1.get('correctAnswer')?.setValue('B')
+                        " [checked]="
+                          questionForm1.get('correctAnswer')?.value === 'B'
+                        " />
+                    <input type="text" class="form-control" placeholder="Option B" formControlName="optionB" />
                   </div>
-                  <div class="col-md-6 mb-2">
-                    <div
-                      class="p-2 border rounded"
-                      [class.bg-success]="selectedQuestion.correctAnswer === 'C'"
-                      [class.text-white]="selectedQuestion.correctAnswer === 'C'"
-                    >
-                      <strong>C)</strong> {{ selectedQuestion.options?.C }}
-                      <i
-                        *ngIf="selectedQuestion.correctAnswer === 'C'"
-                        class="fas fa-check float-end"
-                      ></i>
-                    </div>
+                  <div class="col-md-6 d-flex align-items-center">
+                    <input type="radio" name="correctOption" class="form-check-input me-2" [value]="'C'" (change)="
+                          questionForm1.get('correctAnswer')?.setValue('C')
+                        " [checked]="
+                          questionForm1.get('correctAnswer')?.value === 'C'
+                        " />
+                    <input type="text" class="form-control" placeholder="Option C" formControlName="optionC" />
                   </div>
-                  <div class="col-md-6 mb-2">
-                    <div
-                      class="p-2 border rounded"
-                      [class.bg-success]="selectedQuestion.correctAnswer === 'D'"
-                      [class.text-white]="selectedQuestion.correctAnswer === 'D'"
-                    >
-                      <strong>D)</strong> {{ selectedQuestion.options?.D }}
-                      <i
-                        *ngIf="selectedQuestion.correctAnswer === 'D'"
-                        class="fas fa-check float-end"
-                      ></i>
-                    </div>
+                  <div class="col-md-6 d-flex align-items-center">
+                    <input type="radio" name="correctOption" class="form-check-input me-2" [value]="'D'" (change)="
+                          questionForm1.get('correctAnswer')?.setValue('D')
+                        " [checked]="
+                          questionForm1.get('correctAnswer')?.value === 'D'
+                        " />
+                    <input type="text" class="form-control" placeholder="Option D" formControlName="optionD" />
                   </div>
-                </div>
-                <div class="mt-3">
-                  <h6 class="fw-bold text-success">
-                    Correct Answer: Option {{ selectedQuestion.correctAnswer }}
-                  </h6>
                 </div>
               </div>
 
               <!-- Subjective Word Limit -->
-              <div *ngIf="selectedQuestion.type === 'Subjective'" class="mb-3">
-                <h6 class="fw-bold">Word Limit:</h6>
-                <p class="mb-0 text-info">
-                  <i class="fas fa-edit"></i>
-                  {{ selectedQuestion.wordLimit }} words
-                </p>
+              <div *ngIf="questionForm1.get('type')?.value === 'Subjective'" class="mb-3">
+                <label class="fw-bold">Word Limit:</label>
+                <input type="number" class="form-control" placeholder="e.g. 250" formControlName="wordLimit" />
               </div>
             </div>
           </div>
         </div>
+
         <div class="modal-footer">
+          <button type="submit" class="btn btn-success" [disabled]="questionForm1.invalid">
+            Add Question
+          </button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Close
+            Cancel
           </button>
         </div>
       </div>
+    </form>
+  </div>
+</div>
+
+<!-- Question Details Modal -->
+<div class="modal fade" id="questionDetailsModal" tabindex="-1" aria-labelledby="questionDetailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="questionDetailsModalLabel">
+          Question Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedQuestion">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-0">{{ selectedQuestion.code }}</h6>
+              <small class="text-muted">{{ selectedQuestion.topic }} •
+                {{ selectedQuestion.difficulty }}</small>
+            </div>
+            <div>
+              <span [class]="
+                    selectedQuestion.type === 'MCQ'
+                      ? 'badge bg-primary'
+                      : 'badge bg-success'
+                  ">
+                {{ selectedQuestion.type }}
+              </span>
+              <span class="badge bg-warning ms-2">{{ selectedQuestion.marks }} Marks</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="mb-4">
+              <h6 class="fw-bold">Question:</h6>
+              <p class="mb-0">{{ selectedQuestion.questionText }}</p>
+            </div>
+
+            <!-- MCQ Options -->
+            <div *ngIf="selectedQuestion.type === 'MCQ'" class="mb-4">
+              <h6 class="fw-bold">Options:</h6>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'A'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'A'">
+                    <strong>A)</strong> {{ selectedQuestion.options?.A }}
+                    <i *ngIf="selectedQuestion.correctAnswer === 'A'" class="fas fa-check float-end"></i>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'B'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'B'">
+                    <strong>B)</strong> {{ selectedQuestion.options?.B }}
+                    <i *ngIf="selectedQuestion.correctAnswer === 'B'" class="fas fa-check float-end"></i>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'C'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'C'">
+                    <strong>C)</strong> {{ selectedQuestion.options?.C }}
+                    <i *ngIf="selectedQuestion.correctAnswer === 'C'" class="fas fa-check float-end"></i>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="p-2 border rounded" [class.bg-success]="selectedQuestion.correctAnswer === 'D'"
+                    [class.text-white]="selectedQuestion.correctAnswer === 'D'">
+                    <strong>D)</strong> {{ selectedQuestion.options?.D }}
+                    <i *ngIf="selectedQuestion.correctAnswer === 'D'" class="fas fa-check float-end"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <h6 class="fw-bold text-success">
+                  Correct Answer: Option {{ selectedQuestion.correctAnswer }}
+                </h6>
+              </div>
+            </div>
+
+            <!-- Subjective Word Limit -->
+            <div *ngIf="selectedQuestion.type === 'Subjective'" class="mb-3">
+              <h6 class="fw-bold">Word Limit:</h6>
+              <p class="mb-0 text-info">
+                <i class="fas fa-edit"></i>
+                {{ selectedQuestion.wordLimit }} words
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- Delete Confirmation Modal -->
-  <div
-    class="modal fade"
-    id="deleteConfirmationModal"
-    tabindex="-1"
-    aria-labelledby="deleteConfirmationModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div
-          class="modal-header flex-column align-items-start pb-0"
-          style="border-bottom: none"
-        >
-          <h5 class="modal-title" id="deleteConfirmationModalLabel">
-            Delete Question
-          </h5>
-          <hr class="modal-title-line w-100 m-0 mt-3" />
-          <button
-            type="button"
-            class="btn-close position-absolute end-0 top-0 m-3"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            <i class="fa-solid fa-xmark-large"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>
-            Are you sure that you want to delete question
-            <span id="questionCodeToDelete"></span>?
-          </p>
-        </div>
-        <div class="modal-footer justify-content-end border-0 pt-0">
-          <button
-            type="button"
-            class="btn btn-primary px-4"
-            id="confirmDeleteBtn"
-            style="
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header flex-column align-items-start pb-0" style="border-bottom: none">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">
+          Delete Question
+        </h5>
+        <hr class="modal-title-line w-100 m-0 mt-3" />
+        <button type="button" class="btn-close position-absolute end-0 top-0 m-3" data-bs-dismiss="modal"
+          aria-label="Close">
+          <i class="fa-solid fa-xmark-large"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure that you want to delete question
+          <span id="questionCodeToDelete"></span>?
+        </p>
+      </div>
+      <div class="modal-footer justify-content-end border-0 pt-0">
+        <button type="button" class="btn btn-primary px-4" id="confirmDeleteBtn" style="
               background-color: #2962ff;
               border-radius: 6px;
               font-weight: 500;
-            "
-          >
-            Yes
-          </button>
-          <button
-            type="button"
-            class="btn btn-outline-secondary px-4 ms-2"
-            data-bs-dismiss="modal"
-            style="border-radius: 6px; font-weight: 500"
-          >
-            No
-          </button>
-        </div>
+            ">
+          Yes
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-4 ms-2" data-bs-dismiss="modal"
+          style="border-radius: 6px; font-weight: 500">
+          No
+        </button>
       </div>
     </div>
   </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{ modalStep === 'confirm' ? 'Confirm Assignment' : 'Set Section Durations' }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Step 1: Confirmation -->
+<div *ngIf="modalStep === 'confirm'">
+  <p>Are you sure you want to assign the following question codes to the exam?</p>
+  <p><strong>{{ getSelectedCodesArray().join(', ') }}</strong></p>
+</div>
+
+        <!-- Step 2: After successful assignment -->
+<div *ngIf="modalStep === 'duration'" class="container">
+  <div *ngFor="let section of sectionKeys" class="mb-3">
+    <h6>{{ section }}</h6>
+    <p>Number of Questions: {{ groupedQuestions[section].length }}</p>
+    <div class="form-group">
+      <label>Duration (in minutes):</label>
+      <input
+        type="number"
+        class="form-control"
+        placeholder="Enter duration"
+        [(ngModel)]="sectionDurations[section]"
+        min="1"
+        required>
+    </div>
+  </div>
+</div>
+      </div>
+
+      <div class="modal-footer">
+        <!-- Confirm Step Buttons -->
+        <div *ngIf="modalStep === 'confirm'">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button class="btn btn-success" (click)="confirmAssign()">Yes</button>
+        </div>
+
+        <!-- Duration Step Buttons -->
+        <div *ngIf="modalStep === 'duration'">
+          <button class="btn btn-primary" (click)="submitDurations()">Submit Durations</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

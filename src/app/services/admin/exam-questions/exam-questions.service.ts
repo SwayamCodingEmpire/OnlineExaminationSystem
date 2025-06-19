@@ -1,19 +1,25 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, Observable, of, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../../../Enviornment/enviornment';
-import { ExamPayload } from '../../../models/ExamPayload';
+import { SectionPayload } from '../../../models/SectionPayload';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ExamsService {
+export class ExamQuestionsService {
 
-  private apiUrl = `${environment.apiUrl}/exams`; // ✅ Update with your backend base URL
+  private apiUrl = `${environment.apiUrl}/exam`; // ✅ Update with your backend base URL
 
   constructor(private http: HttpClient) {}
 
-
+assignQuestionsToExam(examCode: string, questionCodes: String[]): Observable<any> {
+  const payload = { questionCodes };
+  return this.http.post(`${this.apiUrl}/${examCode}/question`, payload, {
+      responseType: 'text' as 'json' // accept plain text if server returns no JSON
+    })
+    .pipe(catchError(this.handleError));
+}
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
@@ -43,32 +49,19 @@ export class ExamsService {
     return throwError(() => new Error(errorMessage));
   }
 
-  getExams(): Observable<ExamPayload[]> {
-  return this.http.get<ExamPayload[]>(`${this.apiUrl}/all`)
-    .pipe(catchError(this.handleError));
-}
 
-addExam(exam: ExamPayload): Observable<any> {
-  return this.http.post(`${this.apiUrl}`, exam, {
+  addSectionsToExam(examCode: string, sections: SectionPayload[]): Observable<any> {
+  return this.http.post(`${this.apiUrl}/${examCode}/sections`, sections, {
     responseType: 'text' as 'json'
-  }).pipe(catchError(this.handleError));
+  }).pipe(
+    catchError(this.handleError)
+  );
 }
 
-updateExam(exam: ExamPayload, oldcode: string): Observable<any> {
-  return this.http.put(`${this.apiUrl}/${oldcode}`, exam, {
-    responseType: 'text' as 'json'
-  }).pipe(catchError(this.handleError));
-}
+  getExamQuestionsByExamCode(code: String): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${code}/questions/all`)
+      .pipe(catchError(this.handleError));
 
-deleteExam(oldcode: string): Observable<any> {
-  return this.http.delete(`${this.apiUrl}/${oldcode}`, {
-    responseType: 'text' as 'json'
-  }).pipe(catchError(this.handleError));
-}
-
-
-
-
-
+  }
 
 }
