@@ -200,6 +200,8 @@
                       </button>
                     </ng-container>
 
+
+
                     <!-- Save & Cancel Buttons in Edit Mode -->
                     <button
                       (click)="saveExam(i + pageSize * (currentPage - 1))"
@@ -773,6 +775,8 @@
   </div>
 </div>
 
+<!-- View exam modal -->
+
 <div
   class="modal fade"
   id="viewExamModal"
@@ -817,8 +821,7 @@
                   data-bs-toggle="collapse"
                   [attr.data-bs-target]="'#questionCollapse' + i"
                   aria-expanded="false"
-                  [attr.aria-controls]="'questionCollapse' + i"
-                >
+                  [attr.aria-controls]="'questionCollapse' + i">
                   <div
                     class="d-flex justify-content-between w-100 align-items-center"
                   >
@@ -837,9 +840,8 @@
                       <button
                         class="btn btn-danger btn-sm ms-3"
                         style="width: 32px; height: 32px"
-                        (click)="$event.stopPropagation(); deleteQuestion(i)"
-                        title="Remove Question"
-                      >
+                        (click)="deleteQuestion(i)"
+                        title="Remove Question">
                         <i class="fa-regular fa-trash"></i>
                       </button>
                     </div>
@@ -914,6 +916,8 @@
 
 </div>
 
+
+<!-- View student modal -->
 <div
   class="modal fade"
   id="viewStudentModal"

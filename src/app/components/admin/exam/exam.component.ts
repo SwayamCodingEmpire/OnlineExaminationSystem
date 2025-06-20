@@ -8,7 +8,7 @@ import { ExamsService } from '../../../services/admin/exams/exams.service';
 import { ExamPayload } from '../../../models/ExamPayload';
 import { ExamQuestionsService } from '../../../services/admin/exam-questions/exam-questions.service';
 import { QuestionBankPayload } from '../../../models/QuestionBankPayload';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -588,9 +588,11 @@ export class ExamComponent {
   }
 
 deleteQuestion(index: number) {
-    if (this.examSelected && confirm(`Are you sure you want to delete this question?`)) {
+  console.log('Delete question at index:', index);
+  console.log('Exam selected:', this.examSelected);
+    if (this.examSelected) {
       const questionCode = this.examQuestions[index].code;
-      this.examSelectedCode = this.exams[this.examSelected].code;
+      console.log('Deleting question with code:', questionCode, 'from exam:', this.examSelectedCode);
       this.examQuestionsService.deleteQuestion(this.examSelectedCode, questionCode).subscribe({
         next: () => {
           this.toastr.success('Question deleted successfully');
@@ -607,6 +609,8 @@ deleteQuestion(index: number) {
 
 examDetailsClicked(examCode: string) {
     this.examSelectedCode = examCode;
+    this.examSelected = this.exams.findIndex(exam => exam.code === examCode);
+    console.log('Exam selected:', this.examSelected, 'for code:', examCode);
     this.examQuestionsService.getExamQuestionsByExamCode(examCode).subscribe(
       (questions: any[]) => {
         this.examQuestions = questions;
