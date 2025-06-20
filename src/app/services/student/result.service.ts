@@ -18,7 +18,7 @@ export class ResultService {
   /** GET /v1/exams/{code}/summary */
   getSummary(examCode: string): Observable<SectionResult[]> {
     return this.http.get<SectionResult[]>(
-      `${this.baseUrl}/exams/${examCode}/summary`
+      `${this.baseUrl}/take-exam/${examCode}/summary`
     );
   }
 }

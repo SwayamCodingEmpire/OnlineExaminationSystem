@@ -36,14 +36,14 @@ export class TakeExamService {
   /** Fetch raw section details (no pipes/operators) */
   getSections(examCode: string): Observable<SectionDetailDTO[]> {
     return this.http.get<SectionDetailDTO[]>(
-      `${this.baseUrl}/exams/${examCode}/sections`
+      `${this.baseUrl}/exam/${examCode}/sections`
     );
   }
 
   /** Submit answers payload */
   submitAnswers(examCode: string, payload: SubmitRequest): Observable<void> {
     return this.http.post<void>(
-      `${this.baseUrl}/exams/${examCode}/submit`,
+      `${this.baseUrl}/take-exam/${examCode}/submit`,
       payload
     );
   }

@@ -225,8 +225,7 @@ export class TopicComponent {
     } else {
       this.topics = this.originalTopics.filter(topic =>
         topic.code.toLowerCase().includes(searchTerm) ||
-        topic.name.toLowerCase().includes(searchTerm) ||
-        topic.description.toLowerCase().includes(searchTerm)
+        topic.name.toLowerCase().includes(searchTerm)
       );
     }
 

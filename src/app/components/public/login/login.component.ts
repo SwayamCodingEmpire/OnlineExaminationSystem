@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import { LoginCredentials } from '../../../models/LoginCredentials';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { LoginService } from '../../../services/login/login.service';
+import { LoginCredentials } from '../../../models/LoginCredentials';
 
 @Component({
   selector: 'app-login',

@@ -14,10 +14,24 @@ import { ExamsComponent } from './components/student/exams/exams.component';
 import { TopicComponent } from './components/admin/topics/topics/topics.component';
 import { AddStudentComponent } from './components/admin/add-student/add-student.component';
 import { ResultListComponent } from './components/student/result-list/result-list/result-list.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
+
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
+
+  {
+    path: 'login',
+    component: LoginComponent,
+  },
   {
     path: 'admin',
+    canActivate: [authGuard],
+    data: { role: 'ADMIN' },
     component: AdminLayoutComponent,
     children: [
       // ✅ Default admin route
@@ -34,6 +48,8 @@ export const routes: Routes = [
   },
   {
     path: 'student',
+    canActivate: [authGuard],
+    data: { role: 'STUDENT' },
     component: StudentLayoutComponent,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

@@ -25,5 +25,4 @@ export class ViewExamService {
     return this.http.get<Exam[]>(`${this.apiUrl}/all`);
   }
 
-  // Add more API methods as needed
 }

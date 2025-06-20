@@ -523,10 +523,7 @@ onTopicSelect(code: string) {
     if (searchTerm.trim() !== '') {
       filteredQuestions = filteredQuestions.filter(question =>
         question.code.toLowerCase().includes(searchTerm) ||
-        question.question.toLowerCase().includes(searchTerm) ||
-        question.topicCode.toLowerCase().includes(searchTerm) ||
-        question.type.toLowerCase().includes(searchTerm) ||
-        question.difficulty.toLowerCase().includes(searchTerm)
+        question.question.toLowerCase().includes(searchTerm)
       );
     }
 
