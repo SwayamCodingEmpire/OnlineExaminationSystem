@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { UserInfo } from '../../../interfaces/admin/student.interface';
+import { UserInfo } from '../../../models/student.interface';
 import * as XLSX from 'xlsx';
 import { StudentService } from '../../../services/admin/students/students.service';
 

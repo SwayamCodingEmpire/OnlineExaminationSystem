@@ -40,7 +40,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: StudentDashboardComponent },
       { path: 'results/:id', component: ResultsComponent },       // ✅ View specific result
       { path: 'exams', component: ExamsComponent },
-      { path: 'take-exam/:id', component: TakeExamComponent },
+      { path: 'take-exam/:code', component: TakeExamComponent },
       { path: 'student-history' , component:ResultListComponent }
     ]
   },

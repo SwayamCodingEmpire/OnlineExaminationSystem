@@ -133,14 +133,14 @@
                   background: i % 2 === 0 ? '#f8fbff' : 'transparent'
                 }">
                     <!-- Take Exam Button -->
-                    <a [routerLink]="['/student/take-exam', i + pageSize * (currentPage - 1)]"
+                    <a [routerLink]="['/student/take-exam', exam.code]"
                       class="btn px-3 py-1 border border-secondary" [class.disabled]="isAddingNewexam"
                       [attr.aria-disabled]="isAddingNewexam">
                       <small>Take Exam</small>
                     </a>
 
                     <!-- View Results Button -->
-                    <a [routerLink]="['/student/results', i + pageSize * (currentPage - 1)]"
+                    <a [routerLink]="['/student/results', exam.code]"
                       class="btn py-1 border border-secondary mx-2">
                       <small>View Results</small>
                     </a>

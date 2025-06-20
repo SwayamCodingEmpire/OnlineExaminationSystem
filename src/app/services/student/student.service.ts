@@ -1,18 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserInfo } from '../../../models/student.interface';
-import { environment } from '../../../../Enviornment/enviornment';
-
-
-
+import { UserInfo } from '../../models/student.interface';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
-  private baseUrl = `${environment.apiUrl}/student`;
+  private baseUrl = 'http://localhost:8080/admin/Student';
 
   constructor(private http: HttpClient) { }
 
