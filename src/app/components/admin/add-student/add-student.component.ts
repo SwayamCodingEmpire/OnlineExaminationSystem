@@ -7,6 +7,9 @@ import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 
 import { ActivatedRoute } from '@angular/router';
+import { ExamStudentService } from '../../../services/admin/exam-student.service';
+import { ToastrService } from 'ngx-toastr';
+import { StudentService } from '../../../services/admin/students/students.service';
 
 
 @Component({
@@ -47,22 +50,17 @@ export class AddStudentComponent {
   isExamSpecificView: boolean = false;
   selectedQuestion: number | null = null;
   checkedStudents: boolean[] = [];
-  studentService: any;
 
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.examCode = params['examCode'] || null;
+      this.examCode = params['code'] || null;
       this.isExamSpecificView = !!this.examCode;
-
-      if (this.isExamSpecificView) {
-      }
 
       this.loadStudents();
     });
 
     console.log('StudentsComponent ngOnInit called');
-    this.loadStudents();
 
     // Initialize search term change detection
     this.searchForm.get('searchTerm')?.valueChanges.subscribe(term => {
@@ -134,7 +132,12 @@ export class AddStudentComponent {
   }
 
 
-  constructor( private route: ActivatedRoute) {
+  constructor(
+    private route: ActivatedRoute,
+    private examStudentService: ExamStudentService,
+    private toastr: ToastrService,
+    private studentService: StudentService
+  ) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -155,6 +158,40 @@ export class AddStudentComponent {
       pageSize: new FormControl(8, [Validators.required, Validators.min(1)])
     });
 
+  }
+
+  addStudent() {
+
+
+    const selectedStudentCodes = this.checkedStudents
+      .map((isChecked, index) => isChecked ? this.Students[index]?.code : null)
+      .filter(code => code !== null);
+
+    if (!selectedStudentCodes.length) {
+      this.toastr.error('Please select at least one student');
+      return;
+    }
+
+    if (!this.examCode) {
+      this.toastr.error('Exam code is not available');
+      return;
+    }
+
+    console.log('Calling endpoint to enroll students for exam:', this.examCode);
+    console.log('Payload:', { codes: selectedStudentCodes });
+
+
+
+      this.examStudentService.addStudentToExam(this.examCode, selectedStudentCodes)
+      .subscribe({
+        next: (response) => {
+          console.log('Server response:', response);
+          this.toastr.success('Students added to exam successfully');
+        },
+        error: (error) => {
+          this.toastr.error('Error adding students to exam');
+        }
+      });
   }
 
 
@@ -270,25 +307,13 @@ export class AddStudentComponent {
 
 
   loadStudents() {
-    // For your current mock data approach:
-    const data: any[] = [
-      {
-        code: 'S001',
-        name: 'John Doe',
-        email: 'john.doe@email.com',
-        phoneNo: '1234567890',
-        exams: ['EX001'] // Add this exams array to track which exams the student is enrolled in
-      }
-    ];
-
-    this.originalStudents = data.map((Student: any) => ({
+    this.studentService.getStudents().subscribe((data: any) => {
+      this.originalStudents = data.map((Student: any) => ({
       ...Student,
-      topics: Student.topics && Student.topics.length > 0
-        ? Student.topics
-        : Student.topicsString
-          ? Student.topicsString.split(',').map((t: string) => t.trim())
-          : this.generateDefaultTopics(Student.name)
-    }));
+      exams: Student.exams || []
+      }));
+      this.Students = [...this.originalStudents];
+    });
 
     // Filter students if we're in exam-specific view
     if (this.isExamSpecificView && this.examCode) {

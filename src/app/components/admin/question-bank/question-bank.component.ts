@@ -4,9 +4,11 @@ import { Form, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsMo
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import * as bootstrap from 'bootstrap';
+import * as XLSX from 'xlsx';
 import { QuestionBankService } from '../../../services/admin/questionbank/question-bank.service';
 import { TopicsService } from '../../../services/admin/topics/topics.service';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { TopicComponent } from "../topics/topics/topics.component";
 
 
 @Component({
@@ -18,11 +20,13 @@ import { ToastrModule, ToastrService } from 'ngx-toastr';
     FormsModule,
     NgxPaginationModule,
     ToastrModule,
-  ],
+    TopicComponent
+],
   templateUrl: './question-bank.component.html',
   styleUrl: './question-bank.component.scss'
 })
 export class QuestionBankComponent {
+  selectedTopic: string = '';
   popupPosition = { top: 0, left: 0 };
   descriptionForm!: FormGroup;
   originalQuestions: any[] = [];
@@ -51,9 +55,19 @@ export class QuestionBankComponent {
   questionDetailsModal: any;
   fb: FormBuilder = new FormBuilder();
   topics: any;
+  // For bulk upload
+  selectedBulkFile: File | null = null;
+  bulkQuestions: any[] = [];
+  bulkUploadModal: any = null;
+  bulkUploadTopicCode: string = '';
+
+onTopicSelect(code: string) {
+  this.selectedTopicFilter = code;
+  this.filterByTopic();
+}
 
   constructor(
-    private questionService: QuestionBankService, 
+    private questionService: QuestionBankService,
     private topicService: TopicsService,
     private toastr: ToastrService,
     ) {
@@ -107,7 +121,7 @@ export class QuestionBankComponent {
     this.loadQuestions();
     this.topicService.getTopics().subscribe((data) => {
       this.topics = data;
-    }); 
+    });
     // Initialize search term change detection
     this.searchForm.get('searchTerm')?.valueChanges.subscribe(term => {
       this.filterQuestions();
@@ -145,6 +159,12 @@ export class QuestionBankComponent {
       if (detailsModalElement) {
         this.questionDetailsModal = new bootstrap.Modal(detailsModalElement);
       }
+
+      // Initialize bulk upload modal
+      const bulkUploadModalElement = document.getElementById('bulkUploadModal');
+      if (bulkUploadModalElement) {
+        this.bulkUploadModal = new bootstrap.Modal(bulkUploadModalElement);
+      }
     }, 500);
   }
 
@@ -160,7 +180,7 @@ export class QuestionBankComponent {
 
     }
   }
-  
+
 
   createQuestion() {
     let formToValidate: FormGroup;
@@ -213,7 +233,7 @@ export class QuestionBankComponent {
       this.questionService.addQuestion(questionData).subscribe({
         next: (response) => {
           console.log('Question created successfully:', response);
-          
+
           // Reload questions from API to get updated list
           this.loadQuestions();
 
@@ -228,7 +248,7 @@ export class QuestionBankComponent {
         },
         error: (error) => {
           console.error('Error creating question:', error);
-          
+
         }
       });
     } else {
@@ -243,6 +263,74 @@ export class QuestionBankComponent {
   bulkUpload() {
     console.log('Bulk upload functionality to be implemented');
     // Implement bulk upload functionality here
+  }
+
+  openBulkUploadModal() {
+    this.selectedBulkFile = null;
+    this.bulkQuestions = [];
+    if (this.bulkUploadModal) {
+      this.bulkUploadModal.show();
+    }
+  }
+
+  onBulkFileSelected(event: any, topicCode: string) {
+    const file = event.target.files[0];
+    if (!file) {
+      this.selectedBulkFile = null;
+      return;
+    }
+    this.selectedBulkFile = file;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheet];
+        const jsonArr: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+        this.bulkUploadTopicCode = topicCode;
+        this.bulkQuestions = jsonArr.map(row => ({
+          code: row['code'],
+          question: row['question'],
+          topicCode: row['topicCode'],
+          difficulty: row['difficulty'],
+          marks: row['marks'],
+          options: [
+            row['optionA'],
+            row['optionB'],
+            row['optionC'],
+            row['optionD']
+          ],
+          correctOption: row['correctOption'],
+          type: 'MCQ',
+        }));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  uploadBulkFile() {
+    if (!this.bulkQuestions || this.bulkQuestions.length === 0) {
+      this.toastr.error('No valid question records found in the file.');
+      return;
+    }
+
+    this.questionService.bulkUploadQuestions(this.bulkQuestions, this.bulkUploadTopicCode).subscribe({
+      next: (res: any) => {
+        this.toastr.success('Bulk upload successful!');
+        this.bulkUploadModal.hide();
+        this.selectedBulkFile = null;
+        this.bulkQuestions = [];
+        this.loadQuestions();
+      },
+      error: (err: any) => {
+        const errorMessage = err?.error?.message || err?.error || 'Bulk upload failed.';
+        this.toastr.error(errorMessage);
+      }
+    });
   }
 
   filterByTopic() {
@@ -276,7 +364,7 @@ export class QuestionBankComponent {
       isNew: true
     };
     this.isAddingNewQuestion = true;
-    this.editingIndex = -1; 
+    this.editingIndex = -1;
   }
 
   editQuestion(question: any) {
@@ -336,7 +424,7 @@ export class QuestionBankComponent {
       this.questionService.deleteQuestion(questionCodeToDelete).subscribe({
         next: (response) => {
           this.toastr.success('Question deleted successfully!');
-          
+
           const indexInOriginal = this.originalQuestions.findIndex(q => q.code === questionCodeToDelete);
           if (indexInOriginal !== -1) {
             this.originalQuestions.splice(indexInOriginal, 1);
@@ -346,9 +434,9 @@ export class QuestionBankComponent {
           if (indexInCurrent !== -1) {
             this.questions.splice(indexInCurrent, 1);
           }
-          
-          this.filterQuestions(); 
-          
+
+          this.filterQuestions();
+
           this.questionIndexToDelete = null;
           this.deleteModal.hide();
         },
@@ -530,7 +618,7 @@ onSubmit() {
       this.addQuestionModal.hide();
       this.loadQuestions();
       this.questionForm1.reset({
-        type: 'MCQ' 
+        type: 'MCQ'
       });
     },
     error: (err) => {

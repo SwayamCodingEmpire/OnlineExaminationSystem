@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
+import { ToastrService } from 'ngx-toastr';
 // import { StudentService } from '../../../services/student/student.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -42,7 +43,7 @@ export class StudentComponent implements OnInit {
   StudentForm: FormGroup;
   pageSizeForm: FormGroup;
 
-    constructor(private studentService: StudentService) {
+    constructor(private studentService: StudentService, private toastr: ToastrService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -115,14 +116,15 @@ export class StudentComponent implements OnInit {
     this.bulkUploadError = '';
     this.bulkUploadSuccess = '';
     if (!this.bulkUsers || this.bulkUsers.length === 0) {
-      this.bulkUploadError = 'No valid records found in the file.';
+      this.toastr.error('No valid records found in the file.');
       return;
     }
 
+    console.log('Uploading students:', this.bulkUsers); // For debugging
+
     this.studentService.bulkUploadStudents(this.bulkUsers).subscribe({
       next: (res: any) => {
-        this.bulkUploadError = '';   // <--- CLEAR ERROR
-        this.bulkUploadSuccess = 'Bulk upload successful!';
+        this.toastr.success('Bulk upload successful!');
         this.bulkUploadModal.hide();
         this.selectedBulkFile = null;
         this.bulkUsers = [];
@@ -131,10 +133,11 @@ export class StudentComponent implements OnInit {
       error: (err: any) => {
         // Convert error to string, not object
         if (typeof err?.error === 'object') {
-          this.bulkUploadSuccess = JSON.stringify(err.error); // Or use a friendlier message
+          this.bulkUploadError = JSON.stringify(err.error); // Or use a friendlier message
         } else {
           this.bulkUploadError = (err?.error?.message || err?.error || 'Bulk upload failed.');
         }
+        this.toastr.error(this.bulkUploadError);
       }
     });
   }

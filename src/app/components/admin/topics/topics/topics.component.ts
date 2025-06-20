@@ -47,7 +47,7 @@ export class TopicComponent {
   deleteModal: any;
   topicIndexToDelete: number | null = null;
   totalPages = 1;
- 
+
 
   constructor(
     private topicService: TopicsService,
@@ -177,9 +177,8 @@ export class TopicComponent {
     }
 
     // Show the modal
-    if (this.deleteModal) {
-      this.deleteModal.show();
-    }
+    this.confirmDeleteTopic();
+
   }
 
   confirmDeleteTopic(): void {
@@ -285,4 +284,4 @@ export class TopicComponent {
     }
   }
 
-}                                                                                                                                                                                                                                                                
+}

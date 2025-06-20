@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserInfo } from '../../../interfaces/admin/student.interface';
+import { environment } from '../../../../Enviornment/enviornment';
 
 
 
@@ -11,7 +12,7 @@ import { UserInfo } from '../../../interfaces/admin/student.interface';
   providedIn: 'root'
 })
 export class StudentService {
-  private baseUrl = 'http://localhost:8080/admin/Student';
+  private baseUrl = `${environment.apiUrl}/student`;
 
   constructor(private http: HttpClient) { }
 

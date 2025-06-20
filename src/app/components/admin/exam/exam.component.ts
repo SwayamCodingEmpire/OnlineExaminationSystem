@@ -43,6 +43,7 @@ export class ExamComponent {
   duration: string = '';
   deleteModal: any;
   examIndexToDelete: number | null = null;
+  instantExamModal: any;
   totalPages = Math.ceil(this.exams.length / this.pageSize);
   fb: FormBuilder = new FormBuilder();
   selectedQuestions: any[] = []; // replace 'Question' with your actual interface
@@ -85,6 +86,8 @@ export class ExamComponent {
 
       // Initialize the delete modal
       this.deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal')!);
+
+      this.instantExamModal = new bootstrap.Modal(document.getElementById('instantExamModal')!);
     }, 500);
 
     this.selectedQuestions = [
@@ -572,9 +575,13 @@ export class ExamComponent {
           // Optionally reset the form or show success message
           this.instantExamForm.reset();
           this.questions.clear(); // Clear the questions array
+          this.instantExamModal.hide(); // Hide the modal after submission
+          this.toastr.success('Questions assigned successfully to the exam');
+
         },
         error: (error: any) => {
           console.error('Error assigning questions:', error);
+          this.toastr.error('Failed to assign questions to the exam');
           // Handle error case
         }
       });

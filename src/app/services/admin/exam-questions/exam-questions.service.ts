@@ -64,16 +64,7 @@ assignQuestionsToExam(examCode: string, codes: String[]): Observable<any> {
       .pipe(catchError(this.handleError));
 
   }
-
-    addInstantExam(examCode: string, questions: QuestionBankPayload[]): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${examCode}/instant-exam`, questions, {
-      responseType: 'text' as 'json'
-    }).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  deleteQuestion(examCode: string, questionCode: string): Observable<any> {
+    deleteQuestion(examCode: string, questionCode: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${examCode}/question/${questionCode}`, {
       responseType: 'text' as 'json'
     }).pipe(catchError(this.handleError));
@@ -82,6 +73,14 @@ assignQuestionsToExam(examCode: string, codes: String[]): Observable<any> {
   getStudentsByExamCode(code: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${code}/students`)
       .pipe(catchError(this.handleError));
+  }
+
+    addInstantExam(examCode: string, questions: QuestionBankPayload[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${examCode}/instant-exam`, questions, {
+      responseType: 'text' as 'json'
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
 }
