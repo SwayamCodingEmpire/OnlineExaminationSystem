@@ -1,9 +1,12 @@
+<!-- src/app/components/student/result-list/result-list.component.html -->
 <div class="container-fluid py-4">
   <div class="row justify-content-center">
     <div class="col-lg-8 col-md-10 col-12">
       <div class="card shadow-sm border-0">
         <div class="card-header header-font text-white py-3">
-          <h4 class="mb-0 text-center"><i class="fas fa-poll me-2"></i>Test Results Summary</h4>
+          <h4 class="mb-0 text-center">
+            <i class="fas fa-poll me-2"></i>Test Results Summary
+          </h4>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
@@ -18,23 +21,22 @@
               </thead>
               <tbody>
                 <tr *ngFor="let result of testResults" class="align-middle">
-                  <td class="ps-4 fw-semibold">{{result.testName}}</td>
-                  <td class="text-center">{{result.totalMarks}}</td>
-                  <td class="text-center">{{result.marksSecured}}</td>
-                  <td class="text-center fw-bold" 
+                  <td class="ps-4 fw-semibold">{{ result.testName }}</td>
+                  <td class="text-center">{{ result.totalMarks }}</td>
+                  <td class="text-center">{{ result.marksSecured }}</td>
+                  <td class="text-center fw-bold"
                       [ngClass]="{
-                        'text-success': calculateAverage(result.marksSecured, result.totalMarks) >= 70,
-                        'text-warning': calculateAverage(result.marksSecured, result.totalMarks) >= 50 && calculateAverage(result.marksSecured, result.totalMarks) < 70,
-                        'text-danger': calculateAverage(result.marksSecured, result.totalMarks) < 50
+                        'text-success': result.average >= 70,
+                        'text-warning': result.average >= 50 && result.average < 70,
+                        'text-danger': result.average < 50
                       }">
-                    {{calculateAverage(result.marksSecured, result.totalMarks)}}%
+                    {{ result.average }}%
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
-        
+        </div>  
       </div>
     </div>
   </div>

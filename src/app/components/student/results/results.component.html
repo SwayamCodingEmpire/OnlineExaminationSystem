@@ -1,27 +1,32 @@
 <div class="container py-4">
   <div class="row">
-    <div class="col">
-      <h2 class="text-center mb-4">Your Results</h2>
-      <p class="text-center text-muted">Student: {{ studentName }}</p>
+    <div class="col text-center mb-4">
+      <h2>Your Results</h2>
     </div>
   </div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
-    <div *ngFor="let test of results" class="col"> <!-- Each card in its own column -->
-      <div class="card h-100 shadow-sm"> <!-- Removed card-size, added h-100 for equal height -->
+    <div *ngFor="let test of results" class="col">
+      <div class="card h-100 shadow-sm">
         <div class="card-header text-white card-font">
           <strong>{{ test.testTitle }}</strong>
         </div>
         <div class="card-body">
           <ul class="list-group mb-3">
-            <li *ngFor="let sec of test.sections" class="list-group-item d-flex justify-content-between">
+            <li
+              *ngFor="let sec of test.sections"
+              class="list-group-item d-flex justify-content-between"
+            >
               <span>{{ sec.sectionTitle }}</span>
               <span><strong>{{ sec.scored }}</strong> / {{ sec.max }}</span>
             </li>
           </ul>
-
           <div class="text-end">
-            <strong>Total: {{ getTotalScore(test.sections) }} / {{ getTotalMax(test.sections) }}</strong>
+            <strong>
+              Total:
+              {{ getTotalScore(test.sections) }} /
+              {{ getTotalMax(test.sections) }}
+            </strong>
           </div>
         </div>
       </div>

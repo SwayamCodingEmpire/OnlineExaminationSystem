@@ -1,55 +1,74 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+// src/app/components/student/results/results.component.ts
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute }     from '@angular/router';
+import { CommonModule }       from '@angular/common';
+import { ResultService }      from '../../../services/student/result.service';
 
-interface SectionResult {
+interface FlatSection {
   sectionTitle: string;
-  scored: number;
-  max: number;
+  totalMarks:   number;
+  marksSecured: number;
+}
+
+interface SectionView {
+  sectionTitle: string;
+  scored:       number;
+  max:          number;
 }
 
 interface TestResult {
   testTitle: string;
-  sections: SectionResult[];
+  sections:  SectionView[];
 }
 
 @Component({
   selector: 'app-results',
   standalone: true,
-  imports: [CommonModule],
+  imports: [ CommonModule ],
   templateUrl: './results.component.html',
   styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent {
-  studentName: string = 'John Doe';
+export class ResultsComponent implements OnInit {
+  examCode = '';
   results: TestResult[] = [];
 
-  constructor(private route: ActivatedRoute) {
-    // Simulated backend response
-    this.results = [
-      {
-        testTitle: 'Test 1',
-        sections: [
-          { sectionTitle: 'General Knowledge', scored: 8, max: 10 },
-          { sectionTitle: 'Math', scored: 6, max: 10 },
-          { sectionTitle: 'Science', scored: 9, max: 10 }
-        ]
+  constructor(
+    private route: ActivatedRoute,
+    private svc:   ResultService
+  ) {}
+
+  ngOnInit() {
+    // route like /student/results/:id
+    this.examCode = this.route.snapshot.paramMap.get('id')!;
+
+    this.svc.getSummary(this.examCode).subscribe({
+      next: (secs: FlatSection[]) => {
+        // remap the backend fields into {scored, max} for the template
+        const view: SectionView[] = secs.map(s => ({
+          sectionTitle: s.sectionTitle,
+          scored:       s.marksSecured,
+          max:          s.totalMarks
+        }));
+
+        this.results = [
+          {
+            testTitle: this.examCode, // or pull real exam name if you have it
+            sections:  view
+          }
+        ];
       },
-      {
-        testTitle: 'Test 2',
-        sections: [
-          { sectionTitle: 'English', scored: 7, max: 10 },
-          { sectionTitle: 'Reasoning', scored: 5, max: 10 }
-        ]
+      error: err => {
+        console.error(err);
+        alert('Failed to load your results');
       }
-    ];
+    });
   }
 
-  getTotalScore(sections: SectionResult[]) {
+  getTotalScore(sections: SectionView[]): number {
     return sections.reduce((sum, s) => sum + s.scored, 0);
   }
 
-  getTotalMax(sections: SectionResult[]) {
+  getTotalMax(sections: SectionView[]): number {
     return sections.reduce((sum, s) => sum + s.max, 0);
   }
 }

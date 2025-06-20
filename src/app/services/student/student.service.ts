@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserInfo } from '../../../models/student.interface';
-
-
-
+import { UserInfo } from '../../models/student.interface';
 
 
 @Injectable({
