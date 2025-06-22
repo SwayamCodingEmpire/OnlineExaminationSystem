@@ -597,7 +597,7 @@ export class ExamComponent {
 deleteQuestion(index: number) {
   console.log('Delete question at index:', index);
   console.log('Exam selected:', this.examSelected);
-    if (this.examSelected) {
+    if (this.examSelected !== null && this.examSelected !== undefined) {
       const questionCode = this.examQuestions[index].code;
       console.log('Deleting question with code:', questionCode, 'from exam:', this.examSelectedCode);
       this.examQuestionsService.deleteQuestion(this.examSelectedCode, questionCode).subscribe({

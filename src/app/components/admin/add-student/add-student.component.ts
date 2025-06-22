@@ -262,48 +262,9 @@ export class AddStudentComponent {
   }
 
 
-  deleteStudent(index: number) {
-    this.StudentIndexToDelete = index;
-    const StudentCode = this.Students[index].code;
-    const StudentName = this.Students[index].name;
-
-    // Set the Student code in the modal
-    const StudentCodeElement = document.getElementById('StudentCodeToDelete');
-    if (StudentCodeElement) {
-      StudentCodeElement.textContent = `${StudentCode}/ ${StudentName}`;
-    }
-
-    // Show the modal
-    this.deleteModal.show();
-
-    // Add event listener to the confirm button
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    if (confirmBtn) {
-      // Remove any existing event listeners
-      confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-
-      // Add new event listener
-      document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
-        this.confirmDeleteStudent();
-      });
-    }
-  }
 
 
-  confirmDeleteStudent() {
-    if (this.StudentIndexToDelete !== null) {
-      const StudentId = this.Students[this.StudentIndexToDelete].code;
-      this.studentService.deleteStudent(StudentId).subscribe(() => {
-        this.StudentIndexToDelete = null;
-        this.deleteModal.hide();
-        this.loadStudents(); // Reload Students after deletion
-      }, (error: any) => {
-        console.error('Error deleting Student:', error);
-        this.deleteModal.hide();
-        this.loadStudents(); // Reload to restore original state
-      });
-    }
-  }
+
 
 
   loadStudents() {

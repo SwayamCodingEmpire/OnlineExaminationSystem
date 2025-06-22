@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserInfo } from '../../../models/student.interface';
 import { environment } from '../../../../Enviornment/enviornment';
@@ -27,10 +27,11 @@ export class StudentService {
   updateStudent(student: UserInfo): Observable<any> {
     return this.http.put(this.baseUrl, student);
   }
+deleteStudent(code: string, email: string): Observable<any> {
+  const headers = new HttpHeaders().set('email', email);
+  return this.http.delete(`${this.baseUrl}/${code}`, { headers });
+}
 
-  deleteStudent(code: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${code}`);
-  }
 
   bulkUploadStudents(userInfo: UserInfo[]): Observable<any> {
     console.log(userInfo);

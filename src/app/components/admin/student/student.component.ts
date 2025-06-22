@@ -276,7 +276,8 @@ export class StudentComponent implements OnInit {
   confirmDeleteStudent() {
     if (this.StudentIndexToDelete !== null) {
       const code = this.Students[this.StudentIndexToDelete].code;
-      this.studentService.deleteStudent(code).subscribe(() => {
+      const email = this.Students[this.StudentIndexToDelete].email;
+      this.studentService.deleteStudent(code, email).subscribe(() => {
         this.StudentIndexToDelete = null;
         this.deleteModal.hide();
         this.loadStudents();

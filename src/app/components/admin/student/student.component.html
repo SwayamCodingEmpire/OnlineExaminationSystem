@@ -20,7 +20,7 @@
           <div class="col-6 justify-content-end d-flex">
             <div class="row">
               <div class="col-6">
-                <button class="btn px-5 py-2 w-100 border border-secondary mx-2" [disabled]="false" (click)="addRow()">
+                <button class="btn px-5 py-2 w-100 border border-secondary mx-2" [disabled]="isAddingNewStudent" (click)="addRow()">
                   Add Student
                 </button>
               </div>
@@ -312,7 +312,8 @@
             background-color: #2962ff;
             border-radius: 6px;
             font-weight: 500;
-          ">
+          "
+          (click)="confirmDeleteStudent()">
           Yes
         </button>
         <button type="button" class="btn btn-outline-secondary px-4 ms-2" data-bs-dismiss="modal"
