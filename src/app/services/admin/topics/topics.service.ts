@@ -7,7 +7,7 @@ import { environment } from '../../../../Enviornment/enviornment';
   providedIn: 'root'
 })
 export class TopicsService {
-  private baseUrl = `${environment.apiUrl}/topic`; 
+  private baseUrl = `${environment.apiUrl}/topic`;
 
   constructor(private http: HttpClient) { }
 
@@ -23,19 +23,19 @@ export class TopicsService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Client Error: ${error.error.message}`;
     } else {
       // Server-side error
       errorMessage = `Server Error: ${error.status} - ${error.message}`;
-      
+
       if (error.error && error.error.message) {
         errorMessage = error.error.message;
       }
     }
-    
+
     console.error('TopicsService Error:', errorMessage);
     return throwError(() => new Error(errorMessage));
   }
@@ -45,11 +45,11 @@ export class TopicsService {
       .pipe(catchError(this.handleError));
   }
 
- 
+
 
   // Additional methods for topic management if needed
   addTopic(topic: any): Observable<any> {
-    return this.http.post(this.baseUrl, topic, this.getHttpOptions())
+    return this.http.post(this.baseUrl, topic,  { ...this.getHttpOptions(), responseType: 'text' as 'json' })
       .pipe(catchError(this.handleError));
   }
 

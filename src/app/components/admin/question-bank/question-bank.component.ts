@@ -352,6 +352,10 @@ onTopicSelect(code: string) {
   }
 
   addRow() {
+
+    if(this.originalQuestions.length === 0) {
+      this.originalQuestions.length
+    }
     if (this.isAddingNewQuestion) {
       return;
     }

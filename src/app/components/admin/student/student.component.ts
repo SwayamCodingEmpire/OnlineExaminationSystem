@@ -185,6 +185,10 @@ export class StudentComponent implements OnInit {
   }
 
   addRow() {
+
+            if(this.originalStudents.length === 0) {
+      this.originalStudents.length=1;
+    }
     this.isAddingNewStudent = true;
     this.tempNewStudent = {
       code: '',

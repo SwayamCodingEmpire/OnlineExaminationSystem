@@ -106,6 +106,10 @@ export class TopicComponent {
   }
 
   addRow(): void {
+    if(this.originalTopics.length == 0) {
+      this.originalTopics.length = 1;
+    }
+     // Clear original topics to avoid confusion
     this.isAddingNewTopic = true;
     this.tempNewTopic = {
       code: '',
@@ -142,11 +146,15 @@ export class TopicComponent {
         this.topicService.addTopic(this.topicForm.value).subscribe({
           next: () => {
             this.loadTopics();
+            console.log('Topic added successfully');
+            console.log('New topic:', this.originalTopics.length);
+            this.cancelEdit();
           },
           error: (err) => {
             console.error('Error adding topic:', err);
             // Reset editing state on error too
             this.cancelEdit();
+            console.log('New topic:', this.originalTopics.length);
           }
         });
       } else {

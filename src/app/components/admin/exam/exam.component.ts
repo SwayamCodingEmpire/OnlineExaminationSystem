@@ -237,6 +237,9 @@ export class ExamComponent {
 
 
   addRow() {
+        if(this.originalexams.length === 0) {
+      this.originalexams.length=1;
+    }
     this.isAddingNewexam = true;
 
     // Create a temporary exam object
