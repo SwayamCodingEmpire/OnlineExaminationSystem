@@ -17,12 +17,12 @@ export interface Exam {
   providedIn: 'root'
 })
 export class ViewExamService {
-  private apiUrl = 'http://localhost:8080/v1/exams'; // Update this if needed
+  private apiUrl = 'http://localhost:8080/v1/student'; // Update this if needed
 
   constructor(private http: HttpClient) {}
 
   getAllExams(): Observable<Exam[]> {
-    return this.http.get<Exam[]>(`${this.apiUrl}/all`);
+    return this.http.get<Exam[]>(`${this.apiUrl}/exam`);
   }
 
 }
