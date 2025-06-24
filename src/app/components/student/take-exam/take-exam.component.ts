@@ -1,9 +1,9 @@
 // src/app/components/student/take-exam/take-exam.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router }       from '@angular/router';
-import { CommonModule }                 from '@angular/common';
-import { FormsModule }                  from '@angular/forms';
-import { NgxPaginationModule }          from 'ngx-pagination';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 import {
   TakeExamService,
@@ -13,19 +13,19 @@ import {
 } from '../../../services/student/take-exam.service';
 
 interface Question {
-  code:       string;
-  text:       string;
-  type:       'mcq' | 'subjective';
-  options:    string[];
-  viewed:     boolean;
-  answered:   boolean;
+  code: string;
+  text: string;
+  type: 'mcq' | 'subjective';
+  options: string[];
+  viewed: boolean;
+  answered: boolean;
   bookmarked: boolean;
-  answer:     string;
+  answer: string;
 }
 
 interface Section {
-  title:     string;
-  duration:  number;   // seconds
+  title: string;
+  duration: number;   // seconds
   questions: Question[];
 }
 
@@ -37,26 +37,26 @@ interface Section {
   styleUrls: ['./take-exam.component.scss']
 })
 export class TakeExamComponent implements OnInit, OnDestroy {
-  examCode               = '';
-  sections: Section[]    = [];
-  examStarted            = false;
+  examCode = '';
+  sections: Section[] = [];
+  examStarted = false;
 
-  sectionChangeMessage   = '';
+  sectionChangeMessage = '';
   showSectionChangeModal = false;
 
-  sectionIndex           = 0;
-  questionIndex          = 0;
-  timeLeft               = 0;
-  timerDisplay           = '';
+  sectionIndex = 0;
+  questionIndex = 0;
+  timeLeft = 0;
+  timerDisplay = '';
   private timerId?: number;
 
-  private answersMap: Record<string,string> = {};
+  private answersMap: Record<string, string> = {};
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private svc: TakeExamService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.examCode = this.route.snapshot.paramMap.get('code') || '';
@@ -80,17 +80,17 @@ export class TakeExamComponent implements OnInit, OnDestroy {
 
   private buildSections(details: SectionDetailDTO[]): void {
     this.sections = details.map(sec => ({
-      title:     sec.sectionName,
-      duration:  sec.duration * 60,
+      title: sec.sectionName,
+      duration: sec.duration * 60,
       questions: sec.questions.map(q => ({
-        code:       q.code,
-        text:       q.text,
-        type:       'mcq',
-        options:    [q.optionA,q.optionB,q.optionC,q.optionD],
-        viewed:     false,
-        answered:   false,
+        code: q.code,
+        text: q.text,
+        type: 'mcq',
+        options: [q.optionA, q.optionB, q.optionC, q.optionD],
+        viewed: false,
+        answered: false,
         bookmarked: false,
-        answer:     ''
+        answer: ''
       }))
     }));
   }
@@ -121,7 +121,7 @@ export class TakeExamComponent implements OnInit, OnDestroy {
 
   private loadSection(idx: number): void {
     if (this.timerId != null) clearInterval(this.timerId);
-    this.sectionIndex  = idx;
+    this.sectionIndex = idx;
     this.questionIndex = 0;
     this.startTimer(this.currentSection.duration);
   }
@@ -138,12 +138,17 @@ export class TakeExamComponent implements OnInit, OnDestroy {
     }
   }
 
+  optionLetter(idx: number): string {
+    return String.fromCharCode(65 + idx); // 65 is 'A'
+  }
+
+
   /** auto-advance when time expires (no modal) */
   private autoAdvance(): void {
     if (this.timerId != null) clearInterval(this.timerId);
 
     if (!this.isLastSection) {
-      this.sectionChangeMessage = `Time's up! Moved to ${ this.sections[this.sectionIndex+1].title }`;
+      this.sectionChangeMessage = `Time's up! Moved to ${this.sections[this.sectionIndex + 1].title}`;
       setTimeout(() => this.sectionChangeMessage = '', 3000);
       this.loadSection(this.sectionIndex + 1);
     } else {
@@ -169,7 +174,7 @@ export class TakeExamComponent implements OnInit, OnDestroy {
   private updateTimerDisplay(): void {
     const m = Math.floor(this.timeLeft / 60);
     const s = this.timeLeft % 60;
-    this.timerDisplay = `${m}:${ s < 10 ? '0'+s : s }`;
+    this.timerDisplay = `${m}:${s < 10 ? '0' + s : s}`;
   }
 
   prevQuestion(_: Question): void {
@@ -193,23 +198,19 @@ export class TakeExamComponent implements OnInit, OnDestroy {
 
   confirmNextSection(): void {
     this.showSectionChangeModal = false;
-    this.sectionChangeMessage = `Moved to ${ this.sections[this.sectionIndex+1].title }`;
+    this.sectionChangeMessage = `Moved to ${this.sections[this.sectionIndex + 1].title}`;
     setTimeout(() => this.sectionChangeMessage = '', 3000);
     this.loadSection(this.sectionIndex + 1);
   }
 
   // ─── Answering & Bookmark ────────────────────────────
-  markAsAnswered(_: Question): void {
-    const q = this.currentQuestion;
-    q.viewed   = true;
-    q.answered = true;
+  markAsAnswered(q: Question, answer: string): void {
+  q.viewed = true;
+  q.answered = true;
+  q.answer = answer;
+  this.answersMap[q.code] = answer;
+}
 
-    const sel = document.querySelector<HTMLInputElement>(
-      `input[name="q${this.questionIndex}"]:checked`
-    );
-    q.answer = sel?.value || '';
-    this.answersMap[q.code] = q.answer;
-  }
 
   toggleBookmark(_: Question): void {
     this.currentQuestion.bookmarked = !this.currentQuestion.bookmarked;
@@ -217,8 +218,8 @@ export class TakeExamComponent implements OnInit, OnDestroy {
 
   getGridClass(q: Question): string {
     if (q.bookmarked) return 'purpl text-white';
-    if (q.answered)   return 'bg-success text-white';
-    if (q.viewed)     return 'bg-warning text-white';
+    if (q.answered) return 'bg-success text-white';
+    if (q.viewed) return 'bg-warning text-white';
     return 'bg-secondary text-white';
   }
 
@@ -230,7 +231,7 @@ export class TakeExamComponent implements OnInit, OnDestroy {
       sec.questions.forEach(q => {
         answers.push({
           questionCode: q.code,
-          answer:       this.answersMap[q.code] || ''
+          answer: this.answersMap[q.code] || ''
         });
       })
     );

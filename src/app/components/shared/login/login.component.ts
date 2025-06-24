@@ -43,6 +43,7 @@ export class LoginComponent {
       email: formValues.userName, // use 'userName' as input, send 'email' to backend
       password: formValues.password
     };
+    console.log('Login credentials:', credentials);
 
     this.loginService.login(credentials).subscribe({
       next: (response) => {

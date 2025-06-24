@@ -75,16 +75,20 @@
 
             <!-- MCQ Options -->
             <div *ngIf="currentQuestion.type === 'mcq'" class="mt-3 fs-4">
-              <div *ngFor="let opt of currentQuestion.options" class="form-check mb-2">
+              <div *ngFor="let opt of currentQuestion.options; let idx = index" class="form-check mb-2">
                 <input type="radio" class="form-check-input" name="q{{ currentQuestionIndex }}"
-                  (change)="markAsAnswered(currentQuestion)" />
-                <label class="form-check-label ms-2">{{ opt }}</label>
+                  [value]="optionLetter(idx)" [checked]="currentQuestion.answer === optionLetter(idx)"
+                  (change)="markAsAnswered(currentQuestion, optionLetter(idx))" />
+                <label class="form-check-label ms-2">
+                  {{ optionLetter(idx) }}. {{ opt }}
+                </label>
               </div>
+
             </div>
 
             <!-- Subjective Answer -->
             <div *ngIf="currentQuestion.type === 'subjective'" class="mt-3">
-              <textarea class="form-control fs-6" rows="5" (input)="markAsAnswered(currentQuestion)"
+              <textarea #answerInput class="form-control fs-6" rows="5" (input)="markAsAnswered(currentQuestion, answerInput.value)"
                 placeholder="Write your answer..."></textarea>
             </div>
           </div>
