@@ -11,15 +11,6 @@ export class TopicsService {
 
   constructor(private http: HttpClient) { }
 
-  private getHttpOptions() {
-    const token = localStorage.getItem('token'); // Get token from localStorage
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` })
-      })
-    };
-  }
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
@@ -41,7 +32,7 @@ export class TopicsService {
   }
 
   getTopics(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/all`, this.getHttpOptions())
+    return this.http.get<any[]>(`${this.baseUrl}/all`)
       .pipe(catchError(this.handleError));
   }
 
@@ -49,18 +40,18 @@ export class TopicsService {
 
   // Additional methods for topic management if needed
   addTopic(topic: any): Observable<any> {
-    return this.http.post(this.baseUrl, topic,  { ...this.getHttpOptions(), responseType: 'text' as 'json' })
+    return this.http.post(this.baseUrl, topic,  { responseType: 'text' as 'json' })
       .pipe(catchError(this.handleError));
   }
 
   updateTopic(code: string, topic: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/${code}`, topic, this.getHttpOptions())
+    return this.http.put(`${this.baseUrl}/${code}`, topic, { responseType: 'text' as 'json' })
       .pipe(catchError(this.handleError));
   }
 
   deleteTopic(code: string): Observable<any> {
     console.log('Deleting topic with code:', code);
-    return this.http.delete(`${this.baseUrl}/${code}`, this.getHttpOptions())
+    return this.http.delete(`${this.baseUrl}/${code}`)
       .pipe(catchError(this.handleError));
   }
 }

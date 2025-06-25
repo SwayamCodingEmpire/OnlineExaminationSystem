@@ -19,30 +19,29 @@
 
           <!-- Topic Filter Dropdown -->
           <div class="col-2">
-            <div class="dropdown">
-              <button class="btn btn-outline-secondary dropdown-toggle px-4" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                {{ getTopicName(selectedTopicFilter) || 'Select Topic' }}
-              </button>
-              <ul class="dropdown-menu">
-                <!-- All Topics -->
-                <li>
-                  <a class="dropdown-item text-primary fw-semibold"
-                    style="background-color: white; cursor: pointer; text-decoration: underline;"
-                    (click)="onTopicSelect('')" data-bs-toggle="modal" data-bs-target="#addTopicModal"
-                    [class.active]="selectedTopicFilter === ''">All Topics</a>
-                </li>
+<div class="dropdown">
+  <button class="btn btn-outline-secondary dropdown-toggle px-4" type="button" data-bs-toggle="dropdown"
+    aria-expanded="false">
+    {{ getTopicName(selectedTopicFilter) || 'Select Topic' }}
+  </button>
 
-                <!-- Topic List -->
-                <li *ngFor="let topic of topics">
-                  <a class="dropdown-item" (click)="onTopicSelect(topic.code)"
-                    [class.active]="selectedTopicFilter === topic.code">{{ topic.name }}</a>
-                </li>
+  <ul class="dropdown-menu" style="max-height: 200px; overflow-y: auto;">
+    <!-- All Topics -->
+    <li>
+      <a class="dropdown-item text-primary fw-semibold"
+        style="background-color: white; cursor: pointer; text-decoration: underline;"
+        (click)="onTopicSelect('')" data-bs-toggle="modal" data-bs-target="#addTopicModal"
+        [class.active]="selectedTopicFilter === ''">All Topics</a>
+    </li>
 
+    <!-- Topic List -->
+    <li *ngFor="let topic of topics">
+      <a class="dropdown-item" (click)="onTopicSelect(topic.code)"
+        [class.active]="selectedTopicFilter === topic.code">{{ topic.name }}</a>
+    </li>
+  </ul>
+</div>
 
-                <!-- Add New Topic -->
-              </ul>
-            </div>
 
 
           </div>

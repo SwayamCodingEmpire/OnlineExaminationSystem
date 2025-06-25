@@ -66,6 +66,11 @@ deleteExam(oldcode: string): Observable<any> {
   }).pipe(catchError(this.handleError));
 }
 
+getAllExamCodes(): Observable<string[]> {
+  return this.http.get<string[]>(`${this.apiUrl}/codes`)
+    .pipe(catchError(this.handleError));
+}
+
 
 
 

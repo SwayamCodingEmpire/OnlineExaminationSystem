@@ -15,8 +15,8 @@
           </div>
         </div>
         <div class="card-body pt-2">
-          <p class="small mb-0" [ngClass]="getTrendClass(stats.totalStudents.trend)">
-            <i class="fa-solid" [ngClass]="getTrendIcon(stats.totalStudents.trend)"></i>
+          <p class="small mb-0" [ngClass]="getTrendClassForTotalStudents(stats.totalStudents.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIconForTotalStudents(stats.totalStudents.trend)"></i>
             {{ stats.totalStudents.percentage }}% from last month
           </p>
         </div>
@@ -32,14 +32,14 @@
             </div>
           </div>
           <div class="text-end">
-            <small class="text-muted">Ongoing Exams</small>
-            <h5 class="mb-0 text-secondary">{{ stats.ongoingExams.current }}</h5>
+            <small class="text-muted">Total Exams</small>
+            <h5 class="mb-0 text-secondary">{{ stats.totalExams.current }}</h5>
           </div>
         </div>
         <div class="card-body pt-2">
-          <p class="small mb-0" [ngClass]="getTrendClass(stats.ongoingExams.trend)">
-            <i class="fa-solid" [ngClass]="getTrendIcon(stats.ongoingExams.trend)"></i>
-            {{ stats.ongoingExams.percentage }}% from last week
+          <p class="small mb-0" [ngClass]="getTrendClassForTotalExams(stats.totalExams.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIconForTotalExams(stats.totalExams.trend)"></i>
+            {{ stats.totalExams.percentage }}% from last week
           </p>
         </div>
       </div>
@@ -59,8 +59,8 @@
           </div>
         </div>
         <div class="card-body pt-2">
-          <p class="small mb-0" [ngClass]="getTrendClass(stats.completedExams.trend)">
-            <i class="fa-solid" [ngClass]="getTrendIcon(stats.completedExams.trend)"></i>
+          <p class="small mb-0" [ngClass]="getTrendClassForCompletedExams(stats.completedExams.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIconForCompletedExams(stats.completedExams.trend)"></i>
             {{ stats.completedExams.percentage }}% from last month
           </p>
         </div>
@@ -81,8 +81,8 @@
           </div>
         </div>
         <div class="card-body pt-2">
-          <p class="small mb-0" [ngClass]="getTrendClass(stats.averageScore.trend)">
-            <i class="fa-solid" [ngClass]="getTrendIcon(stats.averageScore.trend)"></i>
+          <p class="small mb-0" [ngClass]="getTrendClassForAverageScore(stats.averageScore.trend)">
+            <i class="fa-solid" [ngClass]="getTrendIconForAverageScore(stats.averageScore.trend)"></i>
             {{ stats.averageScore.percentage }}% from last month
           </p>
         </div>
@@ -95,41 +95,73 @@
     <!-- Performance Trends Line Chart -->
     <div class="col-6">
       <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <h5 class="mb-0">Performance Trends</h5>
-          <small class="text-muted">Monthly average scores</small>
+        <div class="card-header bg-white d-flex align-items-center">
+          <div>
+            <h5 class="mb-0">Exam Trends</h5>
+            <small class="text-muted">Exam average scores</small>
+          </div>
+          <button class="btn btn-sm btn-outline-primary ms-auto" *ngIf="!showMoreExamButtons"
+            (click)="toggleTopicExamButtons()">
+            More Exams
+          </button>
+          <div *ngIf="showMoreExamButtons" class="btn-group ms-auto">
+            <button class="btn btn-sm btn-outline-secondary" (click)="onScrollLeftExam()">
+              <i class="fa-solid fa-backward"></i>
+
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="onScrollRightExam()">
+              <i class="fa-solid fa-forward"></i>
+            </button>
+          </div>
         </div>
+
         <div class="card-body">
-          <apx-chart
-            [series]="lineChartOptions.series"
-            [chart]="lineChartOptions.chart"
-            [xaxis]="lineChartOptions.xaxis"
-            [yaxis]="lineChartOptions.yaxis"
-            [stroke]="lineChartOptions.stroke"
+          <apx-chart [series]="lineChartOptions.series" [chart]="lineChartOptions.chart"
+            [xaxis]="lineChartOptions.xaxis" [yaxis]="lineChartOptions.yaxis" [stroke]="lineChartOptions.stroke"
             [dataLabels]="lineChartOptions.dataLabels">
           </apx-chart>
         </div>
       </div>
     </div>
 
-    <!-- Subject-wise Performance Bar Chart -->
+
+    <!-- Topic-wise Performance Bar Chart -->
     <div class="col-6">
       <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <h5 class="mb-0">Subject-wise Performance</h5>
-          <small class="text-muted">Average scores by subject</small>
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">Topic-wise Performance</h5>
+            <small class="text-muted">Average scores by topic</small>
+          </div>
+
+          <!-- Right-side buttons -->
+          <div>
+            <button *ngIf="!showMoreButtons" class="btn btn-sm btn-outline-primary" (click)="toggleTopicButtons()">
+              More Topics
+            </button>
+
+
+            <div *ngIf="showMoreButtons" class="btn-group">
+              <button class="btn btn-sm btn-outline-secondary" (click)="onScrollLeft()">
+                <i class="fa-solid fa-backward"></i>
+
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="onScrollRight()">
+                <i class="fa-solid fa-forward"></i>
+              </button>
+            </div>
+          </div>
         </div>
+
         <div class="card-body">
-          <apx-chart
-            [series]="barChartOptions.series"
-            [chart]="barChartOptions.chart"
-            [xaxis]="barChartOptions.xaxis"
-            [yaxis]="barChartOptions.yaxis"
-            [plotOptions]="barChartOptions.plotOptions">
+          <apx-chart [series]="topicWisePerformanceChart.series" [chart]="topicWisePerformanceChart.chart"
+            [xaxis]="topicWisePerformanceChart.xaxis" [yaxis]="topicWisePerformanceChart.yaxis"
+            [plotOptions]="topicWisePerformanceChart.plotOptions">
           </apx-chart>
         </div>
       </div>
     </div>
+
   </div>
 
   <!-- Pass/Fail & Completion Charts -->
@@ -141,10 +173,7 @@
           <small class="text-muted">Overall exam results</small>
         </div>
         <div class="card-body">
-          <apx-chart
-            [series]="pieChartOptions.series"
-            [chart]="pieChartOptions.chart"
-            [labels]="pieChartOptions.labels"
+          <apx-chart [series]="pieChartOptions.series" [chart]="pieChartOptions.chart" [labels]="pieChartOptions.labels"
             [responsive]="pieChartOptions.responsive">
           </apx-chart>
         </div>
@@ -158,11 +187,8 @@
           <small class="text-muted">Current exam progress</small>
         </div>
         <div class="card-body">
-          <apx-chart
-            [series]="doughnutChartOptions.series"
-            [chart]="doughnutChartOptions.chart"
-            [labels]="doughnutChartOptions.labels"
-            [responsive]="doughnutChartOptions.responsive">
+          <apx-chart [series]="doughnutChartOptions.series" [chart]="doughnutChartOptions.chart"
+            [labels]="doughnutChartOptions.labels" [responsive]="doughnutChartOptions.responsive">
           </apx-chart>
         </div>
       </div>
@@ -178,11 +204,8 @@
           <h5 class="mb-0">Exam Schedule</h5>
           <div class="d-flex gap-2">
             <button class="btn btn-sm"
-                    [class]="calendarView === 'month' ? 'btn-primary' : 'btn-outline-primary'"
-                    (click)="switchCalendarView('month')">Month</button>
-            <button class="btn btn-sm"
-                    [class]="calendarView === 'week' ? 'btn-primary' : 'btn-outline-primary'"
-                    (click)="switchCalendarView('week')">Week</button>
+              [class]="calendarView === 'month' ? 'btn-primary' : 'btn-outline-primary'">Month</button>
+
           </div>
         </div>
         <div class="card-body">
@@ -198,7 +221,7 @@
           </div>
 
           <!-- Upcoming Exams List -->
-          <div class="upcoming-exams">
+          <div class="upcoming-exams" *ngIf="examSchedules && examSchedules.length > 0">
             <div *ngFor="let exam of examSchedules | slice:0:5" class="exam-schedule-item p-2 mb-2 border rounded">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -206,8 +229,7 @@
                   <small class="text-muted">{{ exam.date | date:'mediumDate' }} at {{ exam.time }}</small>
                 </div>
                 <div class="text-end">
-                  <span class="badge"
-                        [class]="exam.status === 'upcoming' ? 'bg-warning' :
+                  <span class="badge" [class]="exam.status === 'upcoming' ? 'bg-warning' :
                                 exam.status === 'ongoing' ? 'bg-success' : 'bg-secondary'">
                     {{ exam.status | titlecase }}
                   </span>
@@ -215,6 +237,11 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <div *ngIf="examSchedules.length === 0" class="text-center text-muted">
+            No upcoming exams scheduled.
+
           </div>
         </div>
       </div>
@@ -225,7 +252,7 @@
       <div class="card shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
           <h5 class="mb-0">Top Performers</h5>
-          <select class="form-select w-auto" [(ngModel)]="selectedExamCode" (change)="filterLeaderboard()">
+          <select class="form-select w-auto" [(ngModel)]="selectedExamCode" (change)="fetchLeaderboardData()">
             <option *ngFor="let code of examCodes" [value]="code">{{ code }}</option>
           </select>
         </div>
@@ -241,10 +268,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let student of filteredLeaderboard; index as i">
+                <tr *ngFor="let student of leaderboardData; index as i">
                   <td>
                     <span class="rank-badge"
-                          [class]="i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank- ' : 'rank-default'">
+                      [class]="i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank- ' : 'rank-default'">
                       {{ i + 1 }}
                     </span>
                   </td>
@@ -254,7 +281,7 @@
                   </td>
                   <td>{{ student.time }}</td>
                 </tr>
-                <tr *ngIf="filteredLeaderboard.length === 0">
+                <tr *ngIf="leaderboardData.length === 0">
                   <td colspan="4" class="text-center text-muted">No data available</td>
                 </tr>
               </tbody>

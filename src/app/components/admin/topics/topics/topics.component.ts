@@ -163,6 +163,7 @@ export class TopicComponent {
         this.topicService.updateTopic(this.topics[index].code, updatedTopic).subscribe({
           next: () => {
             this.loadTopics();
+            this.cancelEdit();
           },
           error: (err) => {
             console.error('Error updating topic:', err);
