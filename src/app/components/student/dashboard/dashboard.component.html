@@ -1,157 +1,187 @@
-<div class="container-fluid py-4">
+<div class="container py-4 bg-dashboard">
 
-  <!-- Quiz Selection -->
-  <div class="row mb-4">
-    <div class="col-md-2">
-      <label for="quizSelect" class="form-label fw-bold">Select Quiz</label>
-      <select
-        id="quizSelect"
-        class="form-select"
-        [(ngModel)]="selectedQuiz"
-        (change)="onQuizChange()"
-      >
-        <option *ngFor="let quiz of quizList" [value]="quiz">{{ quiz }}</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Summary Cards -->
-  <div class="row g-3 text-center">
-    <div class="col-sm-6 col-lg-3">
-      <div class="stat-box bg-primary text-white py-3 rounded-3 h-100">
-        <i class="fas fa-users fa-lg mb-2 d-block"></i>
-        <div class="small">Number of Participants</div>
-        <div class="fw-bold fs-5">1234</div>
+  <!-- USER INFO GREETING -->
+  <div class="profile-header fade-in-up mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between">
+      <div class="welcome-section">
+        <div class="mb-1 fs-5 text-muted greeting-text">Welcome back,</div>
+        <h2 class="fw-bold mb-2 student-name">{{studentInfo.name}}</h2>
+      </div>
+      <div class="profile-meta small text-muted text-end">
+        <div class="meta-item">
+          <i class="fa-solid fa-envelope me-1"></i>{{studentInfo.email}}
+        </div>
+        <div class="meta-item">
+          <i class="fa-solid fa-id-badge me-1"></i>{{studentInfo.code}}
+        </div>
+        <div class="meta-item" *ngIf="studentInfo.city || studentInfo.country">
+          <i class="fa-solid fa-location-dot me-1"></i>
+          {{studentInfo.city}}{{studentInfo.state ? ', ' + studentInfo.state : ''}}
+          <span *ngIf="studentInfo.country">, {{studentInfo.country}}</span>
+        </div>
       </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="stat-box bg-warning text-white py-3 rounded-3 h-100">
-        <i class="fas fa-star fa-lg mb-2 d-block"></i>
-        <div class="small">Average Score</div>
-        <div class="fw-bold fs-5">1234</div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="stat-box bg-danger text-white py-3 rounded-3 h-100">
-        <i class="fas fa-stopwatch fa-lg mb-2 d-block"></i>
-        <div class="small">Average Time</div>
-        <div class="fw-bold fs-5">2m 33s</div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="stat-box bg-info text-white py-3 rounded-3 h-100">
-        <i class="fas fa-pen fa-lg mb-2 d-block"></i>
-        <div class="small">Quiz Name</div>
-        <div class="fw-bold fs-5">Basics of IT</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Toggle Chart Button -->
-  <div class="text-end my-4">
-    <button class="btn btn-outline-primary" (click)="showScoreChart = !showScoreChart">
-      Show {{ showScoreChart ? 'Average Time' : 'Score Trend' }}
-    </button>
-  </div>
-
-  <!-- Charts + Leaderboard -->
- <div class="row g-4 align-items-stretch">
-
-  <!-- Left Column: Donut + Leaderboard -->
-  <div class="col-md-6">
-    <div class="card p-4 shadow-sm h-100">
-      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-4">
-
-        <!-- Donut Chart -->
-        <div class="text-center flex-shrink-0">
-          <h5 class="mb-3">Quizzers Leaderboard</h5>
-          <div class="mx-auto" style="max-width: 250px;">
-            <apx-chart
-              *ngIf="donutChart"
-              [series]="donutChart.series"
-              [chart]="donutChart.chart"
-              [labels]="donutChart.labels"
-              [colors]="donutChart.colors"
-              [legend]="donutChart.legend"
-              [responsive]="donutChart.responsive"
-              [fill]="donutChart.fill"
-            ></apx-chart>
+    <!-- Enhanced Stats Section -->
+    <div class="row mt-4 g-3 profile-statbar">
+      <div *ngFor="let stat of statCards; let i = index" class="col-6 col-md-3">
+        <div class="stat-block" [ngClass]="'stat-' + getStatColorClass(i)" [attr.data-animation-delay]="(i + 1) * 100">
+          <div class="stat-icon-wrapper">
+            <i class="fa-solid {{stat.icon}} stat-icon"></i>
           </div>
-
-          <!-- Custom Legend -->
-          <div class="small mt-3 text-start" style="max-width: 250px; margin: 0 auto;">
-            <div class="d-flex align-items-center mb-1">
-              <span class="legend-dot me-2" style="background: #ff7f50;"></span> 120 Tech
-            </div>
-            <div class="d-flex align-items-center mb-1">
-              <span class="legend-dot me-2" style="background: #2ecc71;"></span> 160 Operations
-            </div>
-            <div class="d-flex align-items-center mb-1">
-              <span class="legend-dot me-2" style="background: #3498db;"></span> 16 Design
-            </div>
-            <div class="d-flex align-items-center">
-              <span class="legend-dot me-2" style="background: #aed6f1;"></span> 160 HR
-            </div>
+          <div class="stat-content">
+            <div class="stat-value">{{stat.value}}</div>
+            <div class="stat-label">{{stat.title}}</div>
           </div>
+          <div class="stat-glow"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+      <div class="card minimalist-card h-100 chart-card" data-animation-delay="500">
+        <div class="section-title"><i class="fa-solid fa-chart-line me-2"></i>Score Trend (per Exam)</div>
+        <apx-chart [series]="scoreTrendOptions.series" [chart]="scoreTrendOptions.chart"
+          [xaxis]="scoreTrendOptions.xaxis" [colors]="scoreTrendOptions.colors"
+          [stroke]="scoreTrendOptions.stroke"></apx-chart>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card minimalist-card h-100 chart-card" data-animation-delay="600">
+        <div class="section-title"><i class="fa-solid fa-clock me-2"></i>Time Trend (per Exam)</div>
+        <apx-chart [series]="timeTrendOptions.series" [chart]="timeTrendOptions.chart" [xaxis]="timeTrendOptions.xaxis"
+          [colors]="timeTrendOptions.colors" [stroke]="timeTrendOptions.stroke"></apx-chart>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+      <div class="card minimalist-card h-100 chart-card" data-animation-delay="700">
+        <div class="section-title"><i class="fa-solid fa-bars-progress me-2"></i>Topic-wise Average Score</div>
+        <apx-chart [series]="topicBarChartOptions.series" [chart]="topicBarChartOptions.chart"
+          [xaxis]="topicBarChartOptions.xaxis" [colors]="topicBarChartOptions.colors"
+          [plotOptions]="topicBarChartOptions.plotOptions"></apx-chart>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card minimalist-card h-100" data-animation-delay="1100">
+        <div class="section-title"><i class="fa-solid fa-calendar-alt me-2"></i>Upcoming Exams</div>
+        <div class="table-responsive">
+          <table class="table modern-table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Duration</th>
+                <th>Total Marks</th>
+                <th>Topic</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let exam of upcomingExams; let i = index" class="upcoming-exam-row"
+                [style.animation-delay]="(1 + i * 0.2) + 's'">
+                <td>{{exam.name}}</td>
+                <td>{{exam.date}}</td>
+                <td>{{exam.duration}} min</td>
+                <td>{{exam.totalMarks}}</td>
+                <td>{{exam.topic}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PER-EXAM TABLE & LEADERBOARD -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8">
+      <div class="card minimalist-card h-100" data-animation-delay="900">
+        <div class="section-title"><i class="fa-solid fa-list me-2"></i>All Attempted Exams (Detailed)</div>
+        <div class="table-responsive">
+          <table class="table modern-table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Exam</th>
+                <th>Date</th>
+                <th>Topic</th>
+                <th>Score</th>
+                <th>Time</th>
+                <th>Rank</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let exam of examTableData | paginate: { itemsPerPage: examsPerPage, currentPage: examTablePage }; let i = index"
+                class="table-row-animated" [style.animation-delay]="(0.5 + i * 0.2) + 's'">
+                <td>{{exam.name}}</td>
+                <td>{{exam.date}}</td>
+                <td>{{exam.topic}}</td>
+                <td><span class="badge badge-score">{{exam.score}}%</span></td>
+                <td>{{formatSeconds(exam.time)}}</td>
+                <td><span class="badge badge-rank">#{{exam.rank}}</span></td>
+
+                <td>
+                  <button class="btn btn-sm btn-outline-primary pulse-btn" (click)="selectExamForLeaderboard(exam)">
+                    <i class="fa-solid fa-trophy me-1"></i>Leaderboard
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+<pagination-controls [autoHide]="true" [responsive]="true" (pageChange)="examTablePage = $event">
+        </pagination-controls>
+        </div>
+        
+      </div>
+    </div>
+    <!-- Dynamic Leaderboard for selected exam -->
+    <div class="col-lg-4" *ngIf="selectedLeaderboard.length">
+
+      <div class="row">
+        <div class="card minimalist-card h-100 leaderboard-card" data-animation-delay="1000">
+          <div class="section-title"><i class="fa-solid fa-trophy me-2"></i>Leaderboard — {{selectedExamName}}</div>
+          <table class="table table-sm table-borderless mb-0">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let lb of leaderboardToDisplay; let i = index" class="leaderboard-item"
+                [ngClass]="{'current-user': lb.name == studentInfo.name}"
+                [style.animation-delay]="(0.2 + i * 0.2) + 's'">
+                <td><span class="rank-badge" [ngClass]="getRankBadgeClass(lb.rank || i+1)">{{lb.rank || i+1}}</span></td>
+                <td [ngClass]="{'fw-bold text-primary': lb.name == studentInfo.name}">{{lb.name}}</td>
+                <td>{{lb.score}}%</td>
+                <td>{{formatSeconds(lb.time)}}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!-- Leaderboard -->
-        <div class="flex-grow-1">
-          <div class="text-muted text-end mb-2">This month</div>
-          <div *ngFor="let user of leaderboard" class="d-flex align-items-center mb-3">
-            <div
-              class="rounded-circle text-white d-flex justify-content-center align-items-center"
-              [ngStyle]="{ 'background-color': user.color }"
-              style="width: 36px; height: 36px;"
-            >
-              {{ user.initial }}
-            </div>
-            <div class="ms-3">
-              <div class="fw-semibold">{{ user.name }}</div>
-              <div class="text-muted small">{{ user.department }}</div>
-            </div>
-            <div class="ms-auto fw-bold">{{ user.points }} Pts</div>
+        <div class="card minimalist-card h-100 mt-5" *ngIf="selectedLeaderboard && selectedLeaderboard.length > 0">
+          <div class="section-title">
+            <i class="fa-solid fa-stopwatch me-2"></i>
+            Your Time vs Top 2 (in minutes)
           </div>
+          <apx-chart *ngIf="leaderboardTimeChart" [series]="leaderboardTimeChart.series"
+            [chart]="leaderboardTimeChart.chart" [xaxis]="leaderboardTimeChart.xaxis"
+            [colors]="leaderboardTimeChart.colors" [plotOptions]="leaderboardTimeChart.plotOptions"
+            [dataLabels]="leaderboardTimeChart.dataLabels" [tooltip]="leaderboardTimeChart.tooltip"></apx-chart>
         </div>
-
       </div>
+
     </div>
   </div>
 
-  <!-- Right Column: Toggle Chart -->
-  <div class="col-md-6">
-    <div class="card shadow-sm h-100">
-      <div class="card-header fw-bold">
-        {{ showScoreChart ? 'Score Trend' : 'Average Time' }}
-      </div>
-      <div class="card-body">
-        <apx-chart
-          *ngIf="showScoreChart"
-          [series]="scoreChart.series"
-          [chart]="scoreChart.chart"
-          [xaxis]="scoreChart.xaxis"
-          [colors]="scoreChart.colors"
-          [stroke]="scoreChart.stroke"
-          [markers]="scoreChart.markers"
-          [grid]="scoreChart.grid"
-          [dataLabels]="scoreChart.dataLabels"
-        ></apx-chart>
-
-        <apx-chart
-          *ngIf="!showScoreChart"
-          [series]="timeChart.series"
-          [chart]="timeChart.chart"
-          [xaxis]="timeChart.xaxis"
-          [colors]="timeChart.colors"
-          [stroke]="timeChart.stroke"
-          [markers]="timeChart.markers"
-          [grid]="timeChart.grid"
-          [dataLabels]="timeChart.dataLabels"
-        ></apx-chart>
-      </div>
-    </div>
-  </div>
-
-</div>
 
 </div>
