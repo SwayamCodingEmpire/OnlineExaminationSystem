@@ -1,5 +1,5 @@
 // src/app/components/student/take-exam/take-exam.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,12 +37,17 @@ interface Section {
   styleUrls: ['./take-exam.component.scss']
 })
 export class TakeExamComponent implements OnInit, OnDestroy {
+  @ViewChild('fullScreenContainer') fullScreenContainer!: ElementRef;
   examCode = '';
   sections: Section[] = [];
   examStarted = false;
+  showKeyboardWarning = false;
+keyboardListener: any = null;
+gobackToFullScreenTimer = 5;
 
   sectionChangeMessage = '';
   showSectionChangeModal = false;
+  showGoBackToFullScreenModal = false;
 
   sectionIndex = 0;
   questionIndex = 0;
@@ -59,6 +64,7 @@ export class TakeExamComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+
     this.examCode = this.route.snapshot.paramMap.get('code') || '';
     if (!this.examCode) {
       alert('No exam code provided.');
@@ -76,6 +82,9 @@ export class TakeExamComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.timerId != null) clearInterval(this.timerId);
+  if (this.keyboardListener) {
+    document.removeEventListener('keydown', this.keyboardListener);
+  }
   }
 
   private buildSections(details: SectionDetailDTO[]): void {
@@ -115,8 +124,42 @@ export class TakeExamComponent implements OnInit, OnDestroy {
 
   // ─── Timer & Navigation ─────────────────────────────
   startExam(): void {
+    this.goFullScreen()
     this.examStarted = true;
     this.loadSection(0);
+
+     this.keyboardListener = (event: KeyboardEvent) => {
+    // Ignore function keys, Alt, Ctrl, etc.
+    // if (event.key === 'F11' || event.key === 'F12' ||
+    //     event.key === 'PrintScreen' || event.altKey ||
+    //     event.ctrlKey || event.metaKey) {
+
+    //   return;
+    // }
+    this.showGoBackToFullScreenModal = true;
+
+    this.showKeyboardWarning = true;
+    // Auto-hide warning after 3 seconds
+    let counter = 1;
+    this.gobackToFullScreenTimer = 5; // Reset timer to 5 seconds
+const interval = setInterval(() => {
+  console.log(`Second ${counter}`);
+  this.gobackToFullScreenTimer = this.gobackToFullScreenTimer - 1;
+  counter++;
+
+  if (counter > 5) {
+    clearInterval(interval);
+    this.gobackToFullScreenTimer = 5;
+    this.showKeyboardWarning = false;
+    this.showGoBackToFullScreenModal = false;
+    this.submitExam(); // Auto-submit after 5 seconds
+  }
+
+
+}, 1000);
+  };
+
+  document.addEventListener('keydown', this.keyboardListener);
   }
 
   private loadSection(idx: number): void {
@@ -225,6 +268,7 @@ export class TakeExamComponent implements OnInit, OnDestroy {
 
   // ─── Final Submit ────────────────────────────────────
   submitExam(): void {
+
     if (this.timerId != null) clearInterval(this.timerId);
     const answers: AnswerDTO[] = [];
     this.sections.forEach(sec =>
@@ -238,7 +282,45 @@ export class TakeExamComponent implements OnInit, OnDestroy {
     this.svc
       .submitAnswers(this.examCode, { answers })
       .subscribe(() => {
+        this.exitFullScreen();
         this.router.navigate(['/student/results', this.examCode]);
       });
   }
+
+  goFullScreen(): void {
+    this.showKeyboardWarning = false; // Dismiss warning when entering full screen
+    const elem: any = this.fullScreenContainer.nativeElement;
+    this.showGoBackToFullScreenModal = false; // Dismiss modal when entering full screen
+
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    }
+  }
+
+  exitFullScreen(): void {
+    const doc: any = document;
+
+    if (doc.exitFullscreen) {
+      doc.exitFullscreen();
+    } else if (doc.webkitExitFullscreen) {
+      doc.webkitExitFullscreen();
+    } else if (doc.msExitFullscreen) {
+      doc.msExitFullscreen();
+    } else if (doc.mozCancelFullScreen) {
+      doc.mozCancelFullScreen();
+    }
+  }
+
+
+
+// Add method to dismiss warning
+dismissKeyboardWarning(): void {
+  this.showKeyboardWarning = false;
+}
 }

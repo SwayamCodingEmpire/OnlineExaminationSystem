@@ -254,7 +254,7 @@ export class QuestionsComponent {
       this.questions = [...this.originalQuestions];
     } else {
       this.questions = this.originalQuestions.filter(question =>
-        question.topic === this.selectedTopicFilter
+        question.topicCode === this.selectedTopicFilter
       );
     }
     this.currentPage = 1;
@@ -362,7 +362,8 @@ export class QuestionsComponent {
     // Apply topic filter first
     if (this.selectedTopicFilter) {
       filteredQuestions = filteredQuestions.filter(question =>
-        question.topic === this.selectedTopicFilter
+
+        question.topicCode === this.selectedTopicFilter
       );
     }
 
@@ -370,9 +371,8 @@ export class QuestionsComponent {
     if (searchTerm.trim() !== '') {
       filteredQuestions = filteredQuestions.filter(question =>
         question.code.toLowerCase().includes(searchTerm) ||
-        question.questionText.toLowerCase().includes(searchTerm) ||
-        question.topic.toLowerCase().includes(searchTerm) ||
-        question.type.toLowerCase().includes(searchTerm) ||
+        question.question.toLowerCase().includes(searchTerm) ||
+        question.topicName.toLowerCase().includes(searchTerm) ||
         question.difficulty.toLowerCase().includes(searchTerm)
       );
     }

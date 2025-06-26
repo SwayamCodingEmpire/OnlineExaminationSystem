@@ -69,20 +69,26 @@ export class ExamsComponent implements OnInit {
     }, 500);
   }
 
-  loadexams() {
-    this.examService.getAllExams().subscribe((data: Exam[]) => {
-      this.originalexams = data.map((exam: Exam) => ({
-        ...exam,
-        date: this.formatDate(exam.examDate),
-        time: this.formatTime(exam.examTime)
-      }));
-      this.exams = [...this.originalexams];
-      if (this.searchForm.get('searchTerm')?.value) {
-        this.filterexams();
-      }
-      this.totalPages = Math.ceil(this.exams.length / this.pageSize);
-    });
-  }
+loadexams() {
+  this.examService.getAllExams().subscribe((data: Exam[]) => {
+    this.originalexams = data.map((exam: Exam) => ({
+      ...exam,
+      rawDate: exam.examDate,                             // ISO date string for logic (e.g., "2025-06-25")
+      date: this.formatDate(exam.examDate),               // formatted for display (e.g., "25/06/2025")
+      time: this.formatTime(exam.examTime)                // formatted for display (e.g., "11:30")
+    }));
+
+    this.exams = [...this.originalexams];
+
+    // Apply filtering if user had typed something
+    if (this.searchForm.get('searchTerm')?.value) {
+      this.filterexams();
+    }
+
+    // Calculate total pages for pagination
+    this.totalPages = Math.ceil(this.exams.length / this.pageSize);
+  });
+}
 
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
@@ -141,5 +147,18 @@ export class ExamsComponent implements OnInit {
   closeDescriptionPopup() {}
   saveExam(index: number) {}
   cancelEdit() {}
+
+
+  checkDate(rawDateString: string): boolean {
+  if (!rawDateString) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalize
+
+  const examDate = new Date(rawDateString);
+  examDate.setHours(0, 0, 0, 0);
+
+  return examDate >= today;
+}
 }
 

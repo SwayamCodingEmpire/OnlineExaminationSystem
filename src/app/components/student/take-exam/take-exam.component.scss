@@ -58,3 +58,37 @@
 .purpl{
     background-color: #9426d4;
 }
+
+:host ::ng-deep {
+  // Fullscreen styles
+  .exam-fullscreen-active {
+    // For Webkit browsers (Chrome, Safari)
+    &::-webkit-full-screen {
+      background-color: white !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      overflow-y: auto !important;
+    }
+
+    // For Firefox
+    &:fullscreen {
+      background-color: #e9f3f9 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      overflow-y: auto !important;
+    }
+
+    // Target the fullscreen container specifically
+    .exam-container {
+      background-color: white !important;
+      min-height: 100vh !important;
+      padding: 20px;
+    }
+  }
+}
+
+.bg-page{
+  background-color: #e9f3f9;
+  min-height: 100vh;
+}
+

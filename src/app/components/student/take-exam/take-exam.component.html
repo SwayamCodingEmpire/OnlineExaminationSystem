@@ -15,161 +15,197 @@
   </div>
 
   <!-- Exam UI -->
-  <div *ngIf="examStarted && currentSection">
-    <!-- Section Tabs -->
-    <nav class="nav nav-tabs mb-4">
-      <a *ngFor="let section of sections; let i = index" class="nav-link" [ngClass]="getSectionTabClass(i)">
-        {{ section.title }}
-      </a>
-    </nav>
 
-    <!-- Timer and Title -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5>{{ currentSection.title }}</h5>
-      <div class="badge bg-warning text-dark fs-6">⏱️ {{ timerDisplay }}</div>
+  <div #fullScreenContainer class="exam-container" class="bg-page">
+    <ng-container *ngIf="examStarted && currentSection">
+      <!-- Section Tabs -->
+      <nav class="nav nav-tabs mb-4">
+        <a *ngFor="let section of sections; let i = index" class="nav-link" [ngClass]="getSectionTabClass(i)">
+          {{ section.title }}
+        </a>
+      </nav>
+
+      <!-- Timer and Title -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5>{{ currentSection.title }}</h5>
+        <div class="badge bg-warning text-dark fs-6">⏱️ {{ timerDisplay }}</div>
+      </div>
+
+      <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-3">
+          <h6 class="fw-semibold text-primary-emphasis mb-3 ps-5 ms-5">Question Status</h6>
+          <div class="d-flex flex-wrap gap-2 question-status-grid ps-4">
+            <div *ngFor="let q of currentSection.questions; let i = index"
+              class="question-bubble text-white text-center fw-bold" [ngClass]="getGridClass(q)"
+              (click)="goToQuestion(i,q)">
+              {{ i + 1 }}
+            </div>
+          </div>
+
+          <div class="mt-4 small">
+            <div class="legend-box">
+              <div class="legend-item">
+                <span class="legend-color bg-secondary"></span> Not Viewed
+              </div>
+              <div class="legend-item">
+                <span class="legend-color bg-warning"></span> Viewed
+              </div>
+              <div class="legend-item">
+                <span class="legend-color bg-success"></span> Answered
+              </div>
+              <div class="legend-item">
+                <span class="legend-color purpl"></span> Bookmarked
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Questions -->
+        <div *ngIf="currentQuestion" class="col-md-9 d-flex flex-column justify-content-center align-items-center">
+
+          <!-- Question Card -->
+          <div class="card p-4 d-flex flex-column justify-content-between align-items-stretch"
+            style="width: 100%; max-width: 600px; height: 500px; border-radius: 1rem;">
+
+            <!-- Question Content -->
+            <div class="card-body d-flex flex-column justify-content-start h-100">
+              <p class="fw-bold fs-4">Q{{ currentQuestionIndex + 1 }}. {{ currentQuestion.text }}</p>
+
+              <!-- MCQ Options -->
+              <div *ngIf="currentQuestion.type === 'mcq'" class="mt-3 fs-4">
+                <div *ngFor="let opt of currentQuestion.options; let idx = index" class="form-check mb-2">
+                  <input type="radio" class="form-check-input" name="q{{ currentQuestionIndex }}"
+                    [value]="optionLetter(idx)" [checked]="currentQuestion.answer === optionLetter(idx)"
+                    (change)="markAsAnswered(currentQuestion, optionLetter(idx))" />
+                  <label class="form-check-label ms-2">
+                    {{ optionLetter(idx) }}. {{ opt }}
+                  </label>
+                </div>
+
+              </div>
+
+              <!-- Subjective Answer -->
+              <div *ngIf="currentQuestion.type === 'subjective'" class="mt-3">
+                <textarea #answerInput class="form-control fs-6" rows="5"
+                  (input)="markAsAnswered(currentQuestion, answerInput.value)"
+                  placeholder="Write your answer..."></textarea>
+              </div>
+            </div>
+
+            <!-- Footer Controls (Inside the Card) -->
+            <div class="mt-auto pt-3">
+              <div class="d-flex justify-content-end align-items-center gap-2 pe-1">
+
+                <!-- Navigation Arrows -->
+                <div class="d-flex gap-2">
+                  <!-- Left Arrow -->
+                  <button
+                    class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0"
+                    style="width: 36px; height: 36px;" [disabled]="currentQuestionIndex === 0"
+                    (click)="prevQuestion(currentQuestion)">
+                    <i class="fas fa-chevron-left text-secondary"></i>
+                  </button>
+
+                  <!-- Right Arrow -->
+                  <button
+                    class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0"
+                    style="width: 36px; height: 36px;"
+                    [disabled]="currentQuestionIndex === currentSection.questions.length - 1"
+                    (click)="nextQuestion(currentQuestion)">
+                    <i class="fas fa-chevron-right text-secondary"></i>
+                  </button>
+                </div>
+
+                <!-- Bookmark Button -->
+                <button
+                  class="btn btn-outline-purpl rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0"
+                  style="width: 36px; height: 36px;" (click)="toggleBookmark(currentQuestion)">
+                  <span class="fs-6">
+                    <i class="fas fa-bookmark" *ngIf="currentQuestion.bookmarked"></i>
+                    <i class="far fa-bookmark" *ngIf="!currentQuestion.bookmarked"></i>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Section -->
+          <div class="mt-4">
+            <button class="btn btn-success px-5 py-2 fs-6" (click)="nextSectionOrSubmit()">Submit Section</button>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </ng-container>
+
+    <div class="modal fade" id="sectionChangeModal" tabindex="-1" aria-hidden="true"
+      [ngClass]="{ 'show d-block': showSectionChangeModal }">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+          <div class="modal-body">
+            <p class="mb-3">Do you want to move to the next section?</p>
+            <div class="text-end">
+              <button class="btn btn-primary me-2" (click)="confirmNextSection()">Yes, Continue</button>
+              <button class="btn btn-outline-secondary" (click)="showSectionChangeModal = false">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-
-      <!-- Sidebar -->
-      <div class="col-md-3">
-        <h6 class="fw-semibold text-primary-emphasis mb-3 ps-5 ms-5">Question Status</h6>
-        <div class="d-flex flex-wrap gap-2 question-status-grid ps-4">
-          <div *ngFor="let q of currentSection.questions; let i = index"
-            class="question-bubble text-white text-center fw-bold" [ngClass]="getGridClass(q)"
-            (click)="goToQuestion(i,q)">
-            {{ i + 1 }}
-          </div>
-        </div>
-
-        <div class="mt-4 small">
-          <div class="legend-box">
-            <div class="legend-item">
-              <span class="legend-color bg-secondary"></span> Not Viewed
-            </div>
-            <div class="legend-item">
-              <span class="legend-color bg-warning"></span> Viewed
-            </div>
-            <div class="legend-item">
-              <span class="legend-color bg-success"></span> Answered
-            </div>
-            <div class="legend-item">
-              <span class="legend-color purpl"></span> Bookmarked
+    <!-- Final Submit Modal -->
+    <div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+          <div class="modal-body">
+            <p class="mb-3">Are you sure you want to submit the exam? This action cannot be undone.</p>
+            <div class="text-end">
+              <button class="btn btn-danger me-2" data-bs-dismiss="modal" (click)="submitExam()">Yes, Submit</button>
+              <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
 
+<div
+  class="modal fade"
+  id="goBackToFullScreenModal"
+  tabindex="-1"
+  aria-hidden="true"
+  [ngClass]="{ 'show d-block': showGoBackToFullScreenModal }"
+  style="background-color: rgba(0, 0, 0, 0.5);"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-3">
+      <div class="modal-body text-center py-4 px-5">
+        <h5 class="mb-3 text-danger">⚠️ Attention!</h5>
+        <p class="mb-3">You have exited fullscreen. Please return within:</p>
 
-      <!-- Questions -->
-      <div *ngIf="currentQuestion" class="col-md-9 d-flex flex-column justify-content-center align-items-center">
+        <span class="badge bg-danger fs-5 px-3 py-2 mb-4">
+          {{ gobackToFullScreenTimer }} seconds
+        </span>
 
-        <!-- Question Card -->
-        <div class="card p-4 d-flex flex-column justify-content-between align-items-stretch"
-          style="width: 100%; max-width: 600px; height: 500px; border-radius: 1rem;">
-
-          <!-- Question Content -->
-          <div class="card-body d-flex flex-column justify-content-start h-100">
-            <p class="fw-bold fs-4">Q{{ currentQuestionIndex + 1 }}. {{ currentQuestion.text }}</p>
-
-            <!-- MCQ Options -->
-            <div *ngIf="currentQuestion.type === 'mcq'" class="mt-3 fs-4">
-              <div *ngFor="let opt of currentQuestion.options; let idx = index" class="form-check mb-2">
-                <input type="radio" class="form-check-input" name="q{{ currentQuestionIndex }}"
-                  [value]="optionLetter(idx)" [checked]="currentQuestion.answer === optionLetter(idx)"
-                  (change)="markAsAnswered(currentQuestion, optionLetter(idx))" />
-                <label class="form-check-label ms-2">
-                  {{ optionLetter(idx) }}. {{ opt }}
-                </label>
-              </div>
-
-            </div>
-
-            <!-- Subjective Answer -->
-            <div *ngIf="currentQuestion.type === 'subjective'" class="mt-3">
-              <textarea #answerInput class="form-control fs-6" rows="5" (input)="markAsAnswered(currentQuestion, answerInput.value)"
-                placeholder="Write your answer..."></textarea>
-            </div>
-          </div>
-
-          <!-- Footer Controls (Inside the Card) -->
-          <div class="mt-auto pt-3">
-            <div class="d-flex justify-content-end align-items-center gap-2 pe-1">
-
-              <!-- Navigation Arrows -->
-              <div class="d-flex gap-2">
-                <!-- Left Arrow -->
-                <button
-                  class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0"
-                  style="width: 36px; height: 36px;" [disabled]="currentQuestionIndex === 0"
-                  (click)="prevQuestion(currentQuestion)">
-                  <i class="fas fa-chevron-left text-secondary"></i>
-                </button>
-
-                <!-- Right Arrow -->
-                <button
-                  class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0"
-                  style="width: 36px; height: 36px;"
-                  [disabled]="currentQuestionIndex === currentSection.questions.length - 1"
-                  (click)="nextQuestion(currentQuestion)">
-                  <i class="fas fa-chevron-right text-secondary"></i>
-                </button>
-              </div>
-
-              <!-- Bookmark Button -->
-              <button
-                class="btn btn-outline-purpl rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0"
-                style="width: 36px; height: 36px;" (click)="toggleBookmark(currentQuestion)">
-                <span class="fs-6">
-                  <i class="fas fa-bookmark" *ngIf="currentQuestion.bookmarked"></i>
-                  <i class="far fa-bookmark" *ngIf="!currentQuestion.bookmarked"></i>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Submit Section -->
-        <div class="mt-4">
-          <button class="btn btn-success px-5 py-2 fs-6" (click)="nextSectionOrSubmit()">Submit Section</button>
+        <div class="d-flex justify-content-center">
+          <button
+            class="btn btn-outline-danger px-4"
+            (click)="goFullScreen()"
+          >
+            Yes, Go Back to Fullscreen
+          </button>
         </div>
       </div>
-
-
-
-
     </div>
   </div>
 </div>
 
-<!-- Section Change Modal -->
-<div class="modal fade" id="sectionChangeModal" tabindex="-1" aria-hidden="true"
-  [ngClass]="{ 'show d-block': showSectionChangeModal }">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content p-3">
-      <div class="modal-body">
-        <p class="mb-3">Do you want to move to the next section?</p>
-        <div class="text-end">
-          <button class="btn btn-primary me-2" (click)="confirmNextSection()">Yes, Continue</button>
-          <button class="btn btn-outline-secondary" (click)="showSectionChangeModal = false">Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Final Submit Modal -->
-<div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content p-3">
-      <div class="modal-body">
-        <p class="mb-3">Are you sure you want to submit the exam? This action cannot be undone.</p>
-        <div class="text-end">
-          <button class="btn btn-danger me-2" data-bs-dismiss="modal" (click)="submitExam()">Yes, Submit</button>
-          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
