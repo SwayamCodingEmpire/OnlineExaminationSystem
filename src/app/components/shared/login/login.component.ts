@@ -32,6 +32,13 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
+
+  ngOnInit() {
+    localStorage.removeItem('user'); // Clear any previous user data
+    localStorage.removeItem('token'); // Clear any previous token
+    localStorage.removeItem('role'); // Clear any previous role
+  }
+
   login() {
     if (this.loginForm.invalid) {
       this.toastr.error('Please enter Username and Password');
