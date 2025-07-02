@@ -62,7 +62,7 @@ export class QuestionsComponent {
   modalInstance: any;
   examCode: string = '';
 
-  constructor( private topicService: TopicsService, private questionService: ExamQuestionsService, private route: ActivatedRoute, private questionBankService: QuestionBankService, private toastr: ToastrService) {
+  constructor(private topicService: TopicsService, private questionService: ExamQuestionsService, private route: ActivatedRoute, private questionBankService: QuestionBankService, private toastr: ToastrService) {
     this.searchForm = new FormGroup({
       searchTerm: new FormControl('')
     });
@@ -421,122 +421,120 @@ export class QuestionsComponent {
     }
   }
 
-questionForm1 = this.fb.group({
-  code: [''],
-  topic: [''],
-  difficulty: [''],
-  type: ['MCQ'],
-  marks: [1],
-  questionText: [''],
-  optionA: [''],
-  optionB: [''],
-  optionC: [''],
-  optionD: [''],
-  correctAnswer: [''],
-  wordLimit: [null]
-});
+  questionForm1 = this.fb.group({
+    code: [''],
+    topic: [''],
+    difficulty: [''],
+    type: ['MCQ'],
+    marks: [1],
+    questionText: [''],
+    optionA: [''],
+    optionB: [''],
+    optionC: [''],
+    optionD: [''],
+    correctAnswer: [''],
+    wordLimit: [null]
+  });
 
-onSubmit() {
-  if (this.questionForm.valid) {
-    console.log('Form Submitted', this.questionForm.value);
-    // Call your API or emit event here
+  onSubmit() {
+    if (this.questionForm.valid) {
+      console.log('Form Submitted', this.questionForm.value);
+      // Call your API or emit event here
+    }
   }
-}
 
-addQuestion(){
-  console.log(this.selectedQuestions);
-}
+  addQuestion() {
+    console.log(this.selectedQuestions);
+  }
 
   isSelected(code: String) {
     return this.selectedCodes.has(code);
   }
 
-toggle(code: string, event: Event) {
-  const input = event.target as HTMLInputElement;
-  const checked = input.checked;
+  toggle(code: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const checked = input.checked;
 
-  // Do something with `checked`
-  if (checked) {
-    this.selectedCodes.add(code);
-  } else {
-    this.selectedCodes.delete(code);
+    // Do something with `checked`
+    if (checked) {
+      this.selectedCodes.add(code);
+    } else {
+      this.selectedCodes.delete(code);
+    }
   }
-}
 
-confirmAssign() {
-  console.log('Selected Codes:', Array.from(this.selectedCodes));
+  confirmAssign() {
+    console.log('Selected Codes:', Array.from(this.selectedCodes));
 
-  this.questionService.assignQuestionsToExam(this.examCode, Array.from(this.selectedCodes))
-    .subscribe({
-      next: (response) => {
-        // Update local question list based on selected codes
-        this.questions = this.questions.filter(q => this.selectedCodes.has(q.code));
+    this.questionService.assignQuestionsToExam(this.examCode, Array.from(this.selectedCodes))
+      .subscribe({
+        next: (response) => {
+          // Update local question list based on selected codes
+          this.questions = this.questions.filter(q => this.selectedCodes.has(q.code));
 
-        this.prepareSectionDurations();
-        this.modalStep = 'duration';
-      },
-      error: (err) => {
-        console.error('Assignment failed', err);
-        this.modalInstance.hide();
-      }
-    });
-}
+          this.prepareSectionDurations();
+          this.modalStep = 'duration';
+        },
+        error: (err) => {
+          console.error('Assignment failed', err);
+          this.modalInstance.hide();
+        }
+      });
+  }
 
-prepareSectionDurations() {
-  this.groupedQuestions = this.questions.reduce((acc, q) => {
-    acc[q.topicCode] = acc[q.topicCode] || [];
-    acc[q.topicCode].push(q);
-    return acc;
-  }, {} as Record<string, any[]>);
+  prepareSectionDurations() {
+    this.groupedQuestions = this.questions.reduce((acc, q) => {
+      acc[q.topicCode] = acc[q.topicCode] || [];
+      acc[q.topicCode].push(q);
+      return acc;
+    }, {} as Record<string, any[]>);
 
-  this.sectionKeys = Object.keys(this.groupedQuestions);
-  this.sectionDurations = this.sectionKeys.reduce((acc, key) => {
-    acc[key] = 0;
-    return acc;
-  }, {} as Record<string, number>);
+    this.sectionKeys = Object.keys(this.groupedQuestions);
+    this.sectionDurations = this.sectionKeys.reduce((acc, key) => {
+      acc[key] = 0;
+      return acc;
+    }, {} as Record<string, number>);
 
-  console.log("Grouped Questions:", this.groupedQuestions);
-}
+    console.log("Grouped Questions:", this.groupedQuestions);
+  }
 
 
 
   submitDurations() {
-  const sectionPayloads: SectionPayload[] = this.sectionKeys.map(section => {
-    const topicQuestions = this.groupedQuestions[section];
-    const totalMarks = topicQuestions.reduce((sum, q) => sum + (q.marks || 0), 0);
+    const sectionPayloads: SectionPayload[] = this.sectionKeys.map(section => {
+      const topicQuestions = this.groupedQuestions[section];
+      const totalMarks = topicQuestions.reduce((sum, q) => sum + (q.marks || 0), 0);
 
-    return {
-      topicCode: section,
-      duration: this.sectionDurations[section],
-      totalMarks: totalMarks
-    };
-  });
-
-  this.questionService.addSectionsToExam(this.examCode, sectionPayloads)
-    .subscribe({
-      next: (response) => {
-        // Handle success
-        console.log('Sections assigned successfully');
-        this.modalInstance.hide();
-        this.toastr.success('Sections assigned successfully', 'Success');
-      },
-      error: (error) => {
-        console.error('Error assigning sections:', error);
-        this.modalInstance.hide();
-        this.toastr.error('Failed to assign sections', 'Error');
-      }
+      return {
+        topicCode: section,
+        duration: this.sectionDurations[section],
+        totalMarks: totalMarks
+      };
     });
-}
-openAssignModal() {
-  this.modalStep = 'confirm';
-  const el = document.getElementById('assignModal');
-  if (el) {
-    this.modalInstance = new bootstrap.Modal(el);
-    this.modalInstance.show();
-  } else {
-    console.error('Modal element not found!');
+
+    this.questionService.addSectionsToExam(this.examCode, sectionPayloads)
+      .subscribe({
+        next: (response) => {
+          // Handle success
+          console.log('Sections assigned successfully');
+          this.modalInstance.hide();
+          this.toastr.success('Sections assigned successfully', 'Success');
+        },
+        error: (error) => {
+          console.error('Error assigning sections:', error);
+          this.modalInstance.hide();
+          this.toastr.error('Failed to assign sections', 'Error');
+        }
+      });
   }
-}
-
-
+  openAssignModal() {
+    this.modalStep = 'confirm';
+    const el = document.getElementById('assignModal');
+    if (el) {
+      this.modalInstance = new bootstrap.Modal(el);
+      this.modalInstance.show();
+    } else {
+      console.error('Modal element not found!');
+    }
+  }
 }

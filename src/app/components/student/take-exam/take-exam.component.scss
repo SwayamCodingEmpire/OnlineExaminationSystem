@@ -59,36 +59,27 @@
     background-color: #9426d4;
 }
 
-:host ::ng-deep {
-  // Fullscreen styles
-  .exam-fullscreen-active {
-    // For Webkit browsers (Chrome, Safari)
-    &::-webkit-full-screen {
-      background-color: white !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      overflow-y: auto !important;
-    }
-
-    // For Firefox
-    &:fullscreen {
-      background-color: #e9f3f9 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      overflow-y: auto !important;
-    }
-
-    // Target the fullscreen container specifically
-    .exam-container {
-      background-color: white !important;
-      min-height: 100vh !important;
-      padding: 20px;
-    }
-  }
+.fullscreen-warning-overlay {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-
-.bg-page{
-  background-color: #e9f3f9;
-  min-height: 100vh;
+.fullscreen-warning-box {
+  background: #ffe0e0;
+  color: #d00;
+  border: 2px solid #d00;
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  font-size: 1.4rem;
 }
-
+.hint {
+  font-size: 1rem;
+  color: #7a4f01;
+  margin-top: 8px;
+  display: block;
+}

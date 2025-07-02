@@ -1,5 +1,4 @@
-// src/app/components/student/take-exam/take-exam.component.ts
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,17 +36,12 @@ interface Section {
   styleUrls: ['./take-exam.component.scss']
 })
 export class TakeExamComponent implements OnInit, OnDestroy {
-  @ViewChild('fullScreenContainer') fullScreenContainer!: ElementRef;
   examCode = '';
   sections: Section[] = [];
   examStarted = false;
-  showKeyboardWarning = false;
-keyboardListener: any = null;
-gobackToFullScreenTimer = 5;
 
   sectionChangeMessage = '';
   showSectionChangeModal = false;
-  showGoBackToFullScreenModal = false;
 
   sectionIndex = 0;
   questionIndex = 0;
@@ -57,6 +51,12 @@ gobackToFullScreenTimer = 5;
 
   private answersMap: Record<string, string> = {};
 
+  isFullscreen = false;
+  showFullscreenWarning = false;
+  fullscreenCountdown = 15;
+  private fullscreenTimer?: any;
+  private alreadySubmitted = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -64,7 +64,6 @@ gobackToFullScreenTimer = 5;
   ) { }
 
   ngOnInit(): void {
-
     this.examCode = this.route.snapshot.paramMap.get('code') || '';
     if (!this.examCode) {
       alert('No exam code provided.');
@@ -82,9 +81,8 @@ gobackToFullScreenTimer = 5;
 
   ngOnDestroy(): void {
     if (this.timerId != null) clearInterval(this.timerId);
-  if (this.keyboardListener) {
-    document.removeEventListener('keydown', this.keyboardListener);
-  }
+    if (this.fullscreenTimer) clearInterval(this.fullscreenTimer);
+    this.showNavbar();
   }
 
   private buildSections(details: SectionDetailDTO[]): void {
@@ -94,7 +92,7 @@ gobackToFullScreenTimer = 5;
       questions: sec.questions.map(q => ({
         code: q.code,
         text: q.text,
-        type: 'mcq',
+        type: 'subjective',
         options: [q.optionA, q.optionB, q.optionC, q.optionD],
         viewed: false,
         answered: false,
@@ -104,7 +102,6 @@ gobackToFullScreenTimer = 5;
     }));
   }
 
-  // ─── Template getters ────────────────────────────────
   get currentSection(): Section {
     return this.sections[this.sectionIndex];
   }
@@ -122,44 +119,10 @@ gobackToFullScreenTimer = 5;
     return i === this.sectionIndex ? 'fw-bold text-primary' : 'text-muted';
   }
 
-  // ─── Timer & Navigation ─────────────────────────────
-  startExam(): void {
-    this.goFullScreen()
+  async startExam(): Promise<void> {
     this.examStarted = true;
     this.loadSection(0);
-
-     this.keyboardListener = (event: KeyboardEvent) => {
-    // Ignore function keys, Alt, Ctrl, etc.
-    // if (event.key === 'F11' || event.key === 'F12' ||
-    //     event.key === 'PrintScreen' || event.altKey ||
-    //     event.ctrlKey || event.metaKey) {
-
-    //   return;
-    // }
-    this.showGoBackToFullScreenModal = true;
-
-    this.showKeyboardWarning = true;
-    // Auto-hide warning after 3 seconds
-    let counter = 1;
-    this.gobackToFullScreenTimer = 5; // Reset timer to 5 seconds
-const interval = setInterval(() => {
-  console.log(`Second ${counter}`);
-  this.gobackToFullScreenTimer = this.gobackToFullScreenTimer - 1;
-  counter++;
-
-  if (counter > 5) {
-    clearInterval(interval);
-    this.gobackToFullScreenTimer = 5;
-    this.showKeyboardWarning = false;
-    this.showGoBackToFullScreenModal = false;
-    this.submitExam(); // Auto-submit after 5 seconds
-  }
-
-
-}, 1000);
-  };
-
-  document.addEventListener('keydown', this.keyboardListener);
+    await this.goFullscreenAndHideNavbar();
   }
 
   private loadSection(idx: number): void {
@@ -169,7 +132,6 @@ const interval = setInterval(() => {
     this.startTimer(this.currentSection.duration);
   }
 
-  /** user clicked “Submit Section” */
   nextSectionOrSubmit(): void {
     if (!this.examStarted) return;
     if (this.timerId != null) clearInterval(this.timerId);
@@ -182,11 +144,9 @@ const interval = setInterval(() => {
   }
 
   optionLetter(idx: number): string {
-    return String.fromCharCode(65 + idx); // 65 is 'A'
+    return String.fromCharCode(65 + idx);
   }
 
-
-  /** auto-advance when time expires (no modal) */
   private autoAdvance(): void {
     if (this.timerId != null) clearInterval(this.timerId);
 
@@ -246,14 +206,12 @@ const interval = setInterval(() => {
     this.loadSection(this.sectionIndex + 1);
   }
 
-  // ─── Answering & Bookmark ────────────────────────────
   markAsAnswered(q: Question, answer: string): void {
-  q.viewed = true;
-  q.answered = true;
-  q.answer = answer;
-  this.answersMap[q.code] = answer;
-}
-
+    q.viewed = true;
+    q.answered = true;
+    q.answer = answer;
+    this.answersMap[q.code] = answer;
+  }
 
   toggleBookmark(_: Question): void {
     this.currentQuestion.bookmarked = !this.currentQuestion.bookmarked;
@@ -266,61 +224,149 @@ const interval = setInterval(() => {
     return 'bg-secondary text-white';
   }
 
-  // ─── Final Submit ────────────────────────────────────
-  submitExam(): void {
-
-    if (this.timerId != null) clearInterval(this.timerId);
-    const answers: AnswerDTO[] = [];
-    this.sections.forEach(sec =>
-      sec.questions.forEach(q => {
-        answers.push({
-          questionCode: q.code,
-          answer: this.answersMap[q.code] || ''
-        });
-      })
-    );
-    this.svc
-      .submitAnswers(this.examCode, { answers })
-      .subscribe(() => {
-        this.exitFullScreen();
-        this.router.navigate(['/student/results', this.examCode]);
-      });
+  // ---------- FULLSCREEN AND NAVBAR ----------
+  async goFullscreenAndHideNavbar() {
+    await this.enterFullscreen();
+    this.hideNavbar();
   }
 
-  goFullScreen(): void {
-    this.showKeyboardWarning = false; // Dismiss warning when entering full screen
-    const elem: any = this.fullScreenContainer.nativeElement;
-    this.showGoBackToFullScreenModal = false; // Dismiss modal when entering full screen
-
+  async enterFullscreen() {
+    const elem = document.documentElement as any;
     if (elem.requestFullscreen) {
-      elem.requestFullscreen();
+      await elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     } else if (elem.msRequestFullscreen) {
       elem.msRequestFullscreen();
-    } else if (elem.mozRequestFullScreen) {
-      elem.mozRequestFullScreen();
+    }
+    this.isFullscreen = true;
+    this.showFullscreenWarning = false;
+    if (this.fullscreenTimer) clearInterval(this.fullscreenTimer);
+    setTimeout(() => this.hideNavbar(), 100);
+  }
+
+  async exitFullscreen() {
+    if (document.fullscreenElement) {
+      await (document as any).exitFullscreen();
+    } else if ((document as any).webkitExitFullscreen) {
+      (document as any).webkitExitFullscreen();
+    } else if ((document as any).msExitFullscreen) {
+      (document as any).msExitFullscreen();
+    }
+    this.isFullscreen = false;
+    this.showFullscreenWarning = false;
+    if (this.fullscreenTimer) clearInterval(this.fullscreenTimer);
+    this.showNavbar();
+  }
+
+  hideNavbar() {
+    setTimeout(() => {
+      const nav = document.getElementById('navbar');
+      if (nav) nav.style.display = 'none';
+      const navbars = document.getElementsByClassName('navbar');
+      Array.from(navbars).forEach((el: any) => el.style.display = 'none');
+    }, 0);
+  }
+
+  showNavbar() {
+    setTimeout(() => {
+      const nav = document.getElementById('navbar');
+      if (nav) nav.style.display = '';
+      const navbars = document.getElementsByClassName('navbar');
+      Array.from(navbars).forEach((el: any) => el.style.display = '');
+    }, 0);
+  }
+
+  // ----- ESC/EXIT FULLSCREEN HANDLING -----
+  @HostListener('document:fullscreenchange', [])
+  onFullScreenChange() {
+    if (!document.fullscreenElement && this.examStarted) {
+      this.triggerFullscreenWarning();
+      this.showNavbar();
+    } else if (document.fullscreenElement && this.examStarted) {
+      this.cancelFullscreenWarning();
+      this.hideNavbar();
     }
   }
 
-  exitFullScreen(): void {
-    const doc: any = document;
-
-    if (doc.exitFullscreen) {
-      doc.exitFullscreen();
-    } else if (doc.webkitExitFullscreen) {
-      doc.webkitExitFullscreen();
-    } else if (doc.msExitFullscreen) {
-      doc.msExitFullscreen();
-    } else if (doc.mozCancelFullScreen) {
-      doc.mozCancelFullScreen();
+  @HostListener('document:keydown.escape', [])
+  onEscKey() {
+    if (this.examStarted && this.isFullscreen && !this.showFullscreenWarning) {
+      this.triggerFullscreenWarning();
+      this.showNavbar();
     }
   }
 
+  // ----- DOUBLE CLICK RECOVERY (WINDOWS/DESKTOP ONLY) -----
+  @HostListener('document:dblclick', ['$event'])
+  onDoubleClick(event: MouseEvent) {
+    if (this.showFullscreenWarning) {
+      this.recoverFromWarning();
+    }
+  }
 
+  // Recovery logic: called after double click on warning
+  private async recoverFromWarning() {
+    await this.goFullscreenAndHideNavbar();
+    this.cancelFullscreenWarning();
+  }
 
-// Add method to dismiss warning
-dismissKeyboardWarning(): void {
-  this.showKeyboardWarning = false;
+  triggerFullscreenWarning() {
+    this.isFullscreen = false;
+    this.showFullscreenWarning = true;
+    this.fullscreenCountdown = 15;
+    if (this.fullscreenTimer) clearInterval(this.fullscreenTimer);
+    this.fullscreenTimer = setInterval(() => {
+      this.fullscreenCountdown--;
+      if (this.fullscreenCountdown <= 0) {
+        clearInterval(this.fullscreenTimer);
+        this.autoSubmitExam();
+      }
+    }, 1000);
+  }
+
+  cancelFullscreenWarning() {
+    this.isFullscreen = true;
+    this.showFullscreenWarning = false;
+    if (this.fullscreenTimer) clearInterval(this.fullscreenTimer);
+    this.hideNavbar();
+  }
+
+  autoSubmitExam() {
+    this.submitExam();
+  }
+
+  // ---------- SUBMISSION ----------
+  async submitExam(): Promise<void> {
+  if (this.alreadySubmitted) return;
+  this.alreadySubmitted = true; // Lock immediately
+  if (this.timerId != null) clearInterval(this.timerId);
+  if (this.fullscreenTimer) clearInterval(this.fullscreenTimer);
+  await this.exitFullscreen();
+  this.showNavbar();
+
+  const answers: AnswerDTO[] = [];
+  this.sections.forEach(sec =>
+    sec.questions.forEach(q => {
+      answers.push({
+        questionCode: q.code,
+        answer: this.answersMap[q.code] || ''
+      });
+    })
+  );
+
+  this.svc
+    .submitAnswers(this.examCode, { answers })
+    .subscribe({
+      next: () => {
+        // Success: Always navigate to result
+        this.router.navigate(['/student/results', this.examCode]);
+      },
+      error: (err) => {
+        // Failure: Still navigate to result so user is not stuck
+        console.error('Submission failed but navigating anyway:', err);
+        this.router.navigate(['/student/results', this.examCode]);
+      }
+    });
 }
 }
